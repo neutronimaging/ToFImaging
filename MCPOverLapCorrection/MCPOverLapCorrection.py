@@ -16,6 +16,7 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
     # here fits and txt files are sorted, the last fits is excluded being the SumImg
     sorted_fits= sorted(glob.glob(folder_input+'/*.fits'))[:-1]
     sorted_TXT= sorted(glob.glob(folder_input+'/*.txt'))
+    #display(sorted_TXT)
 
     # the output folder is created if non-existing
     if not os.path.exists(folder_output):
@@ -92,10 +93,10 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
                 P=sumim/i[0][1]
 
             newim = array[j]/(1-P)
-            newim= newim.astype(float)
+            newim= newim.astype(int)
             filename=filename_output+str(indexname).zfill(5)
-            display(filename)
-#           indexname+=1
+#            display(filename)
+            indexname+=1
 #             filename_long =  i[1].name
 #             filename_img = sfilename_long[len(folder_input)+1:]
             fits.writeto(folder_output+filename+'.fits',newim)
