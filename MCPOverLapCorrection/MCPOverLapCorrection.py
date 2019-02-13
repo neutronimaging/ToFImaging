@@ -1,9 +1,13 @@
+# this function implements the MCP overlapcorrection as described in: A. S. Tremsin, J. V. Vallerga, J. B. McPhate, and O. H.  # W. Siegmund, Optimization of Timepix count rate capabilities for the applications with a periodic input signal, J. Instrum., vol. 9, no. 5, 2014. https://doi.org/10.1088/1748-0221/9/05/C05026
+
+
 import glob,sys,os
 import pandas as pd
 import matplotlib.pyplot as plt
 from IPython.display import display, HTML
 import numpy as np
 from astropy.io import fits
+import shutil
 
 def interAssig(value,intervalDict,df_shutterCount, tolerance): 
     #auxiliary function for OverLapCorrection
@@ -22,7 +26,7 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
     if not os.path.exists(folder_output):
         os.makedirs(folder_output)
 
-    #     display(sorted_TXT[0]) #shutter counts
+#     display(sorted_TXT[0]) #shutter counts
 #     display(sorted_TXT[1]) # shutter times
 #     display(sorted_TXT[2]) #spectra
 #     display(sorted_TXT[3]) # status
@@ -69,37 +73,79 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
     dfName['ToF'] = df['Time']
     dfName['ShutterWindow']= dfName['ToF'].apply(lambda i:interAssig(i,interval,df_shutterCount, tolerance))
     indexname=0
+    
+    
 
-#     display(dfName.iloc[0,2][1])
+    
+    i_wb =0 # index used to initialize white beam image
 
-# display(dfName[500:550])
+    for names in dfName.groupby('ShutterWindow'):
+#        print(type(names), len(names))
+#        print(names[0][1])
+        
+        
+        
+        i=0;
+        for idx, value in names[1]['name'].iteritems():
+            with fits.open(value) as f:
+                array = (f[0].data) # load the image file, size is rows x columns (es. 512x512)
+                
+                if i==0:
+                    sumim=np.zeros(np.shape(array)) # create a blank sum img for each new window
+                                    
+                sumim+=array # pixel wise sum of loaded imgs
+                
+                if i_wb==0:
+                    white_beam=np.zeros(np.shape(array))
+                    i_wb = 1
+                
+                if i==0:
+                    P=0
+                    i+=1          
+                else:
+                    P=sumim/names[0][1] # each pixel divided by the shutter count
 
+                newim = array/(1-P) # image correction
+                newim= newim.astype(float) # data casting, somehow the convertion to int does not work properly, I have then an error of wrong pixel depth
+                white_beam += newim
+                filename=filename_output+str(indexname).zfill(5)
+    #            display(filename)
+                indexname+=1
+                fits.writeto(folder_output+filename+'.fits',newim)
 
-    for i in dfName.groupby('ShutterWindow'):
-        display(i[0])
-    #     display(i[1]['name'])
-        array = i[1]['name'].apply(lambda i:fits.open(i)[0].data).as_matrix()
-    #     array = array.reshape(len(array),np.shape(array[0])[0],np.shape(array[0])[1])
-    #     display(type(array),np.shape(array))
-        sumim=np.zeros(np.shape(array[0]))
+#    print(folder_output +  filename_output + 'SummedImg.fits')
+    fits.writeto(folder_output +  filename_output + 'SummedImg.fits', white_beam)
 
-        for j in range(0,len(array)):
-            sumim+=array[j]
-    #         display(sumim)
+# finally I copy the txt files because they can be usefull for the future
+    for txt in sorted_TXT:
+        filename = txt
+        destname = folder_output
+        shutil.copy(filename, destname)  
+        
 
-            if j==0:
-                P=0
-            else:
-                P=sumim/i[0][1]
+        ## OLD IMPLEMENTATION: This is now correct except for the convertion to int which does not work at the moment
+#     for i in dfName.groupby('ShutterWindow'):
+#         display(i[0])
 
-            newim = array[j]/(1-P)
-            newim= newim.astype(int)
-            filename=filename_output+str(indexname).zfill(5)
-#            display(filename)
-            indexname+=1
-#             filename_long =  i[1].name
-#             filename_img = sfilename_long[len(folder_input)+1:]
-            fits.writeto(folder_output+filename+'.fits',newim)
-#            fits.writeto(folder_output+filename_output+str(i[0][0])+str(j).zfill(5)+'.fits',newim)
+#         array = i[1]['name'].apply(lambda i:fits.open(i)[0].data).as_matrix()
 
+#         sumim=np.zeros(np.shape(array[0]))
+
+#         for j in range(0,len(array)):
+#             sumim+=array[j]
+
+#             if j==0:
+#                 P=0
+#             else:
+#                 P=sumim/i[0][1]
+
+#             newim = array[j]/(1-P)
+#             newim= newim.astype(float)
+#             filename=filename_output+str(indexname).zfill(5)
+#             indexname+=1
+#             fits.writeto(folder_output+filename+'.fits',newim)
+#        del array # it works but some time there are too many files in one shutter window
+                
+    
+    
     
