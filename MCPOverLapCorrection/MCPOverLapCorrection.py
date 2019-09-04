@@ -80,11 +80,7 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
     i_wb =0 # index used to initialize white beam image
 
     for names in dfName.groupby('ShutterWindow'):
-#        print(type(names), len(names))
-#        print(names[0][1])
-        
-        
-        
+  
         i=0;
         for idx, value in names[1]['name'].iteritems():
             with fits.open(value) as f:
@@ -92,17 +88,20 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
                 
                 if i==0:
                     sumim=np.zeros(np.shape(array)) # create a blank sum img for each new window
+                    prev_array=np.zeros(np.shape(array)) # variable containing the previous array, initialized to zeros (P. Boillat 12.7.19)
+                    i += 1 # (P. Boillat 12.7.19)
                                     
-                sumim+=array # pixel wise sum of loaded imgs
+#                 sumim+=array # pixel wise sum of loaded imgs
+                sumim += (array.astype(float)/2 + prev_array.astype(float)/2) # pixel wise sum of loaded imgs (modified P. Boillat 12.7.19)
                 
                 if i_wb==0:
                     white_beam=np.zeros(np.shape(array))
                     i_wb = 1
                 
-                if i==0:
-                    P=0
-                    i+=1          
-                else:
+#                 if i==0:
+#                     P=0
+#                     i+=1          
+#                 else:
                     P=sumim/names[0][1] # each pixel divided by the shutter count
 
                 newim = array/(1-P) # image correction
@@ -121,31 +120,7 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
         filename = txt
         destname = folder_output
         shutil.copy(filename, destname)  
-        
-
-        ## OLD IMPLEMENTATION: This is now correct except for the convertion to int which does not work at the moment
-#     for i in dfName.groupby('ShutterWindow'):
-#         display(i[0])
-
-#         array = i[1]['name'].apply(lambda i:fits.open(i)[0].data).as_matrix()
-
-#         sumim=np.zeros(np.shape(array[0]))
-
-#         for j in range(0,len(array)):
-#             sumim+=array[j]
-
-#             if j==0:
-#                 P=0
-#             else:
-#                 P=sumim/i[0][1]
-
-#             newim = array[j]/(1-P)
-#             newim= newim.astype(float)
-#             filename=filename_output+str(indexname).zfill(5)
-#             indexname+=1
-#             fits.writeto(folder_output+filename+'.fits',newim)
-#        del array # it works but some time there are too many files in one shutter window
-                
+              
     
     
     

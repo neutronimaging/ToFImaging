@@ -380,6 +380,8 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
 #     pos_min = find_nearest(fitted_data[0:index_t0], min_fit)
 #     pos_max = index_t0+find_nearest(fitted_data[index_t0:-1], max_fit)
 
+## For other attempts have a look in the SENJU branch
+
     height = np.abs(mybragg[pos_extrema[0]]-mybragg[pos_extrema[1]])
     
     
