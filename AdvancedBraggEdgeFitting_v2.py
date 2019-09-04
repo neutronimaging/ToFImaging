@@ -3,13 +3,15 @@ from numpy import pi, r_, math, random
 import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy.optimize import curve_fit
-from scipy.special import erfc
+from scipy.special import erfc, erf
 #-------------------------------------------------------
 from scipy.misc import electrocardiogram #add by Monica 
 from scipy.signal import find_peaks #add by Monica 
 
 #-------------------------------------------------------
 from lmfit import Model
+from lmfit.printfuncs import *
+import lmfit
 from numpy import loadtxt
 from scipy.signal import argrelextrema
 from TOF_routines import find_nearest
@@ -27,11 +29,17 @@ from TOF_routines import rotatedata
 def term3(t,t0,sigma):
     return erfc(-((t-t0)/(sigma * math.sqrt(2))))
 
+def term3_1(t,t0,sigma):
+    return erf(-((t-t0)/(sigma * math.sqrt(2))))
+
 def term4(t,t0,alpha,sigma):
     return np.exp(-((t-t0)/alpha) + ((sigma*sigma)/(2*alpha*alpha)))
 
 def term5(t,t0,alpha,sigma):
     return erfc(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
+
+def term5_1(t,t0,alpha,sigma):
+    return erf(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
 
 def line_after(t,a1,a2):
     return a1+a2*t
@@ -48,14 +56,21 @@ def exp_before(t,a5,a6):
 def exp_combined(t,a1,a2,a5,a6):
     return exp_after(t,a1,a2)*exp_before(t,a5,a6)
 
-def B(t,t0,alpha,sigma):
-    return (0.5*(term3(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5(t,t0,alpha,sigma)))
+def B(t,t0,alpha,sigma, bool_transmission):
+    if (bool_transmission):
+        edge = 0.5*(term3(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5(t,t0,alpha,sigma))
+    else:
+#         edge = 1-0.5*(term3(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5(t,t0,alpha,sigma))
+        edge = 0.5*(term3_1(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5_1(t,t0,alpha,sigma))
+    return (edge)
 
-def BraggEdgeLinear(t,t0,alpha,sigma,a1,a2,a5,a6):
-    return line_after(t,a1,a2)*B(t,t0,alpha,sigma)+line_before(t,a5,a6)*(1-B(t,t0,alpha,sigma))
 
-def BraggEdgeExponential(t,t0,alpha,sigma,a1,a2,a5,a6):
-    return exp_after(t,a1,a2) * ( exp_before(t,a5,a6)+ (1-exp_before(t,a5,a6)) * B(t,t0,alpha,sigma) )
+def BraggEdgeLinear(t,t0,alpha,sigma,a1,a2,a5,a6,bool_transmission):
+    return line_after(t,a1,a2)*B(t,t0,alpha,sigma,bool_transmission)+line_before(t,a5,a6)*(1-B(t,t0,alpha,sigma,bool_transmission))
+
+def BraggEdgeExponential(t,t0,alpha,sigma,a1,a2,a5,a6,bool_transmission):
+    return exp_after(t,a1,a2) * ( exp_before(t,a5,a6)+ (1-exp_before(t,a5,a6)) * B(t,t0,alpha,sigma,bool_transmission) )
+
 
 
 def running_mean(x, N):
@@ -67,7 +82,7 @@ def running_mean(x, N):
 # def AdvancedBraggEdegFittingAll(t,t0,sigma,alpha,a1,a2,a5,a6):
 #     return a1 + term0(t,a2,a6) + term1(t,a2,a5,a6) * (1-(term3(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5(t,t0,alpha,sigma)))
 
-def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est_alpha, bool_print, bool_average, bool_linear): ## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is
+def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est_alpha, bool_print, bool_average, bool_linear, bool_transmission): ## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is
     
     #get the part of the spectrum that I want to fit
     #    mybragg = -1*np.log(myspectrum[myrange[0]:myrange[1]]/np.max(myspectrum[myrange[0]:myrange[1]]))
@@ -96,7 +111,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     plt.figure()
     plt.plot(t, mybragg)
     plt.plot(t0_f, mybragg[est_pos],'x', markeredgewidth=3, c='orange')
-    plt.title('(1,1,0) Bragg edge')
+    plt.title('Bragg edge')
     plt.xlabel('Wavelenght [Å]')
     plt.ylabel('Tranmission I/I$_{0}$')
     #     plt.savefig('step1_fitting.pdf')
@@ -182,7 +197,8 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     
     #     gmodel = Model(BraggEdgeLinear)
     
-    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
+    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f, bool_trasmission=bool_transmission)
+    print(bool_transmission)
     
     first_guess = gmodel.eval(params, t=t)
     plt.figure()
@@ -199,6 +215,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     params['t0'].vary = False
     params['a2'].vary= False
     params['a5'].vary = False
+    params['bool_transmission'].vary = False
     
     
     result1 = gmodel.fit(mybragg, params, t=t, method=method, nan_policy='propagate')
@@ -213,12 +230,13 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     a1_f=result1.best_values.get('a1')
     a6_f=result1.best_values.get('a6')
     
-    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
+    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f, bool_trasmission=bool_transmission)
     params['alpha'].vary = False
     params['sigma'].vary = False
     params['t0'].vary = False
     params['a1'].vary= False
     params['a6'].vary = False
+    params['bool_transmission'].vary = False
     
     
     result2 = gmodel.fit(mybragg, params, t=t, method=method, nan_policy='propagate')
@@ -232,13 +250,17 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     a2_f = result2.best_values.get('a2')
     a5_f = result2.best_values.get('a5')
     
-    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
+    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f, bool_trasmission=bool_transmission)
     params['a2'].vary = False
     params['a5'].vary = False
     params['a1'].vary= False
     params['a6'].vary = False
     params['sigma'].vary= False
     params['alpha'].vary = False
+    params['bool_transmission'].vary = False
+    params['t0'].min = myTOF[myrange[0]]
+    params['t0'].max = myTOF[myrange[1]]
+
     
     
     result3=gmodel.fit(mybragg, params, t=t, method=method, nan_policy='propagate')
@@ -253,12 +275,18 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     #     sigma_f=result3.best_values.get('sigma')
     #     alpha_f=result3.best_values.get('alpha')
     
-    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
+    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f, bool_trasmission=bool_transmission)
     params['a2'].vary = False
     params['a5'].vary = False
     params['a1'].vary= False
     params['a6'].vary = False
-    #     params['t0'].vary= False
+    params['bool_transmission'].vary = False
+    params['t0'].min = myTOF[myrange[0]]
+    params['t0'].max = myTOF[myrange[1]]
+    params['alpha'].min = 0.0
+    params['alpha'].max =1.5
+    params['sigma'].min = 0.0
+    params['sigma'].max =1.5
     
     result4=gmodel.fit(mybragg, params, t=t, nan_policy='propagate',method=method)
     
@@ -276,10 +304,11 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     t0_f=result4.best_values.get('t0')
     
     
-    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
+    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f, bool_trasmission=bool_transmission)
     params['t0'].vary = False
     params['sigma'].vary = False
     params['alpha'].vary= False
+    params['bool_transmission'].vary = False
     
     
     result5 = gmodel.fit(mybragg, params, t=t, nan_policy='propagate', method=method)
@@ -298,11 +327,18 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     #     sigma_f=result5.best_values.get('sigma')
     #     alpha_f=result5.best_values.get('alpha')
     
-    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
+    params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f, bool_trasmission=bool_transmission)
     params['a2'].vary = False
     params['a5'].vary = False
     params['a1'].vary= False
     params['a6'].vary = False
+    params['bool_transmission'].vary = False
+    params['t0'].min = myTOF[myrange[0]]
+    params['t0'].max = myTOF[myrange[1]]
+    params['alpha'].min = 0.0
+    params['alpha'].max =1.5
+    params['sigma'].min = 0.0
+    params['sigma'].max =1.5
     
     result6= gmodel.fit(mybragg, params, t=t, nan_policy='propagate', method=method)
     
@@ -322,10 +358,25 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     alpha_f=result6.best_values.get('alpha')
     
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
+    params['bool_transmission'].vary = False
+    params['t0'].min = myTOF[myrange[0]]
+    params['t0'].max = myTOF[myrange[1]]
+    params['alpha'].min = 0.0
+    params['alpha'].max =1.5
+    params['sigma'].min = 0.0
+    params['sigma'].max =1.5
     print(params)
     result7 = gmodel.fit(mybragg, params, t=t, nan_policy='propagate', method=method)
     
+#     print('errors: ', report_errors(params))
+    
     print(result7.fit_report())
+    print(result7.covar)
+    
+    print('bool value, Boolean for whether error bars were estimated by fit.', result7.errorbars)
+    print(result7.ci_out)
+#     print(result7.conf_interval())
+#     print(result7.ci_report()) # this crashes sometimes when the MinimizerException: Cannot determine Confidence Intervals without sensible uncertainty estimates
     
     
     t0_f=result7.best_values.get('t0')
