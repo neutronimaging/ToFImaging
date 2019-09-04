@@ -347,9 +347,11 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     fit_edge = B(t,t0_f,alpha_f,sigma_f, bool_transmission)
     
     plt.figure()
-    plt.plot(t,fit_before)
-    plt.plot(t,fit_after)
-    plt.plot(t,fit_edge)
+    plt.plot(t,fit_before,'o-')
+    plt.plot(t,fit_after,'o-')
+    plt.plot(t,fitted_data,'.-')
+    
+    index_t0 = find_nearest(t,t0_f)
     
 
     # Attempt n.2 ------This is Florencia's approach: this gives an overestimation in most cases of the edge height
@@ -358,15 +360,17 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
 
 # Attempt n.3 ------ This approach is based on the difference between the fit before and after the edge and the fitted data itself. so far, it gives the nicest results on the calibration sample, however the value used as threshold is not general and should probably be adjusted from case to case. So again it is not yet the final solution
 
-#     for i in range(0, len(fitted_data)):
-#         if (np.abs(fitted_data[i]-fit_before[i])>=0.0015):
-#             pos_extrema.append(i)
-#             break
+    for i in range(0, len(fitted_data)):
+#         print(i,(fitted_data[i]-fit_before[i]))
+        if (np.abs(fitted_data[i]-fit_before[i])>1e-4):            
+            pos_extrema.append(i-1)
+            break
 
-#     for i in range(len(fitted_data)-1,0,-1):
-#         if (np.abs(fitted_data[i]-fit_after[i])>=0.0015):
-#             pos_extrema.append(i)
-#             break
+    for i in range(len(fitted_data)-1,0,-1): # here I am moving backwards
+#         print(i,(fitted_data[i]-fit_after[i]))
+        if (np.abs(fitted_data[i]-fit_after[i])>1e-3):            
+            pos_extrema.append(i)
+            break
 
 #     # Attempt n.4 -- max and min before and after the estimated edge position, for the calibration sample works fine
 #     range_min = t[0:index_t0]
@@ -376,71 +380,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
 #     pos_min = find_nearest(fitted_data[0:index_t0], min_fit)
 #     pos_max = index_t0+find_nearest(fitted_data[index_t0:-1], max_fit)
 
-# Attempt n.5
-    index_t0 = find_nearest(t,t0_f)
-    pos_min = index_t0
-    pos_max = index_t0
-
-#     for i in range(0, index_t0):
-#         if (np.abs((fitted_data[i]-fit_before[i])/fit_before[i]*100)>=0.05):
-#             pos_min= i-1
-#             break
-            
-#     for i in range(0, index_t0):
-#         if ((fitted_data[i]-fit_before[i])!=0.00):
-#             pos_min= i-1
-#             break
-
-
-
-#     for i in range(len(fitted_data)-1,index_t0,-1):
-#         if (np.abs((fitted_data[i]-fit_after[i])/fit_after[i]*100)>=0.1):
-#             pos_max=i-1
-#             break
-# #-----------------------------------------------------------
-# #--------For me, Monica, it works best to have the min from the third derivative and the max with the rotation of the axis:
-# #-----------------------------------------------------------
-# # Attempt n. 6 - third derivative of the fitted function
-# #     pos_min = index_t0
-# #     pos_max = index_t0
-#     derI = np.gradient(fitted_data)
-#     derII = np.gradient(derI)
-#     derIII = np.gradient(derII)
-#     max_val_derIII = find_peaks(derIII, distance=3, height = 0.0000005)
-#     pos_min = max_val_derIII[0][0]
-#     print(pos_min)
-
-
-# # Attempt n. 7
-#     range_min = t[0:index_t0]
-#     range_max= t[index_t0:-1]
-#     data_min = fitted_data[0:index_t0]
-#     data_max = fitted_data[index_t0:-1]
-
-
-#     #what is the slope? 
-#     slope_max = (fitted_data[-1] - fitted_data[index_t0])/(t[-1] - t[index_t0])
-# #    slope_min = (fitted_data[index_t0] - fitted_data[0])/(t[index_t0] - t[0])
-# #    x1,y1=rotatedata(range_min,data_min, -np.arctan(slope_min))
-#     x2,y2 = rotatedata(range_max,data_max, -np.arctan(slope_max))
-# #     plt.figure()
-# #     plt.plot(x1,y1)
-# #     plt.figure()
-# #     plt.plot(x2,y2)
-# #     print('Slope before mid is:',slope_min)
-# #     print('Slope after mid is:',slope_max)
-# #     print('t0 position is:', index_t0)
-# #     print('Max position', np.max(y2), x2[find_nearest(y2, np.max(y2))], find_nearest(y2, np.max(y2)),t[index_t0+find_nearest(y2, np.max(y2))] )
-# #     print('Min position', np.min(y1), x1[find_nearest(y1, np.min(y1))], find_nearest(y1, np.min(y1)), t[find_nearest(y1, np.min(y1))])
-# #     pos_min = find_nearest(y1, np.min(y1))
-#     pos_max = index_t0 + find_nearest(y2, np.max(y2))
-#     height = mybragg[pos_max]-mybragg[pos_min]
-# #------------------------------------------------------------    
-
-
-    #     print(min_fit, max_fit, pos_min, pos_max)
-    pos_extrema.append(pos_min)
-    pos_extrema.append(pos_max)
+    height = np.abs(mybragg[pos_extrema[0]]-mybragg[pos_extrema[1]])
     
     
     plt.figure()
@@ -462,14 +402,9 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     
     
     plt.plot(t0_f,result7.best_fit[index_t0],'ok')
-    #     plt.plot(t0_f, fit_before[index_t0],'ok')
-    #     plt.plot(t0_f, fit_after[index_t0],'ok')
     plt.plot(t[pos_extrema[0]],result7.best_fit[pos_extrema[0]],'ok')
     plt.plot(t[pos_extrema[1]],result7.best_fit[pos_extrema[1]],'ok')
-    #     plt.plot(t,step_function,'--k')
     plt.title('edge fitting and estimated edge position')
-    #     plt.plot(t0_f, result7.best_fit[np.where(t==t0_f)],'ok')
-    #     plt.savefig('step4_fitting.pdf')
     plt.show()
     
     if (bool_print):
