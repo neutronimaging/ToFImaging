@@ -60,8 +60,8 @@ def B(t,t0,alpha,sigma, bool_transmission):
     if (bool_transmission):
         edge = 0.5*(term3(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5(t,t0,alpha,sigma))
     else:
-#         edge = 1-0.5*(term3(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5(t,t0,alpha,sigma))
-        edge = 0.5*(term3_1(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5_1(t,t0,alpha,sigma))
+        edge = 1-0.5*(term3(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5(t,t0,alpha,sigma))
+#         edge = 0.5*(term3_1(t,t0,sigma) - term4(t,t0,alpha,sigma)* term5_1(t,t0,alpha,sigma))
     return (edge)
 
 
