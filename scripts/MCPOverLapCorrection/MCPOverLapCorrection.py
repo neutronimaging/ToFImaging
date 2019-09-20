@@ -21,7 +21,7 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
     sorted_fits= sorted(glob.glob(folder_input+'/*.fits'))[:-1]
     sorted_TXT= sorted(glob.glob(folder_input+'/*.txt'))
     #display(sorted_TXT)
-
+f
     # the output folder is created if non-existing
     if not os.path.exists(folder_output):
         os.makedirs(folder_output)
@@ -33,6 +33,15 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
     filename_spectra= sorted_TXT[2]
     filename_shuttercount = sorted_TXT[0]
     filename_shuttertime = sorted_TXT[1]
+    
+    # name of the shutter count file to be read\\
+    if (num_windows==0):
+        shutter_file = np.genfromtxt(filename_shuttercount, usecols=1) # read the file
+        num_windows = np.shape((np.nonzero(shutter)))[1] # count the number of non zero elements
+        print(num_windows)
+    
+    
+    
     df = pd.read_csv( filename_spectra,delim_whitespace=True,header=None,
                 names=['Time','Spectra'])
     df['diff']=df['Time'].diff()
@@ -44,6 +53,8 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
 
     df_shutterCount = pd.read_csv(filename_shuttercount,delim_whitespace=True,header=None,
                                  names=['Counts'], nrows=num_windows, index_col=0)
+    
+
 
 #     display(df_shutterCount)
 
