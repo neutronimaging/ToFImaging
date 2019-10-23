@@ -12,6 +12,10 @@ CONFIG += c++11
 
 DEFINES += TOF_IMAGINGALGORITHM_LIBRARY
 
+CONFIG(release, debug|release): DESTDIR    = $$PWD/../../lib
+else:CONFIG(debug, debug|release): DESTDIR = $$PWD/../../lib/debug
+
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -24,13 +28,39 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        tof_imagingalgorithm.cpp
+        tof_imagingalgorithm.cpp \
+    edgefunction.cpp \
+    edgefitting.cpp
 
 HEADERS += \
         tof_imagingalgorithm.h \
-        tof_imagingalgorithm_global.h 
+        tof_imagingalgorithm_global.h \ 
+    edgefunction.h \
+    edgefitting.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+unix {
+#    INCLUDEPATH += $$PWD/../../../../external/src/linalg // not sure I need those yet.
+    QMAKE_CXXFLAGS += -fPIC -O2
+    unix:!macx {
+        QMAKE_CXXFLAGS += -fopenmp
+        QMAKE_LFLAGS += -lgomp
+        LIBS += -lgomp
+    }
+
+    unix:macx {
+        INCLUDEPATH += /opt/local/include
+        QMAKE_LIBDIR += /opt/local/lib
+    }
+}
+
+
+CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms
+else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms
+
+INCLUDEPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
+DEPENDPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
