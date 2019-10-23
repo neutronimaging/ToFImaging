@@ -22,6 +22,7 @@ EdgeFunction::EdgeFunction(int n)
 /// m_par[4] = b_{0} second linear parameter for the function after the edge
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+///
 double EdgeFunction::EdgeFunctionTExponential(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,exp_after,exp_before;
@@ -45,6 +46,7 @@ double EdgeFunction::EdgeFunctionTExponential(double x, const double *m_pars)
 /// m_par[4] = b_{0} second linear parameter for the function after the edge
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+///
 double EdgeFunction::EdgeFunctionTLinear(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,line_after,line_before;
@@ -68,6 +70,7 @@ double EdgeFunction::EdgeFunctionTLinear(double x, const double *m_pars)
 /// m_par[4] = b_{0} second linear parameter for the function after the edge
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+///
 double EdgeFunction::EdgeFunctionAExponential(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,exp_after,exp_before;
@@ -91,6 +94,7 @@ double EdgeFunction::EdgeFunctionAExponential(double x, const double *m_pars)
 /// m_par[4] = b_{0} second linear parameter for the function after the edge
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+///
 double EdgeFunction::EdgeFunctionALinear(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,line_after,line_before;

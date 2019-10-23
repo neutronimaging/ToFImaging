@@ -21,7 +21,7 @@ enum eEdgeFunction{
 class TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction
 {
 public:
-    EdgeFunction(int n);
+    EdgeFunction(int n=1);
     ///\brief Implements edge function in transmission with exponentials before and after the edge
     static double EdgeFunctionTExponential(double x, const double *m_pars);
     ///\brief Implements edge function in transmission with lines before and after the edge
@@ -33,15 +33,17 @@ public:
     ///\brief Implements simple fitting of the edge position by fitting the first derivative with a Gaussian model
     static double EdgeGradientGaussian(double x, const double *m_pars);
 
+    virtual ~EdgeFunction(); // has to be virtual?
+
 protected:
-    /// \brief Parameter array
-    double *m_pars;
-    /// \brief Parameter lock array
-    bool *m_lock;
+//    /// \brief Parameter array
+//    double *m_pars;
+//    /// \brief Parameter lock array
+//    bool *m_lock;
     /// \brief The number of parameters
     int m_Npars;
-    /// \brief The number of parameters to be fitted
-    int m_pars2fit;
+//    /// \brief The number of parameters to be fitted
+//    int m_pars2fit;
 };
 
 }
