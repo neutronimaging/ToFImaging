@@ -22,6 +22,7 @@ class TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction
 {
 public:
     EdgeFunction(int n=1);
+    ~EdgeFunction();
     ///\brief Implements edge function in transmission with exponentials before and after the edge
     static double EdgeFunctionTExponential(double x, const double *m_pars);
     ///\brief Implements edge function in transmission with lines before and after the edge
@@ -33,7 +34,7 @@ public:
     ///\brief Implements simple fitting of the edge position by fitting the first derivative with a Gaussian model
     static double EdgeGradientGaussian(double x, const double *m_pars);
 
-    virtual ~EdgeFunction(); // has to be virtual?
+
 
 protected:
 //    /// \brief Parameter array

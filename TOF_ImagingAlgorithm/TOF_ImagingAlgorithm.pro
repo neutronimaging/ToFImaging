@@ -28,13 +28,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        tof_imagingalgorithm.cpp \
+#        tof_imagingalgorithm.cpp \
     edgefunction.cpp \
     edgefitting.cpp
 
 HEADERS += \
-        tof_imagingalgorithm.h \
-        tof_imagingalgorithm_global.h \ 
+#        tof_imagingalgorithm.h \
+        tof_imagingalgorithm_global.h \
     edgefunction.h \
     edgefitting.h
 
@@ -43,8 +43,9 @@ unix {
     INSTALLS += target
 }
 
+
+## Do I need all of this?
 unix {
-#    INCLUDEPATH += $$PWD/../../../../external/src/linalg // not sure I need those yet.
     QMAKE_CXXFLAGS += -fPIC -O2
     unix:!macx {
         QMAKE_CXXFLAGS += -fopenmp
@@ -56,11 +57,18 @@ unix {
         INCLUDEPATH += /opt/local/include
         QMAKE_LIBDIR += /opt/local/lib
     }
+
+    LIBS += -lm -lz -L/opt/usr/lib -llmfit
 }
 
 
-CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms
-else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms
+CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms -lFaddeeva
+else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms -lFaddeeva
 
 INCLUDEPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 DEPENDPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
+
+INCLUDEPATH += $$PWD/../../imagingsuite/external/src/linalg
+
+INCLUDEPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf
+DEPENDPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf

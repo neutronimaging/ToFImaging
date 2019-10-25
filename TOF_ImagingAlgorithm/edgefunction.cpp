@@ -6,9 +6,14 @@
 
 namespace BraggEdge{
 
-EdgeFunction::EdgeFunction(int n)
+TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunction(int n)
 {
     m_Npars=n;
+}
+
+TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::~EdgeFunction()
+{
+    //delete stuff
 }
 
 /// \param x The argument
@@ -23,7 +28,7 @@ EdgeFunction::EdgeFunction(int n)
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
 ///
-double EdgeFunction::EdgeFunctionTExponential(double x, const double *m_pars)
+double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTExponential(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,exp_after,exp_before;
     term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
@@ -47,7 +52,7 @@ double EdgeFunction::EdgeFunctionTExponential(double x, const double *m_pars)
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
 ///
-double EdgeFunction::EdgeFunctionTLinear(double x, const double *m_pars)
+double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTLinear(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,line_after,line_before;
     term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
@@ -71,7 +76,7 @@ double EdgeFunction::EdgeFunctionTLinear(double x, const double *m_pars)
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
 ///
-double EdgeFunction::EdgeFunctionAExponential(double x, const double *m_pars)
+double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionAExponential(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,exp_after,exp_before;
     term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
@@ -95,7 +100,7 @@ double EdgeFunction::EdgeFunctionAExponential(double x, const double *m_pars)
 /// m_par[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_par[6] = b_{hkl} second linear parameter for the function after the edge
 ///
-double EdgeFunction::EdgeFunctionALinear(double x, const double *m_pars)
+double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,line_after,line_before;
     term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
@@ -107,12 +112,12 @@ double EdgeFunction::EdgeFunctionALinear(double x, const double *m_pars)
     return line_after*edge + line_before*(1.0-edge);
 }
 
-double EdgeFunction::EdgeGradientGaussian(double x, const double *m_pars)
+double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeGradientGaussian(double x, const double *m_pars)
 {
     return 1.0;
 }
 
-void   string2enum(std::string &str, BraggEdge::eEdgeFunction &e)
+TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, BraggEdge::eEdgeFunction &e)
 {
     std::string lowstr=kipl::strings::toLower(str);
 
@@ -132,7 +137,8 @@ void   string2enum(std::string &str, BraggEdge::eEdgeFunction &e)
     e=it->second;
 
 }
-std::string enum2string(BraggEdge::eEdgeFunction  e)
+
+TOF_IMAGINGALGORITHMSHARED_EXPORT std::string enum2string(BraggEdge::eEdgeFunction  e)
 {
     std::string str;
     switch(e){
@@ -157,7 +163,7 @@ std::string enum2string(BraggEdge::eEdgeFunction  e)
     }
     return str;
 }
-std::ostream  &  operator<<(std::ostream &s,BraggEdge::eEdgeFunction e)
+TOF_IMAGINGALGORITHMSHARED_EXPORT std::ostream  &  operator<<(std::ostream &s,BraggEdge::eEdgeFunction e)
 {
     s<<enum2string(e);
     return s;
