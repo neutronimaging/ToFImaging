@@ -71,22 +71,13 @@ CONFIG(debug, debug|release): DEFINES += DEBUG
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-#CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms -lFaddeeva -lTOF_ImagingAlgorithm
-#else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms -lFaddeeva -lTOF_ImagingAlgorithm
-
-#INCLUDEPATH += "$$PWD/../../imagingsuite/core/kipl/kipl/include" "$$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include" "$$PWD/../TOF_ImagingAlgorithm"
-#DEPENDPATH += "$$PWD/../../imagingsuite/core/kipl/kipl/include" "$$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include" "$$PWD/../TOF_ImagingAlgorithm"
-
-##INCLUDEPATH += $$PWD/../../imagingsuite/external/src/linalg # not sure I need
-
-
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../lib/release/
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../lib/debug/ -
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../lib/debug/
 else:unix: LIBS += -L$$PWD/../../lib/
 
-LIBS += -lkipl -lImagingAlgorithms -lTOF_ImagingAlgorithm
+LIBS += -lkipl -lImagingAlgorithms -lTOF_ImagingAlgorithm -lFaddeeva
 
 INCLUDEPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include
 DEPENDPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include
@@ -97,8 +88,8 @@ DEPENDPATH += $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 INCLUDEPATH += $$PWD/../TOF_ImagingAlgorithm
 DEPENDPATH += $$PWD/../TOF_ImagingAlgorithm
 
-#INCLUDEPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf # to be removed when switching to another imagingsuite branch without Fadeeva
-#DEPENDPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf
+INCLUDEPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf # to be removed when switching to another imagingsuite branch without Fadeeva
+DEPENDPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf
 
 #INCLUDEPATH += $$PWD/../../imagingsuite/external/src/linalg
 

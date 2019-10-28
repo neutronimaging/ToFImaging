@@ -28,6 +28,8 @@
 #include <pixelinfo.h>
 #include <PolynomialCorrection.h>
 
+#include <edgefunction.h>
+
 using namespace std;
 class tst_tof_imagingalgorithm : public QObject
 {
@@ -119,6 +121,7 @@ void tst_tof_imagingalgorithm::test_createEdgeLineShape()
     kipl::math::edgefunction myedge(size, t);
 
     ImagingAlgorithms::AverageImage avg;
+
 
 
 
