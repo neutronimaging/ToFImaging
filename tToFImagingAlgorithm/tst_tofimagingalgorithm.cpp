@@ -2,13 +2,9 @@
 
 // add necessary includes here
 
-#include <math/nonlinfit.h>
 #include <averageimage.h>
 #include <edgefunction.h>
-#include <PolynomialCorrection.h>
-
-//#include <sstream>
-//#include <iostream>
+#include <edgefitting.h>
 #include <fstream>
 
 
@@ -46,6 +42,8 @@ void ToFImagingAlgorithm::test_case1()
     double *first_guess = new double[N];
     double *computed_first_guess = new double[N];
     double *y = new double[N];
+
+    double eps=0.0001;
 
     for (double a; myfile>>a;)
     {
@@ -85,21 +83,43 @@ void ToFImagingAlgorithm::test_case1()
 
     double *computed_firstedge = new double[N];
 
-//    Nonlinear::Voight vg;
-
-//    ImagingAlgorithms::PolynomialCorrection pc;
-
     BraggEdge::EdgeFunction myedge(7);
+
 
     for (int i=0; i<N; ++i)
     {
         computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionTExponential(x[i], param);
+        QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
         }
 
-    // go on here: compare the computed first edge with the loaded one
+
     // then fitting, and compare the results with the expected final parameters
 
+    edgefitting myfit(7);
+    myfit.intialize_params(param);
+    myfit.fit(x,y,N);
+
+
+    double *updated_params = new double[7];
+    updated_params = myfit.get_params();
+
+    // compare with expected output
+
+    double *expected_params = new double[7];
+    expected_params[0] = 0.05773708;
+    expected_params[1] = 6.1353e-05;
+    expected_params[2] = 3.6402e-04;
+    expected_params[3] = 0.12457211;
+    expected_params[4] = 8.01859477;
+    expected_params[5] = 0.08703528;
+    expected_params[6] = 17.2455669;
+
+    for (int i=0; i<7; ++i)
+    {
+        qDebug() << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
+        QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
+    }
 
 
 }

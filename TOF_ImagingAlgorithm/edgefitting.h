@@ -9,7 +9,7 @@ public:
     edgefitting(int n);
     void intialize_params(double *pars);
     double *get_params();
-    void fit(double *x, double *y);
+    void fit(double *x, double *y, int N);
     ~edgefitting();
 
 

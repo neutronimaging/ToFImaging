@@ -1,5 +1,6 @@
 #include "edgefitting.h"
 #include <lmcurve.h>
+#include <QDebug>
 
 edgefitting::edgefitting(int n)
 {
@@ -22,14 +23,16 @@ double *edgefitting::get_params()
     return m_pars;
 }
 
-void edgefitting::fit(double *x, double *y)
+void edgefitting::fit(double *x, double *y, int N)
 {
     lm_control_struct control = lm_control_double;
     lm_status_struct status;
     control.verbosity = 7;
 
     printf( "Fitting ...\n" );
-    lmcurve(m_Npars, m_pars, (sizeof(x)/sizeof(*x)), x,y, BraggEdge::EdgeFunction::EdgeFunctionTExponential, &control, &status );
+    qDebug() << "size of X" << (sizeof(x)/sizeof(*x));
+    qDebug() << N;
+    lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionTExponential, &control, &status );
 
     printf( "Results:\n" );
     printf( "status after %d function evaluations:\n  %s\n",
