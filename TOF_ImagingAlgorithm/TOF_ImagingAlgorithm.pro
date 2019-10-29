@@ -55,20 +55,22 @@ unix {
 
     unix:macx {
         INCLUDEPATH += /opt/local/include
+        INCLUDEPATH += /usr/local/lib
+        INCLUDEPATH += /usr/local/include
         QMAKE_LIBDIR += /opt/local/lib
     }
 
-    LIBS += -lm -lz -L/opt/usr/lib -llmfit
+    LIBS += -lm -lz -L/opt/usr/lib  -L/usr/local/lib -llmfit
 }
 
 
-CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms -lFaddeeva
-else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms -lFaddeeva
+CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms #-lFaddeeva
+else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms #-lFaddeeva
 
 INCLUDEPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 DEPENDPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 
 INCLUDEPATH += $$PWD/../../imagingsuite/external/src/linalg
 
-INCLUDEPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf
-DEPENDPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf
+#INCLUDEPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf
+#DEPENDPATH += $$PWD/../../imagingsuite/external/src/Fadeeva_erf

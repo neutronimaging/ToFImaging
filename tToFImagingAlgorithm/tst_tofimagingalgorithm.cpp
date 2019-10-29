@@ -1,4 +1,5 @@
 #include <QtTest>
+#include <QTest>
 
 // add necessary includes here
 
@@ -55,7 +56,7 @@ void ToFImagingAlgorithm::test_case1()
     ifstream myfile_y ("/home/carminati_c/git/imagingsuite/core/kipl/UnitTests/data/initialmodel.txt"); //opening the file. //path should be related to the lib
     ifstream myfile_y2 ("/home/carminati_c/git/imagingsuite/core/kipl/UnitTests/data/y.txt"); //opening the file. //path should be related to the lib
 
-    short loop_y=0;
+    int loop_y=0;
     for (double a; myfile_y>>a;)
     {
         first_guess[loop_y]=a;

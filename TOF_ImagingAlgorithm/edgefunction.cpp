@@ -3,6 +3,7 @@
 #include <strings/string2array.h>
 #include <base/KiplException.h>
 #include <math/mathconstants.h>
+#include <math.h>
 
 namespace BraggEdge{
 
