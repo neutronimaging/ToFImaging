@@ -90,6 +90,8 @@ void ToFImagingAlgorithm::test_case1()
     for (int i=0; i<N; ++i)
     {
         computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionTExponential(x[i], param);
+//        qDebug() << computed_firstedge[i];
+//        qDebug() << first_guess[i];
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
         }
@@ -97,7 +99,7 @@ void ToFImagingAlgorithm::test_case1()
 
     // then fitting, and compare the results with the expected final parameters
 
-    edgefitting myfit(7);
+    edgefitting myfit(7, BraggEdge::eEdgeFunction::EdgeTransmissionExponential);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
 
