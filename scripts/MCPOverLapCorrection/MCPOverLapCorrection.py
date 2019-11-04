@@ -21,7 +21,7 @@ def OverLapCorrection(folder_input, folder_output, filename_output, num_windows)
     sorted_fits= sorted(glob.glob(folder_input+'/*.fits'))[:-1]
     sorted_TXT= sorted(glob.glob(folder_input+'/*.txt'))
     #display(sorted_TXT)
-f
+    
     # the output folder is created if non-existing
     if not os.path.exists(folder_output):
         os.makedirs(folder_output)
@@ -37,7 +37,7 @@ f
     # name of the shutter count file to be read\\
     if (num_windows==0):
         shutter_file = np.genfromtxt(filename_shuttercount, usecols=1) # read the file
-        num_windows = np.shape((np.nonzero(shutter)))[1] # count the number of non zero elements
+        num_windows = np.shape((np.nonzero(shutter_file)))[1] # count the number of non zero elements
         print(num_windows)
     
     
