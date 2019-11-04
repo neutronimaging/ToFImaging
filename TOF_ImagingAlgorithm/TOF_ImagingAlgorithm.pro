@@ -28,12 +28,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-#        tof_imagingalgorithm.cpp \
     edgefunction.cpp \
     edgefitting.cpp
 
 HEADERS += \
-#        tof_imagingalgorithm.h \
         tof_imagingalgorithm_global.h \
     edgefunction.h \
     edgefitting.h
