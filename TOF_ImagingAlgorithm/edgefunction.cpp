@@ -122,7 +122,7 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(doubl
 /// m_pars[1] = standard deviation, estimating the edge broadening
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeGradientGaussian(double x, const double *m_pars)
 {
-    return exp((x-m_pars[0])*(x-m_pars[0])/(2.0*m_pars[1]*m_pars[1]));
+    return exp(-(x-m_pars[0])*(x-m_pars[0])/(2.0*m_pars[1]*m_pars[1]));
 }
 
 TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, BraggEdge::eEdgeFunction &e)
