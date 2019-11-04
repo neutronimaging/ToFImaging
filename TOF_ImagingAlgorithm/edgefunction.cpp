@@ -3,6 +3,7 @@
 #include <strings/string2array.h>
 #include <base/KiplException.h>
 #include <math/mathconstants.h>
+#include <math/gradient.h>
 #include <math.h>
 
 namespace BraggEdge{
@@ -21,13 +22,13 @@ TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::~EdgeFunction()
 /// \param m_pars The fitting parameter
 /// \retval The method returns the lineshape formulation from Santisteban et al. 2001
 /// The lineshape is defined by 7 parameters, here:
-/// m_par[0] = t0 is the edge position
-/// m_par[1] = sigma is the Gaussian broadening
-/// m_par[2] = tau is the exponential decay of the trailing edge
-/// m_par[3] = a_{0} first linear parameter for the function after the edge
-/// m_par[4] = b_{0} second linear parameter for the function after the edge
-/// m_par[5] = a_{hkl} first linear parameter for the function before the edge
-/// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+/// m_pars[0] = t0 is the edge position
+/// m_pars[1] = sigma is the Gaussian broadening
+/// m_pars[2] = tau is the exponential decay of the trailing edge
+/// m_pars[3] = a_{0} first linear parameter for the function after the edge
+/// m_pars[4] = b_{0} second linear parameter for the function after the edge
+/// m_pars[5] = a_{hkl} first linear parameter for the function before the edge
+/// m_pars[6] = b_{hkl} second linear parameter for the function after the edge
 ///
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTExponential(double x, const double *m_pars)
 {
@@ -45,13 +46,13 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTExponential(
 /// \param m_pars The fitting parameter
 /// \retval The method returns the lineshape formulation with linear function modification before and after the edges
 /// The lineshape is defined by 7 parameters, here:
-/// m_par[0] = t0 is the edge position
-/// m_par[1] = sigma is the Gaussian broadening
-/// m_par[2] = tau is the exponential decay of the trailing edge
-/// m_par[3] = a_{0} first linear parameter for the function after the edge
-/// m_par[4] = b_{0} second linear parameter for the function after the edge
-/// m_par[5] = a_{hkl} first linear parameter for the function before the edge
-/// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+/// m_pars[0] = t0 is the edge position
+/// m_pars[1] = sigma is the Gaussian broadening
+/// m_pars[2] = tau is the exponential decay of the trailing edge
+/// m_pars[3] = a_{0} first linear parameter for the function after the edge
+/// m_pars[4] = b_{0} second linear parameter for the function after the edge
+/// m_pars[5] = a_{hkl} first linear parameter for the function before the edge
+/// m_pars[6] = b_{hkl} second linear parameter for the function after the edge
 ///
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTLinear(double x, const double *m_pars)
 {
@@ -69,13 +70,13 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTLinear(doubl
 /// \param m_pars The fitting parameter
 /// \retval The method returns the lineshape formulation from Santisteban et al. 2001, with the edge sign modified to accomodate attenuation datasets
 /// The lineshape is defined by 7 parameters, here:
-/// m_par[0] = t0 is the edge position
-/// m_par[1] = sigma is the Gaussian broadening
-/// m_par[2] = tau is the exponential decay of the trailing edge
-/// m_par[3] = a_{0} first linear parameter for the function after the edge
-/// m_par[4] = b_{0} second linear parameter for the function after the edge
-/// m_par[5] = a_{hkl} first linear parameter for the function before the edge
-/// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+/// m_pars[0] = t0 is the edge position
+/// m_pars[1] = sigma is the Gaussian broadening
+/// m_pars[2] = tau is the exponential decay of the trailing edge
+/// m_pars[3] = a_{0} first linear parameter for the function after the edge
+/// m_pars[4] = b_{0} second linear parameter for the function after the edge
+/// m_pars[5] = a_{hkl} first linear parameter for the function before the edge
+/// m_pars[6] = b_{hkl} second linear parameter for the function after the edge
 ///
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionAExponential(double x, const double *m_pars)
 {
@@ -93,13 +94,13 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionAExponential(
 /// \param m_pars The fitting parameter
 /// \retval The method returns the lineshape formulation with the edge sign modified to accomodate attenuation datasets and linear functions before and after the edge position
 /// The lineshape is defined by 7 parameters, here:
-/// m_par[0] = t0 is the edge position
-/// m_par[1] = sigma is the Gaussian broadening
-/// m_par[2] = tau is the exponential decay of the trailing edge
-/// m_par[3] = a_{0} first linear parameter for the function after the edge
-/// m_par[4] = b_{0} second linear parameter for the function after the edge
-/// m_par[5] = a_{hkl} first linear parameter for the function before the edge
-/// m_par[6] = b_{hkl} second linear parameter for the function after the edge
+/// m_pars[0] = t0 is the edge position
+/// m_pars[1] = sigma is the Gaussian broadening
+/// m_pars[2] = tau is the exponential decay of the trailing edge
+/// m_pars[3] = a_{0} first linear parameter for the function after the edge
+/// m_pars[4] = b_{0} second linear parameter for the function after the edge
+/// m_pars[5] = a_{hkl} first linear parameter for the function before the edge
+/// m_pars[6] = b_{hkl} second linear parameter for the function after the edge
 ///
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(double x, const double *m_pars)
 {
@@ -113,9 +114,15 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(doubl
     return line_after*edge + line_before*(1.0-edge);
 }
 
+/// \param x The argument
+/// \param m_pars The fitting parameter
+/// \retval The method returns the simplified fitting with a Gaussian, the input is expected to be the gradient of the signal
+/// The Gaussian is described by the two parameters
+/// m_pars[0] = mean, estimating the edge position
+/// m_pars[1] = standard deviation, estimating the edge broadening
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeGradientGaussian(double x, const double *m_pars)
 {
-    return 1.0;
+    return exp((x-m_pars[0])*(x-m_pars[0])/(2.0*m_pars[1]*m_pars[1]));
 }
 
 TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, BraggEdge::eEdgeFunction &e)
