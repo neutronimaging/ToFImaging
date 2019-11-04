@@ -36,7 +36,7 @@ void ToFImagingAlgorithm::test_case1()
 {
     short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
-    ifstream myfile("/home/carminati_c/git/ToFImaging/test_data/x.txt"); //opening the file.
+    ifstream myfile("../ToFImaging/test_data/x.txt"); //opening the file.
 
     int N=1107;
     double *x = new double[N];
@@ -53,8 +53,8 @@ void ToFImagingAlgorithm::test_case1()
     }
 
 
-    ifstream myfile_y ("/home/carminati_c/git/ToFImaging/test_data/initialmodel.txt"); //opening the file. //path should be related to the lib
-    ifstream myfile_y2 ("/home/carminati_c/git/ToFImaging/test_data/y.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y ("../ToFImaging/test_data/initialmodel.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y2 ("../ToFImaging/test_data/y.txt"); //opening the file. //path should be related to the lib
 
     int loop_y=0;
     for (double a; myfile_y>>a;)
