@@ -18,6 +18,7 @@ from TOF_routines import find_nearest
 from TOF_routines import find_first
 from TOF_routines import find_last
 from TOF_routines import rotatedata
+from TOF_routines import savitzky_golay
 
 
 # def term0(t,a2,a6):
@@ -72,10 +73,8 @@ def BraggEdgeExponential(t,t0,alpha,sigma,a1,a2,a5,a6,bool_transmission):
     return exp_after(t,a1,a2) * ( exp_before(t,a5,a6)+ (1-exp_before(t,a5,a6)) * B(t,t0,alpha,sigma,bool_transmission) )
 
 
-
-def running_mean(x, N):
-    cumsum = np.cumsum(np.insert(x, 0, 0))
-    return (cumsum[N:] - cumsum[:-N]) / float(N)
+def running_mean(x, w, n):
+    return savitzky_golay(y, w, n)
 
 
 def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est_alpha, bool_print, bool_average, bool_linear, bool_transmission): ## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is

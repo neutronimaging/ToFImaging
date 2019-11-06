@@ -40,10 +40,9 @@ void ToFImagingAlgorithm::test_TransmissionExp()
     string line; //this will contain the data read from the file
     ifstream myfile("../ToFImaging/test_data/x.txt"); //opening the file.
 
-    int N=1107;
+    unsigned int N=1107;
     double *x = new double[N];
     double *first_guess = new double[N];
-    double *computed_first_guess = new double[N];
     double *y = new double[N];
 
     double eps=0.0001;
@@ -126,11 +125,39 @@ void ToFImagingAlgorithm::test_TransmissionExp()
         QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
     }
 
+    delete [] x;
+    delete [] y;
+    delete [] expected_params;
+    delete [] param;
+    delete [] updated_params;
+    delete [] first_guess;
+    delete [] computed_firstedge;
+
 
 }
 
 void ToFImagingAlgorithm::test_TransmissionLin()
 {
+
+    double *param = new double[7]; // initial parameters
+    param[0]=0.056568;
+    param[1]=0.0001;
+    param[2]=0.0015;
+    param[3]=0.6950579360230543;
+    param[4]=-2.759274924510319;
+    param[5]=0.5660430851212845;
+    param[6]=-6.692051420263259;
+
+
+    double *expected_params = new double[7];
+    expected_params[0] = 0.05773708;
+    expected_params[1] = 6.2354e-05;
+    expected_params[2] = 3.5847e-04;
+    expected_params[3] = 0.78972162;
+    expected_params[4] = -4.0781558;
+    expected_params[5] = 0.48510798;
+    expected_params[6] = -5.14692195;
+
 
 }
 
