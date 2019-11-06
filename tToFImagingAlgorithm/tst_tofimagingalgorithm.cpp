@@ -18,7 +18,9 @@ public:
     ~ToFImagingAlgorithm();
 
 private slots:
-    void test_case1();
+    void test_TransmissionExp();
+    void test_TransmissionLin();
+    void test_GradientGaussian();
 
 };
 
@@ -32,7 +34,7 @@ ToFImagingAlgorithm::~ToFImagingAlgorithm()
 
 }
 
-void ToFImagingAlgorithm::test_case1()
+void ToFImagingAlgorithm::test_TransmissionExp()
 {
     short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
@@ -124,6 +126,16 @@ void ToFImagingAlgorithm::test_case1()
         QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
     }
 
+
+}
+
+void ToFImagingAlgorithm::test_TransmissionLin()
+{
+
+}
+
+void ToFImagingAlgorithm::test_GradientGaussian()
+{
 
 }
 
