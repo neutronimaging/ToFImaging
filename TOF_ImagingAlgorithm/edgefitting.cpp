@@ -36,26 +36,36 @@ void edgefitting::fit(double *x, double *y, int N)
     qDebug() << "size of X" << (sizeof(x)/sizeof(*x));
     qDebug() << N;
     switch (myfun){
-    case BraggEdge::eEdgeFunction::EdgeTransmissionExponential :
+    case BraggEdge::EdgeTransmissionExponential :
+    {
         lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionTExponential, &control, &status );
         break;
-    case BraggEdge::eEdgeFunction::EdgeTransmissionLinear :
+    }
+    case BraggEdge::EdgeTransmissionLinear :
+    {
         lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionTLinear, &control, &status );
         break;
-    case BraggEdge::eEdgeFunction::EdgeAttenuationExponential :
+    }
+    case BraggEdge::EdgeAttenuationExponential :
+    {
         lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionAExponential, &control, &status );
         break;
-    case BraggEdge::eEdgeFunction::EdgeAttenuationLinear :
+    }
+    case BraggEdge::EdgeAttenuationLinear :
+    {
         lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionALinear, &control, &status );
         break;
-    case BraggEdge::eEdgeFunction::EdgeGradientGaussian :
+    }
+    case BraggEdge::EdgeGradientGaussian :
+    {
         double *gradient = new double[N];
         kipl::math::num_gradient(y,x,N,gradient);
-        lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeGradientGaussian, &control, &status);
+        lmcurve(m_Npars, m_pars, N, x, gradient, BraggEdge::EdgeFunction::EdgeGradientGaussian, &control, &status);
         delete [] gradient;
         break;
-//     default :
-//        throw kipl::base::KiplException("Wrong edge function.",__FILE__,__LINE__);
+    }
+    default :
+        throw kipl::base::KiplException("Wrong edge function.",__FILE__,__LINE__);
 
 
     }
