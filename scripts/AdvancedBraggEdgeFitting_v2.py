@@ -155,7 +155,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
         plt.plot(t_after,bragg_after,'.g', label='int point')
         plt.plot(t,mybragg)
         
-        plt.plot(t,interception_before+slope_before*t,'--r', label='firred line before')
+        plt.plot(t,interception_before+slope_before*t,'--r', label='fitted line before')
         plt.plot(t,interception_after+slope_after*t,'--g', label='fitted line after')
         plt.plot(t,exp_after(t,a1_f,a2_f),'g', label='fitted exp before')
         plt.plot(t,exp_combined(t,a1_f,a2_f,a5_f,a6_f),'r', label='fitted exp after')
