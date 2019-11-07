@@ -21,6 +21,8 @@ private slots:
     void test_TransmissionExp();
     void test_TransmissionLin();
     void test_GradientGaussian();
+    void test_AttenuationExp();
+    void test_AttenuationLin();
 
 };
 
