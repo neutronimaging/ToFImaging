@@ -40,7 +40,7 @@ void ToFImagingAlgorithm::test_TransmissionExp()
 {
     short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
-    ifstream myfile("../ToFImaging/test_data/x.txt"); //opening the file.
+    ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
     unsigned int N=1107;
     double *x = new double[N];
@@ -56,8 +56,8 @@ void ToFImagingAlgorithm::test_TransmissionExp()
     }
 
 
-    ifstream myfile_y ("../ToFImaging/test_data/initialmodel.txt"); //opening the file. //path should be related to the lib
-    ifstream myfile_y2 ("../ToFImaging/test_data/y.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/initialmodel.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
 
     int loop_y=0;
     for (double a; myfile_y>>a;)
@@ -164,6 +164,16 @@ void ToFImagingAlgorithm::test_TransmissionLin()
 }
 
 void ToFImagingAlgorithm::test_GradientGaussian()
+{
+
+}
+
+void ToFImagingAlgorithm::test_AttenuationExp()
+{
+
+}
+
+void ToFImagingAlgorithm::test_AttenuationLin()
 {
 
 }
