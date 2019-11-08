@@ -108,7 +108,7 @@ void ToFImagingAlgorithm::test_TransmissionExp()
 
 
     double *updated_params = new double[7];
-    updated_params = myfit.get_params();
+    myfit.get_params(updated_params);
 
     // compare with expected output
 
@@ -127,11 +127,16 @@ void ToFImagingAlgorithm::test_TransmissionExp()
         QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
     }
 
+    myfile.close();
+    myfile_y.close();
+    myfile_y2.close();
+
+
     delete [] x;
     delete [] y;
     delete [] expected_params;
     delete [] param;
-    delete [] updated_params;
+ //   delete [] updated_params;
     delete [] first_guess;
     delete [] computed_firstedge;
 
@@ -160,9 +165,11 @@ void ToFImagingAlgorithm::test_TransmissionLin()
     expected_params[5] = 0.48510798;
     expected_params[6] = -5.14692195;
 
-//    short loop=0; //short for loop for input
-//    string line; //this will contain the data read from the file
-//    ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
+    short loop=0; //short for loop for input
+    string line; //this will contain the data read from the file
+
+    ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
+
 
 //    unsigned int N=1107;
 //    double *x = new double[N];

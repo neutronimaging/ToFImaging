@@ -8,7 +8,7 @@ class edgefitting
 public:
     edgefitting(int n, BraggEdge::eEdgeFunction ef);
     void intialize_params(double *pars);
-    double *get_params();
+    void get_params(double *pars);
     void fit(double *x, double *y, int N);
     ~edgefitting();
 

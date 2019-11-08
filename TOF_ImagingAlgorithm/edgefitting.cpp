@@ -18,12 +18,12 @@ edgefitting::~edgefitting()
 void edgefitting::intialize_params(double *pars)
 {
     m_pars = new double[m_Npars];
-    m_pars = pars;
+    std::copy_n(pars,m_Npars, m_pars);
 }
 
-double *edgefitting::get_params()
+void edgefitting::get_params(double *pars)
 {
-    return m_pars;
+    std::copy_n(m_pars,m_Npars, pars);
 }
 
 void edgefitting::fit(double *x, double *y, int N)
