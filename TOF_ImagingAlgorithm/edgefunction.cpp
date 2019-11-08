@@ -111,7 +111,7 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(doubl
     edge = 1.0-0.5*(term3-term4*term5); // myedgefunction
     line_after = (m_pars[3]+m_pars[4]*x); // line after
     line_before = (m_pars[5]+m_pars[6]*x); // line before
-    return line_after*edge + line_before*(1.0-edge);
+    return line_after*(1.0-edge) + line_before*edge;
 }
 
 /// \param x The argument
@@ -119,10 +119,11 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(doubl
 /// \retval The method returns the simplified fitting with a Gaussian, the input is expected to be the gradient of the signal
 /// The Gaussian is described by the two parameters
 /// m_pars[0] = mean, estimating the edge position
-/// m_pars[1] = standard deviation, estimating the edge broadening
+/// m_pars[1] = variance, estimating the edge broadening
+/// m_pars[2] = amplitude, possibly non useful for the edge fitting
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeGradientGaussian(double x, const double *m_pars)
 {
-    return exp(-(x-m_pars[0])*(x-m_pars[0])/(2.0*m_pars[1]*m_pars[1]));
+    return m_pars[2]*exp(-(x-m_pars[0])*(x-m_pars[0])/(m_pars[1]));
 }
 
 TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, BraggEdge::eEdgeFunction &e)

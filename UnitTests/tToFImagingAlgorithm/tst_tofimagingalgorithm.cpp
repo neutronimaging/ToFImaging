@@ -7,6 +7,7 @@
 #include <edgefunction.h>
 #include <edgefitting.h>
 #include <fstream>
+#include <math/gradient.h>
 
 
 class ToFImagingAlgorithm : public QObject
@@ -136,7 +137,7 @@ void ToFImagingAlgorithm::test_TransmissionExp()
     delete [] y;
     delete [] expected_params;
     delete [] param;
- //   delete [] updated_params;
+    delete [] updated_params;
     delete [] first_guess;
     delete [] computed_firstedge;
 
@@ -171,69 +172,288 @@ void ToFImagingAlgorithm::test_TransmissionLin()
     ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
 
-//    unsigned int N=1107;
-//    double *x = new double[N];
-//    double *first_guess = new double[N];
-//    double *y = new double[N];
+    unsigned int N=1107;
+    double *x = new double[N];
+    double *first_guess = new double[N];
+    double *y = new double[N];
 
-//    double eps=0.0001;
+    double eps=0.0001;
 
-//    for (double a; myfile>>a;)
-//    {
-//        x[loop]=a;
-//        loop++;
-//    }
+    for (double a; myfile>>a;)
+    {
+        x[loop]=a;
+        loop++;
+    }
 
-//    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Tlin.txt"); //opening the file. //path should be related to the lib
-//    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
-
-
-//    int loop_y=0;
-//    for (double a; myfile_y>>a;)
-//    {
-//        first_guess[loop_y]=a;
-//        loop_y++;
-
-//    }
-
-//    loop_y=0;
-//    for (double a; myfile_y2>>a;)
-//    {
-//        y[loop_y]=a;
-//        loop_y++;
-//    }
-
-//    QCOMPARE(loop_y, 1107);
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Tlin.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
 
 
+    int loop_y=0;
+    for (double a; myfile_y>>a;)
+    {
+        first_guess[loop_y]=a;
+        loop_y++;
+
+    }
+
+    loop_y=0;
+    for (double a; myfile_y2>>a;)
+    {
+        y[loop_y]=a;
+        loop_y++;
+    }
+
+    QCOMPARE(loop_y, 1107);
 
 
-////    BraggEdge::EdgeFunction myedge(7);
-////    double *computed_firstedge = new double[N];
-////    for (int i=0; i<N; ++i)
-////    {
-////        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionTLinear(x[i], param);
-//////        qDebug() << computed_firstedge[i];
-//////        qDebug() << first_guess[i];
-////        QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
-////        }
+
+    BraggEdge::EdgeFunction myedge(7);
+    double *computed_firstedge = new double[N];
+    for (int i=0; i<N; ++i)
+    {
+        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionTLinear(x[i], param);
+        QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
+
+        }
+
+    edgefitting myfit(7, BraggEdge::eEdgeFunction::EdgeTransmissionLinear);
+    myfit.intialize_params(param);
+    myfit.fit(x,y,N);
+
+
+    double *updated_params = new double[7];
+    myfit.get_params(updated_params);
+
+    for (int i=0; i<7; ++i)
+    {
+        qDebug() << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
+        QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
+    }
+
+    myfile.close();
+    myfile_y.close();
+    myfile_y2.close();
+
+
+    delete [] x;
+    delete [] y;
+    delete [] expected_params;
+    delete [] param;
+    delete [] updated_params;
+    delete [] first_guess;
+    delete [] computed_firstedge;
 
 
 }
 
 void ToFImagingAlgorithm::test_GradientGaussian()
 {
+    // Here I assume that the gradient is already smoothed
+
+    double *param = new double[3];
+    param[0] = 0.056568;
+    param[1] = 0.0001;
+    param[2] = 500.0;
+
+// In case of doubt: put just ones, for the gaussian it works
+//    param[0] = 1;
+//    param[1] = 1;
+//    param[2] = 1;
+
+    double *expected_params = new double[3];
+    expected_params[0] = 0.05793304;
+    expected_params[1] = 4.6231e-08;
+    expected_params[2] = 706.346498;
+
+    short loop=0; //short for loop for input
+    string line; //this will contain the data read from the file
+
+    ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
+
+
+    unsigned int N=1107;
+    double *x = new double[N];
+    double *first_guess = new double[N];
+    double *y = new double[N];
+
+    double eps=0.0001;
+
+    for (double a; myfile>>a;)
+    {
+        x[loop]=a;
+        loop++;
+    }
+
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_gauss.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/smoothed_edge.txt"); //opening the file. //path should be related to the lib
+
+
+    int loop_y=0;
+    for (double a; myfile_y>>a;)
+    {
+        first_guess[loop_y]=a;
+        loop_y++;
+
+    }
+
+    loop_y=0;
+    for (double a; myfile_y2>>a;)
+    {
+        y[loop_y]=a;
+        loop_y++;
+    }
+
+    QCOMPARE(loop_y, 1107);
+
+    BraggEdge::EdgeFunction myedge(7);
+    double *computed_firstedge = new double[N];
+    for (int i=0; i<N; ++i)
+    {
+        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeGradientGaussian(x[i], param);
+        QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
+
+        }
+
+
+// check the gradient first
+
+    ifstream myfile_y3 ("../ToFImaging/UnitTests/test_data/gradient.txt");
+    double *exp_gradient = new double[N];
+
+    loop_y=0;
+    for (double a; myfile_y3>>a;)
+    {
+        exp_gradient[loop_y]=a;
+        loop_y++;
+
+    }
+
+    double *gradient = new double[N];
+    kipl::math::num_gradient(y,x,N,gradient);
+
+    for (int i=0; i<N; ++i)
+    {
+        QVERIFY(fabs(exp_gradient[i]-gradient[i])<eps); // compare the computed first edge with the loaded one, passed
+
+        } // OK. it is the same.
+
+
+
+
+    edgefitting myfit(3, BraggEdge::eEdgeFunction::EdgeGradientGaussian);
+    myfit.intialize_params(param);
+    myfit.fit(x,y,N);
+
+    double *updated_params = new double[3];
+    myfit.get_params(updated_params);
+
+    for (int i=0; i<3; ++i)
+    {
+        qDebug() << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
+        QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
+    }
+
+    myfile.close();
+    myfile_y.close();
+    myfile_y2.close();
+    myfile_y3.close();
+
+
+    delete [] x;
+    delete [] y;
+    delete [] expected_params;
+    delete [] param;
+    delete [] updated_params;
+    delete [] first_guess;
+    delete [] computed_firstedge;
+
+
+
 
 }
 
 void ToFImagingAlgorithm::test_AttenuationExp()
 {
 
+// This is still to figure out
+
 }
 
 void ToFImagingAlgorithm::test_AttenuationLin()
 {
+
+    // This fails: to check
+    double *param = new double[7]; // initial parameters
+    param[0]=0.056568;
+    param[1]=0.0001;
+    param[2]=0.0015;
+    param[3]=0.3221873247378136;
+    param[4]=5.2674654703300545;
+    param[5]=-0.12174127292834003;
+    param[6]=31.65784345829804;
+
+
+    double *expected_params = new double[7];
+    expected_params[0] = 0.05788519;
+    expected_params[1] = 2.1650e-04;
+    expected_params[2] = 1.5581e-04;
+    expected_params[3] = 0.15162227;
+    expected_params[4] = 26.4337443;
+    expected_params[5] = 0.14975358;
+    expected_params[6] = 7.67236371;
+
+    short loop=0; //short for loop for input
+    string line; //this will contain the data read from the file
+
+    ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
+
+
+    unsigned int N=1107;
+    double *x = new double[N];
+    double *first_guess = new double[N];
+    double *y = new double[N];
+
+    double eps=0.0001;
+
+    for (double a; myfile>>a;)
+    {
+        x[loop]=a;
+        loop++;
+    }
+
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Alin.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
+
+
+    int loop_y=0;
+    for (double a; myfile_y>>a;)
+    {
+        first_guess[loop_y]=a;
+        loop_y++;
+
+    }
+
+    loop_y=0;
+    for (double a; myfile_y2>>a;)
+    {
+        y[loop_y]=a;
+        loop_y++;
+    }
+
+    QCOMPARE(loop_y, 1107);
+
+
+    BraggEdge::EdgeFunction myedge(7);
+    double *computed_firstedge = new double[N];
+    for (int i=0; i<N; ++i)
+    {
+        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionALinear(x[i], param);
+        QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
+
+        }
+
 
 }
 
