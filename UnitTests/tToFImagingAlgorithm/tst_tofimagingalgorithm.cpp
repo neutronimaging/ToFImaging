@@ -56,7 +56,7 @@ void ToFImagingAlgorithm::test_TransmissionExp()
     }
 
 
-    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/initialmodel.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Texp.txt"); //opening the file. //path should be related to the lib
     ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
 
     int loop_y=0;
@@ -159,6 +159,58 @@ void ToFImagingAlgorithm::test_TransmissionLin()
     expected_params[4] = -4.0781558;
     expected_params[5] = 0.48510798;
     expected_params[6] = -5.14692195;
+
+//    short loop=0; //short for loop for input
+//    string line; //this will contain the data read from the file
+//    ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
+
+//    unsigned int N=1107;
+//    double *x = new double[N];
+//    double *first_guess = new double[N];
+//    double *y = new double[N];
+
+//    double eps=0.0001;
+
+//    for (double a; myfile>>a;)
+//    {
+//        x[loop]=a;
+//        loop++;
+//    }
+
+//    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Tlin.txt"); //opening the file. //path should be related to the lib
+//    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
+
+
+//    int loop_y=0;
+//    for (double a; myfile_y>>a;)
+//    {
+//        first_guess[loop_y]=a;
+//        loop_y++;
+
+//    }
+
+//    loop_y=0;
+//    for (double a; myfile_y2>>a;)
+//    {
+//        y[loop_y]=a;
+//        loop_y++;
+//    }
+
+//    QCOMPARE(loop_y, 1107);
+
+
+
+
+////    BraggEdge::EdgeFunction myedge(7);
+////    double *computed_firstedge = new double[N];
+////    for (int i=0; i<N; ++i)
+////    {
+////        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionTLinear(x[i], param);
+//////        qDebug() << computed_firstedge[i];
+//////        qDebug() << first_guess[i];
+////        QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
+
+////        }
 
 
 }
