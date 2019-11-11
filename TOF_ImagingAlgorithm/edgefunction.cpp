@@ -111,7 +111,7 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(doubl
     edge = 1.0-0.5*(term3-term4*term5); // myedgefunction
     line_after = (m_pars[3]+m_pars[4]*x); // line after
     line_before = (m_pars[5]+m_pars[6]*x); // line before
-    return line_after*(1.0-edge) + line_before*edge;
+    return line_before*edge + line_after*(1.0-edge);
 }
 
 /// \param x The argument

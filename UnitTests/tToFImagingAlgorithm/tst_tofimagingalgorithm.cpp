@@ -389,20 +389,20 @@ void ToFImagingAlgorithm::test_AttenuationLin()
     param[0]=0.056568;
     param[1]=0.0001;
     param[2]=0.0015;
-    param[3]=0.3221873247378136;
-    param[4]=5.2674654703300545;
     param[5]=-0.12174127292834003;
     param[6]=31.65784345829804;
+    param[3]=0.3221873247378136;
+    param[4]=5.2674654703300545;
 
 
     double *expected_params = new double[7];
     expected_params[0] = 0.05788519;
     expected_params[1] = 2.1650e-04;
     expected_params[2] = 1.5581e-04;
-    expected_params[3] = 0.15162227;
-    expected_params[4] = 26.4337443;
     expected_params[5] = 0.14975358;
     expected_params[6] = 7.67236371;
+    expected_params[3] = 0.15162227;
+    expected_params[4] = 26.4337443;
 
     short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
@@ -423,8 +423,8 @@ void ToFImagingAlgorithm::test_AttenuationLin()
         loop++;
     }
 
-    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Alin.txt"); //opening the file. //path should be related to the lib
-    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/inimodel_Alinear.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/logy.txt"); //opening the file. //path should be related to the lib
 
 
     int loop_y=0;
@@ -450,9 +450,26 @@ void ToFImagingAlgorithm::test_AttenuationLin()
     for (int i=0; i<N; ++i)
     {
         computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionALinear(x[i], param);
+//        qDebug() << computed_firstedge[i];
+//        qDebug() << first_guess[i];
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
         }
+
+    edgefitting myfit(7, BraggEdge::eEdgeFunction::EdgeAttenuationLinear);
+    myfit.intialize_params(param);
+    myfit.fit(x,y,N);
+
+
+    double *updated_params = new double[7];
+    myfit.get_params(updated_params);
+
+    for (int i=0; i<7; ++i)
+    {
+        qDebug() << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
+//        QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
+    }
+
 
 
 }
