@@ -87,7 +87,7 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionAExponential(
     edge = 1.0 - 0.5*(term3-term4*term5); // myedgefunction
     exp_after = exp(-1.0*(m_pars[3]+m_pars[4]*x)); //myexp after
     exp_before = exp(-1.0*(m_pars[5]+m_pars[6]*x)); //my exp before
-    return exp_after*(exp_before+(1-exp_before)*edge);
+    return exp_before*(exp_after+(1-exp_after)*edge);
 }
 
 /// \param x The argument

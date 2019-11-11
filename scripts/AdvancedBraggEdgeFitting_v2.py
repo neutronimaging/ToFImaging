@@ -69,8 +69,14 @@ def B(t,t0,alpha,sigma, bool_transmission):
 def BraggEdgeLinear(t,t0,alpha,sigma,a1,a2,a5,a6,bool_transmission):
     return line_after(t,a1,a2)*B(t,t0,alpha,sigma,bool_transmission)+line_before(t,a5,a6)*(1-B(t,t0,alpha,sigma,bool_transmission))
 
+def BraggEdgeLinear_Attenuation(t,t0,alpha,sigma,a1,a2,a5,a6,bool_transmission):
+    return line_before(t,a5,a6)*B(t,t0,alpha,sigma,bool_transmission)+line_after(t,a1,a2)*(1-B(t,t0,alpha,sigma,bool_transmission))
+
 def BraggEdgeExponential(t,t0,alpha,sigma,a1,a2,a5,a6,bool_transmission):
     return exp_after(t,a1,a2) * ( exp_before(t,a5,a6)+ (1-exp_before(t,a5,a6)) * B(t,t0,alpha,sigma,bool_transmission) )
+
+def BraggEdgeExponential_Attenuation(t,t0,alpha,sigma,a1,a2,a5,a6,bool_transmission):
+    return exp_before(t,a5,a6) * ( exp_after(t,a1,a2)+ (1-exp_after(t,a1,a2)) * B(t,t0,alpha,sigma,bool_transmission) )
 
 
 def running_mean(x, w, n):
@@ -126,7 +132,10 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
         plt.plot(t,interception_before+slope_before*t,'g')
         plt.plot(t,interception_after+slope_after*t,'r')
         plt.title('linear fitting before and after the given edge position')
-        gmodel = Model(BraggEdgeLinear)
+        if bool_transmission:
+            gmodel = Model(BraggEdgeLinear)
+        else:
+            gmodel = Model(BraggEdgeLinear_Attenuation)
     else:
         [slope_before, interception_before] = np.polyfit(t_before, bragg_before, 1)
         [slope_after, interception_after] = np.polyfit(t_after, bragg_after, 1)
@@ -149,7 +158,10 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
         result_exp_model_before = exp_model_before.fit(bragg_before,params,t=t_before)
         a5_f=result_exp_model_before.best_values.get('a5')
         a6_f=result_exp_model_before.best_values.get('a6')
-        gmodel = Model(BraggEdgeExponential)
+        if bool_transmission:
+            gmodel = Model(BraggEdgeExponential)
+        else:
+            gmodel = Model(BraggEdgeExponential_Attenuation)
         plt.figure()
         plt.plot(t_before,bragg_before,'.r', label ='int point')
         plt.plot(t_after,bragg_after,'.g', label='int point')
