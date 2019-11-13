@@ -6,7 +6,7 @@
 #include <map>
 
 
-namespace BraggEdge{
+namespace ToFImagingAlgorithms{
 /// enum of different edge functions available
 enum eEdgeFunction{
     EdgeTransmissionExponential,
@@ -49,8 +49,8 @@ protected:
 
 }
 
-void  TOF_IMAGINGALGORITHMSHARED_EXPORT string2enum(std::string &str, BraggEdge::eEdgeFunction &e);
-TOF_IMAGINGALGORITHMSHARED_EXPORT std::string enum2string(BraggEdge::eEdgeFunction  e);
-TOF_IMAGINGALGORITHMSHARED_EXPORT std::ostream  &  operator<<(std::ostream &s,BraggEdge::eEdgeFunction e);
+void  TOF_IMAGINGALGORITHMSHARED_EXPORT string2enum(std::string &str, ToFImagingAlgorithms::eEdgeFunction &e);
+TOF_IMAGINGALGORITHMSHARED_EXPORT std::string enum2string(ToFImagingAlgorithms::eEdgeFunction  e);
+TOF_IMAGINGALGORITHMSHARED_EXPORT std::ostream  &  operator<<(std::ostream &s,ToFImagingAlgorithms::eEdgeFunction e);
 
 #endif // EDGEFUNCTION_H

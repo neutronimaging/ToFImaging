@@ -88,12 +88,12 @@ void ToFImagingAlgorithm::test_TransmissionExp()
 
     double *computed_firstedge = new double[N];
 
-    BraggEdge::EdgeFunction myedge(7);
+    ToFImagingAlgorithms::EdgeFunction myedge(7);
 
 
     for (int i=0; i<N; ++i)
     {
-        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionTExponential(x[i], param);
+        computed_firstedge[i] = ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTExponential(x[i], param);
 //        qDebug() << computed_firstedge[i];
 //        qDebug() << first_guess[i];
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
@@ -103,7 +103,7 @@ void ToFImagingAlgorithm::test_TransmissionExp()
 
     // then fitting, and compare the results with the expected final parameters
 
-    edgefitting myfit(7, BraggEdge::eEdgeFunction::EdgeTransmissionExponential);
+   ToFImagingAlgorithms::edgefitting myfit(7, ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionExponential);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
 
@@ -209,16 +209,16 @@ void ToFImagingAlgorithm::test_TransmissionLin()
 
 
 
-    BraggEdge::EdgeFunction myedge(7);
+    ToFImagingAlgorithms::EdgeFunction myedge(7);
     double *computed_firstedge = new double[N];
     for (int i=0; i<N; ++i)
     {
-        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionTLinear(x[i], param);
+        computed_firstedge[i] = ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTLinear(x[i], param);
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
         }
 
-    edgefitting myfit(7, BraggEdge::eEdgeFunction::EdgeTransmissionLinear);
+    ToFImagingAlgorithms::edgefitting myfit(7, ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionLinear);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
 
@@ -307,11 +307,11 @@ void ToFImagingAlgorithm::test_GradientGaussian()
 
     QCOMPARE(loop_y, 1107);
 
-    BraggEdge::EdgeFunction myedge(7);
+    ToFImagingAlgorithms::EdgeFunction myedge(7);
     double *computed_firstedge = new double[N];
     for (int i=0; i<N; ++i)
     {
-        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeGradientGaussian(x[i], param);
+        computed_firstedge[i] = ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian(x[i], param);
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
         }
@@ -342,7 +342,7 @@ void ToFImagingAlgorithm::test_GradientGaussian()
 
 
 
-    edgefitting myfit(3, BraggEdge::eEdgeFunction::EdgeGradientGaussian);
+    ToFImagingAlgorithms::edgefitting myfit(3, ToFImagingAlgorithms::eEdgeFunction::EdgeGradientGaussian);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
 
@@ -435,11 +435,11 @@ void ToFImagingAlgorithm::test_AttenuationExp()
 
     QCOMPARE(loop_y, 1107);
 
-    BraggEdge::EdgeFunction myedge(7);
+    ToFImagingAlgorithms::EdgeFunction myedge(7);
     double *computed_firstedge = new double[N];
     for (int i=0; i<N; ++i)
     {
-        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionAExponential(x[i], param);
+        computed_firstedge[i] = ToFImagingAlgorithms::EdgeFunction::EdgeFunctionAExponential(x[i], param);
 //        qDebug() << computed_firstedge[i];
 //        qDebug() << first_guess[i];
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
@@ -447,7 +447,7 @@ void ToFImagingAlgorithm::test_AttenuationExp()
         }
 
 
-    edgefitting myfit(7, BraggEdge::eEdgeFunction::EdgeAttenuationExponential);
+    ToFImagingAlgorithms::edgefitting myfit(7, ToFImagingAlgorithms::eEdgeFunction::EdgeAttenuationExponential);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
 
@@ -528,18 +528,18 @@ void ToFImagingAlgorithm::test_AttenuationLin()
     QCOMPARE(loop_y, 1107);
 
 
-    BraggEdge::EdgeFunction myedge(7);
+    ToFImagingAlgorithms::EdgeFunction myedge(7);
     double *computed_firstedge = new double[N];
     for (int i=0; i<N; ++i)
     {
-        computed_firstedge[i] = BraggEdge::EdgeFunction::EdgeFunctionALinear(x[i], param);
+        computed_firstedge[i] = ToFImagingAlgorithms::EdgeFunction::EdgeFunctionALinear(x[i], param);
 //        qDebug() << computed_firstedge[i];
 //        qDebug() << first_guess[i];
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
         }
 
-    edgefitting myfit(7, BraggEdge::eEdgeFunction::EdgeAttenuationLinear);
+    ToFImagingAlgorithms::edgefitting myfit(7, ToFImagingAlgorithms::eEdgeFunction::EdgeAttenuationLinear);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
 

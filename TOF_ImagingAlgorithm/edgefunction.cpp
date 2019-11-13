@@ -6,7 +6,7 @@
 #include <math/gradient.h>
 #include <math.h>
 
-namespace BraggEdge{
+namespace ToFImagingAlgorithms{
 
 TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunction(int n)
 {
@@ -126,17 +126,17 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeGradientGaussian(doub
     return m_pars[2]*exp(-(x-m_pars[0])*(x-m_pars[0])/(m_pars[1]));
 }
 
-TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, BraggEdge::eEdgeFunction &e)
+TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, ToFImagingAlgorithms::eEdgeFunction &e)
 {
     std::string lowstr=kipl::strings::toLower(str);
 
-    std::map<std::string,BraggEdge::eEdgeFunction> convmap;
+    std::map<std::string,ToFImagingAlgorithms::eEdgeFunction> convmap;
 
-    convmap["edgetlinear"] = BraggEdge::eEdgeFunction::EdgeTransmissionLinear;
-    convmap["edgetexponential"] = BraggEdge::eEdgeFunction::EdgeTransmissionExponential;
-    convmap["edgealinear"] = BraggEdge::eEdgeFunction::EdgeAttenuationLinear;
-    convmap["edgeaexponential"] = BraggEdge::eEdgeFunction::EdgeAttenuationExponential;
-    convmap["edgegradgaussian"] = BraggEdge::eEdgeFunction::EdgeGradientGaussian;
+    convmap["edgetlinear"] = ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionLinear;
+    convmap["edgetexponential"] = ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionExponential;
+    convmap["edgealinear"] = ToFImagingAlgorithms::eEdgeFunction::EdgeAttenuationLinear;
+    convmap["edgeaexponential"] = ToFImagingAlgorithms::eEdgeFunction::EdgeAttenuationExponential;
+    convmap["edgegradgaussian"] = ToFImagingAlgorithms::eEdgeFunction::EdgeGradientGaussian;
 
     auto it=convmap.find(lowstr);
 
@@ -147,23 +147,23 @@ TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, BraggEdge::
 
 }
 
-TOF_IMAGINGALGORITHMSHARED_EXPORT std::string enum2string(BraggEdge::eEdgeFunction  e)
+TOF_IMAGINGALGORITHMSHARED_EXPORT std::string enum2string(ToFImagingAlgorithms::eEdgeFunction  e)
 {
     std::string str;
     switch(e){
-        case BraggEdge::EdgeTransmissionLinear:
+        case ToFImagingAlgorithms::EdgeTransmissionLinear:
             str = "EdgeTLinear";
             break;
-        case BraggEdge::EdgeTransmissionExponential:
+        case ToFImagingAlgorithms::EdgeTransmissionExponential:
             str =  "EdgeTExponential";
             break;
-        case BraggEdge::EdgeAttenuationLinear:
+        case ToFImagingAlgorithms::EdgeAttenuationLinear:
             str =  "EdgeALinear";
             break;
-        case BraggEdge::EdgeAttenuationExponential:
+        case ToFImagingAlgorithms::EdgeAttenuationExponential:
             str =  "EdgeAExponential";
             break;
-        case BraggEdge::EdgeGradientGaussian:
+        case ToFImagingAlgorithms::EdgeGradientGaussian:
             str =  "EdgeGradGaussian";
             break;
     default:
@@ -172,7 +172,7 @@ TOF_IMAGINGALGORITHMSHARED_EXPORT std::string enum2string(BraggEdge::eEdgeFuncti
     }
     return str;
 }
-TOF_IMAGINGALGORITHMSHARED_EXPORT std::ostream  &  operator<<(std::ostream &s,BraggEdge::eEdgeFunction e)
+TOF_IMAGINGALGORITHMSHARED_EXPORT std::ostream  &  operator<<(std::ostream &s,ToFImagingAlgorithms::eEdgeFunction e)
 {
     s<<enum2string(e);
     return s;

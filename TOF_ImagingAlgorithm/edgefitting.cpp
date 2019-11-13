@@ -4,7 +4,9 @@
 #include <math/gradient.h>
 #include <base/KiplException.h>
 
-edgefitting::edgefitting(int n, BraggEdge::eEdgeFunction ef)
+namespace ToFImagingAlgorithms {
+
+edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
 {
     m_Npars = n;
     myfun = ef;
@@ -36,31 +38,31 @@ void edgefitting::fit(double *x, double *y, int N)
     qDebug() << "size of X" << (sizeof(x)/sizeof(*x));
     qDebug() << N;
     switch (myfun){
-    case BraggEdge::EdgeTransmissionExponential :
+    case ToFImagingAlgorithms::EdgeTransmissionExponential :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionTExponential, &control, &status );
+        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTExponential, &control, &status );
         break;
     }
-    case BraggEdge::EdgeTransmissionLinear :
+    case ToFImagingAlgorithms::EdgeTransmissionLinear :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionTLinear, &control, &status );
+        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTLinear, &control, &status );
         break;
     }
-    case BraggEdge::EdgeAttenuationExponential :
+    case ToFImagingAlgorithms::EdgeAttenuationExponential :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionAExponential, &control, &status );
+        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionAExponential, &control, &status );
         break;
     }
-    case BraggEdge::EdgeAttenuationLinear :
+    case ToFImagingAlgorithms::EdgeAttenuationLinear :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, BraggEdge::EdgeFunction::EdgeFunctionALinear, &control, &status );
+        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionALinear, &control, &status );
         break;
     }
-    case BraggEdge::EdgeGradientGaussian :
+    case ToFImagingAlgorithms::EdgeGradientGaussian :
     {
         double *gradient = new double[N];
         kipl::math::num_gradient(y,x,N,gradient);
-        lmcurve(m_Npars, m_pars, N, x, gradient, BraggEdge::EdgeFunction::EdgeGradientGaussian, &control, &status);
+        lmcurve(m_Npars, m_pars, N, x, gradient, ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian, &control, &status);
         delete [] gradient;
         break;
     }
@@ -75,5 +77,7 @@ void edgefitting::fit(double *x, double *y, int N)
     printf( "Results:\n" );
     printf( "status after %d function evaluations:\n  %s\n",
             status.nfev, lm_infmsg[status.outcome] );
+
+}
 
 }
