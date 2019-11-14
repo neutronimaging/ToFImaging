@@ -102,6 +102,14 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
     m_pars[0] = est_t0;
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
+
+    // divide the signal in two
+    double *x1;
+    double *x2;
+    double *y1;
+    double *y2;
+
+
 }
 
 /// compute initial parameters without knowing an estimated Bragg edge position
