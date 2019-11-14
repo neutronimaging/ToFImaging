@@ -41,7 +41,8 @@ HEADERS += \
         tof_imagingalgorithm_global.h \
     edgefunction.h \
     edgefitting.h \
-    tof2lambda.h
+    tof2lambda.h \
+    findclosest.h
 
 unix {
     target.path = /usr/lib

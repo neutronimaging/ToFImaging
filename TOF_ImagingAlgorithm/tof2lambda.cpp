@@ -9,7 +9,7 @@ namespace ToFImagingAlgorithms {
 /// m = 1.674927471e-27 #Neutron mass [kg]
 /// inputs:
 /// tof     = pointer to tof array [s]
-/// lambda  = pointer to lambda array [A]
+/// lambda  = pointer to lambda array [A], populated by the function
 /// N       = length of arrays
 /// t0      = trigger in the TOF measure [s]
 /// L       = flight path [m]
@@ -28,7 +28,7 @@ void ToF2Lambda(double *tof, double *lambda, int N, double t0, double L)
 /// h = 6.62607004e-34 #Planck constant [m^2 kg / s]
 /// m = 1.674927471e-27 #Neutron mass [kg]
 /// inputs:
-/// tof     = pointer to tof array [s]
+/// tof     = pointer to tof array [s], populated by the function
 /// lambda  = pointer to lambda array [A]
 /// N       = length of arrays
 /// t0      = trigger in the TOF measure [s]

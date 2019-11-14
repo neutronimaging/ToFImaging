@@ -9,6 +9,7 @@
 #include <fstream>
 #include <math/gradient.h>
 #include <tof2lambda.h>
+#include <findclosest.h>
 
 
 class ToFImagingAlgorithm : public QObject
@@ -27,6 +28,7 @@ private slots:
     void test_AttenuationLin();
     void test_TOF2lambda();
     void test_lambda2TOF();
+    void test_findclosest();
 
 };
 
@@ -655,6 +657,41 @@ void ToFImagingAlgorithm::test_lambda2TOF()
     delete [] exp_tof;
     delete [] comp_tof;
     delete [] lambda;
+
+}
+
+void ToFImagingAlgorithm::test_findclosest()
+{
+   // read the tof data
+    ifstream myfile_tof("../ToFImaging/UnitTests/test_data/tof.txt"); //opening the file.
+
+    int N = 300;
+    double *tof = new double[N];
+    int loop=0;
+    for (double a; myfile_tof>>a;)
+    {
+        tof[loop]=a;
+        loop++;
+
+    }
+
+
+
+    qDebug() << N;
+    QCOMPARE(loop, N);
+
+    qDebug() << tof[150];
+
+    int est_position;
+    double target = 0.056568;
+    est_position = ToFImagingAlgorithms::findClosest(tof, N, target);
+
+    qDebug() << "estimated position is: ";
+    qDebug() << est_position;
+    qDebug() << "value at estimated position: ";
+    qDebug() << tof[est_position];
+
+    QCOMPARE(est_position, 161);
 
 }
 
