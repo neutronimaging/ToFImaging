@@ -8,6 +8,7 @@
 #include <edgefitting.h>
 #include <fstream>
 #include <math/gradient.h>
+#include <tof2lambda.h>
 
 
 class ToFImagingAlgorithm : public QObject
@@ -24,6 +25,8 @@ private slots:
     void test_GradientGaussian();
     void test_AttenuationExp();
     void test_AttenuationLin();
+    void test_TOF2lambda();
+    void test_lambda2TOF();
 
 };
 
@@ -554,6 +557,104 @@ void ToFImagingAlgorithm::test_AttenuationLin()
     }
 
 
+
+}
+
+void ToFImagingAlgorithm::test_TOF2lambda()
+{
+    // open the tof ifle
+    ifstream myfile_tof("../ToFImaging/UnitTests/test_data/tof.txt"); //opening the file.
+    ifstream myfile_lambda("../ToFImaging/UnitTests/test_data/lambda.txt"); //opening the file.
+    unsigned int N = 300;
+    double *exp_lambda = new double[N];
+    double *comp_lambda = new double[N];
+    double *tof = new double[N];
+
+    int loop=0;
+    for (double a; myfile_tof>>a;)
+    {
+        tof[loop]=a;
+        loop++;
+
+    }
+
+    qDebug() << N;
+    QCOMPARE(loop, N);
+
+    loop =0;
+
+    for (double a; myfile_lambda>>a;)
+    {
+        exp_lambda[loop]=a;
+        loop++;
+
+    }
+
+    qDebug() << N;
+    QCOMPARE(loop, N);
+
+    ToFImagingAlgorithms::ToF2Lambda(tof, comp_lambda, N, 0.0,52);
+
+    for (int i=0; i<N; i++)
+    {
+        QCOMPARE(comp_lambda[i], exp_lambda[i]);
+//        qDebug() << comp_lambda[i];
+//        qDebug() << exp_lambda[i];
+
+    }
+
+
+    delete [] tof;
+    delete [] exp_lambda;
+    delete [] comp_lambda;
+}
+
+void ToFImagingAlgorithm::test_lambda2TOF()
+{
+    ifstream myfile_tof("../ToFImaging/UnitTests/test_data/tof.txt"); //opening the file.
+    ifstream myfile_lambda("../ToFImaging/UnitTests/test_data/lambda.txt"); //opening the file.
+    unsigned int N = 300;
+    double *exp_tof = new double[N];
+    double *comp_tof = new double[N];
+    double *lambda = new double[N];
+
+    int loop=0;
+    for (double a; myfile_tof>>a;)
+    {
+        exp_tof[loop]=a;
+        loop++;
+
+    }
+
+    qDebug() << N;
+    QCOMPARE(loop, N);
+
+    loop =0;
+
+    for (double a; myfile_lambda>>a;)
+    {
+        lambda[loop]=a;
+        loop++;
+
+    }
+
+    qDebug() << N;
+    QCOMPARE(loop, N);
+
+    ToFImagingAlgorithms::Lambda2ToF(comp_tof, lambda, N, 0.0,52);
+
+    for (int i=0; i<N; i++)
+    {
+        QCOMPARE(comp_tof[i], exp_tof[i]);
+//        qDebug() << comp_tof[i];
+//        qDebug() << exp_tof[i];
+    }
+
+
+
+    delete [] exp_tof;
+    delete [] comp_tof;
+    delete [] lambda;
 
 }
 
