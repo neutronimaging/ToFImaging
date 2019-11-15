@@ -9,20 +9,16 @@ namespace ToFImagingAlgorithms {
 
 
 template<typename T>
-T getClosest(T, T, T);
+int getClosest(T, T, T);
 
 // Returns element closest to target in arr[]
 template<typename T>
 int findClosest(T *arr, int n, T target)
 {
 
-    std::cout << arr[0] << std::endl;
-    std::cout << target << std::endl;
-    std::cout << n << std::endl;
     // Corner cases
     if (target <= arr[0])
     {
-        std::cout << " I am returning zero" << std::endl;
         return 0;
     }
     if (target >= arr[n - 1])
@@ -31,14 +27,11 @@ int findClosest(T *arr, int n, T target)
     // Doing binary search
     int i = 0, j = n, mid = 0;
 
-    std:: cout << "before while " << std::endl;
     while (i < j) {
         mid = (i + j) / 2;
-        std::cout<< "mid: " << mid << std::endl;
 
         if (arr[mid] == target)
-        {
-            std::cout << " I am returning mid: " << mid << std::endl;
+            {
             return mid;
         }
 
@@ -49,28 +42,38 @@ int findClosest(T *arr, int n, T target)
             // If target is greater than previous
             // to mid, return closest of two
             if (mid > 0 && target > arr[mid - 1])
-                return getClosest(arr[mid - 1],
-                                  arr[mid], target);
+            {
+
+               if (getClosest(arr[mid - 1], arr[mid], target)==0)
+                    {
+                    return mid-1;
+                }
+                else {
+                    return mid;
+                }
+
+            }
 
             /* Repeat for left half */
             j = mid;
 
-            std::cout << "j: " <<j << std::endl;
         }
 
         // If target is greater than mid
         else {
             if (mid < n - 1 && target < arr[mid + 1])
-                return getClosest(arr[mid],
-                                  arr[mid + 1], target);
+            {
+                if (getClosest(arr[mid], arr[mid + 1], target)==0)
+                    return mid;
+                else {
+                    return mid+1;
+                }
+            }
             // update i
             i = mid + 1;
-            std::cout << "i: " << i << std::endl;
         }
     }
 
-    std:: cout << "after while " << std::endl;
-    std::cout << mid << std::endl;
 
     // Only single element left after search
     // returns the array position
@@ -83,12 +86,12 @@ int findClosest(T *arr, int n, T target)
 // that val2 is greater than val1 and target lies
 // between these two.
 template<typename T>
-T getClosest(T val1, T val2, T target)
+int getClosest(T val1, T val2, T target)
 {
     if (target - val1 >= val2 - target)
-        return val2;
+        return 1;
     else
-        return val1;
+        return 0;
 }
 
 }
