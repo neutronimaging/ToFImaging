@@ -1,18 +1,22 @@
 #include "edgefitting.h"
+#include <findclosest.h>
+#include <base/KiplException.h>
 #include <lmcurve.h>
 #include <QDebug>
 #include <math/gradient.h>
-#include <base/KiplException.h>
+#include <math/linfit.h>
 
 namespace ToFImagingAlgorithms {
 
 /// class constructor, inputs:
-/// n = number of parameters to be fitted, 7 for the complete lineshape, 3 for the simpliefies (gaussian of the signal gradient)
+/// n = number of parameters to be fitted, 7 for the complete lineshape, 3 for the simplifies (gaussian of the signal gradient)
 /// ef = lineshape type
 edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
 {
     m_Npars = n;
     myfun = ef;
+    m_pars = new double[m_Npars];
+
 }
 
 /// class deconstructor
@@ -24,8 +28,7 @@ edgefitting::~edgefitting()
 
 /// initialize parameters by copying the inputs in the m_pars
 void edgefitting::intialize_params(double *pars)
-{
-    m_pars = new double[m_Npars];
+{   
     std::copy_n(pars,m_Npars, m_pars);
 }
 
@@ -76,11 +79,12 @@ void edgefitting::fit(double *x, double *y, int N)
         break;
     }
     default :
+    {
         throw kipl::base::KiplException("Wrong edge function.",__FILE__,__LINE__);
+    }
 
 
     }
-
 
 
     printf( "Results:\n" );
@@ -99,15 +103,40 @@ void edgefitting::fit(double *x, double *y, int N)
 /// This computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
 void edgefitting::compute_initial_params(double *x, double *y, int N, double est_t0)
 {
+    int est_pos, size_1, size_2, buffer;
+    double *x1, *x2, *y1, *y2;
     m_pars[0] = est_t0;
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
 
+    buffer = static_cast<int>(0.1*N);
+    est_pos = ToFImagingAlgorithms::findClosest(x,N, est_t0);
+    size_1 = est_pos-buffer;
+    size_2 = N-(est_pos+buffer);
+
     // divide the signal in two
-    double *x1;
-    double *x2;
-    double *y1;
-    double *y2;
+
+    x1 = new double[size_1];
+    y1 = new double[size_1];
+    x2 = new double[size_2];
+    y2 = new double[size_2];
+
+    std::copy_n(x, size_1, x1);
+    std::copy_n(y, size_1, y1);
+    std::copy_n(x+(est_pos+buffer), size_2, x2);
+    std::copy_n(y+(est_pos+buffer), size_2, y2);
+
+    double lin_par_before[2];
+    double lin_par_after[2];
+
+    kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
+    kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
+
+
+    m_pars[3] = lin_par_after[0];
+    m_pars[4] = lin_par_after[1];
+    m_pars[5] = lin_par_before[0];
+    m_pars[6] = lin_par_before[1];
 
 
 }

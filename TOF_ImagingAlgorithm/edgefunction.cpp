@@ -4,7 +4,7 @@
 #include <base/KiplException.h>
 #include <math/mathconstants.h>
 #include <math/gradient.h>
-#include <math.h>
+#include <cmath>
 
 namespace ToFImagingAlgorithms{
 
@@ -33,12 +33,12 @@ TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::~EdgeFunction()
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTExponential(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,exp_after,exp_before;
-    term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
-    term4 = exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
-    term5 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
+    term3 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
+    term4 = std::exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
+    term5 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
     edge = 0.5*(term3-term4*term5); // myedgefunction
-    exp_after = exp(-1.0*(m_pars[3]+m_pars[4]*x)); //myexp after
-    exp_before = exp(-1.0*(m_pars[5]+m_pars[6]*x)); //my exp before
+    exp_after = std::exp(-1.0*(m_pars[3]+m_pars[4]*x)); //myexp after
+    exp_before = std::exp(-1.0*(m_pars[5]+m_pars[6]*x)); //my exp before
     return exp_after*(exp_before+(1-exp_before)*edge);
 }
 
@@ -57,9 +57,9 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTExponential(
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTLinear(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,line_after,line_before;
-    term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
-    term4 = exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
-    term5 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
+    term3 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
+    term4 = std::exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
+    term5 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
     edge = 0.5*(term3-term4*term5); // myedgefunction
     line_after = (m_pars[3]+m_pars[4]*x); //line after
     line_before = (m_pars[5]+m_pars[6]*x); // line before
@@ -81,12 +81,12 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionTLinear(doubl
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionAExponential(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,exp_after,exp_before;
-    term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
-    term4 = exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
-    term5 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
+    term3 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
+    term4 = std::exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
+    term5 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
     edge = 1.0 - 0.5*(term3-term4*term5); // myedgefunction
-    exp_after = exp(-1.0*(m_pars[3]+m_pars[4]*x)); //myexp after
-    exp_before = exp(-1.0*(m_pars[5]+m_pars[6]*x)); //my exp before
+    exp_after = std::exp(-1.0*(m_pars[3]+m_pars[4]*x)); //myexp after
+    exp_before = std::exp(-1.0*(m_pars[5]+m_pars[6]*x)); //my exp before
     return exp_before*(exp_after+(1-exp_after)*edge);
 }
 
@@ -105,9 +105,9 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionAExponential(
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,line_after,line_before;
-    term3 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
-    term4 = exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
-    term5 = erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
+    term3 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2));
+    term4 = std::exp(-1.0*((x-m_pars[0])/m_pars[2])+((m_pars[1]*m_pars[1])/(2.0*m_pars[2]*m_pars[2])));
+    term5 = std::erfc(-1.0*(x-m_pars[0])/(m_pars[1]*dsqrt2)+m_pars[1]/m_pars[2]);
     edge = 1.0-0.5*(term3-term4*term5); // myedgefunction
     line_after = (m_pars[3]+m_pars[4]*x); // line after
     line_before = (m_pars[5]+m_pars[6]*x); // line before
@@ -123,7 +123,7 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(doubl
 /// m_pars[2] = amplitude, possibly non useful for the edge fitting
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeGradientGaussian(double x, const double *m_pars)
 {
-    return m_pars[2]*exp(-(x-m_pars[0])*(x-m_pars[0])/(m_pars[1]));
+    return m_pars[2]*std::exp(-(x-m_pars[0])*(x-m_pars[0])/(m_pars[1]));
 }
 
 TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, ToFImagingAlgorithms::eEdgeFunction &e)

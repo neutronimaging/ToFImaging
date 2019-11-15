@@ -1,9 +1,8 @@
 #ifndef FINDCLOSEST_H
 #define FINDCLOSEST_H
 
-#include <QDebug>
 #include <iostream>
-using namespace std;
+
 
 namespace ToFImagingAlgorithms {
 
@@ -11,7 +10,7 @@ namespace ToFImagingAlgorithms {
 template<typename T>
 int getClosest(T, T, T);
 
-// Returns element closest to target in arr[]
+// Returns element closest to target in arr
 template<typename T>
 int findClosest(T *arr, int n, T target)
 {

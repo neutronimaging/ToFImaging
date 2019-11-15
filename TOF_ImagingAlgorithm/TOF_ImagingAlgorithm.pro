@@ -35,14 +35,16 @@ unix:!mac{
 SOURCES += \
     edgefunction.cpp \
     edgefitting.cpp \
-    tof2lambda.cpp
+    tof2lambda.cpp \
+    auxiliary_functions.cpp
 
 HEADERS += \
         tof_imagingalgorithm_global.h \
     edgefunction.h \
     edgefitting.h \
     tof2lambda.h \
-    findclosest.h
+    findclosest.h \
+    auxiliary_functions.h
 
 unix {
     target.path = /usr/lib

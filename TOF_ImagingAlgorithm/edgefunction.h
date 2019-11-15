@@ -31,8 +31,9 @@ public:
     static double EdgeFunctionAExponential(double x, const double *m_pars);
     ///\brief Implements edge function in attenuation with lines before and after the edge
     static double EdgeFunctionALinear(double x, const double *m_pars);
-    ///\brief Implements simple fitting of the edge position by fitting the first derivative with a Gaussian model
+    ///\brief Implements the Gaussian shape for simple fitting of the edge position (Gaussian fitting of the first derivative of the signal)
     static double EdgeGradientGaussian(double x, const double *m_pars);
+
 
 
 
