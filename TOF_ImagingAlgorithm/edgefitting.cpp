@@ -138,6 +138,11 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
     m_pars[5] = lin_par_before[0];
     m_pars[6] = lin_par_before[1];
 
+    delete [] x1;
+    delete [] x2;
+    delete [] y1;
+    delete [] y2;
+
 
 }
 
@@ -151,6 +156,9 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
 /// Then it computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
 void edgefitting::compute_initial_params(double *x, double *y, int N)
 {
+    int est_pos, size_1, size_2, buffer;
+    double *x1, *x2, *y1, *y2;
+
     double *gradient = new double[N];
     double *gauss_param = new double[3];
     double *updated_gauss_params = new double[3];
@@ -166,6 +174,42 @@ void edgefitting::compute_initial_params(double *x, double *y, int N)
     m_pars[0] = updated_gauss_params[0];
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
+
+    std::cout << m_pars[0] << std::endl;
+
+    buffer = static_cast<int>(0.1*N);
+    est_pos = ToFImagingAlgorithms::findClosest(x,N, m_pars[0]);
+
+
+    size_1 = est_pos-buffer;
+    size_2 = N-(est_pos+buffer);
+
+    x1 = new double[size_1];
+    y1 = new double[size_1];
+    x2 = new double[size_2];
+    y2 = new double[size_2];
+
+    std::copy_n(x, size_1, x1);
+    std::copy_n(y, size_1, y1);
+    std::copy_n(x+(est_pos+buffer), size_2, x2);
+    std::copy_n(y+(est_pos+buffer), size_2, y2);
+
+    double lin_par_before[2];
+    double lin_par_after[2];
+
+    kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
+    kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
+
+
+    m_pars[3] = lin_par_after[0];
+    m_pars[4] = lin_par_after[1];
+    m_pars[5] = lin_par_before[0];
+    m_pars[6] = lin_par_before[1];
+
+    delete [] x1;
+    delete [] x2;
+    delete [] y1;
+    delete [] y2;
 
 
     delete [] gradient;

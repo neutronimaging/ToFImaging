@@ -30,6 +30,7 @@ private slots:
     void test_lambda2TOF();
     void test_findclosest();
     void test_computeIniPars();
+    void test_computeIniParWithPos();
 
 };
 
@@ -703,7 +704,6 @@ void ToFImagingAlgorithm::test_computeIniPars()
 
     unsigned int N=1107;
     double *x = new double[N];
-    double *first_guess = new double[N];
     double *y = new double[N];
 
     double eps=0.001;
@@ -744,8 +744,54 @@ void ToFImagingAlgorithm::test_computeIniPars()
    qDebug() << comp_ini_par[5];
    qDebug() << comp_ini_par[6];
 
+}
+
+void ToFImagingAlgorithm::test_computeIniParWithPos()
+{
+    ifstream myfile_x("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
 
+    unsigned int N=1107;
+    double *x = new double[N];
+    double *y = new double[N];
+
+    double eps=0.001;
+    int loop = 0;
+
+    for (double a; myfile_x>>a;)
+    {
+        x[loop]=a;
+        loop++;
+    }
+
+
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
+
+    loop = 0;
+    for (double a; myfile_y>>a;)
+    {
+        y[loop]=a;
+        loop++;
+
+    }
+
+    // test initial parameters computation, if it does not crash and gives meaningfull numbers
+    ToFImagingAlgorithms::edgefitting myfit(7,ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionLinear);
+
+    myfit.compute_initial_params(x,y,N);
+
+    double *comp_ini_par = new double[7];
+
+   myfit.get_params(comp_ini_par);
+
+   qDebug() << " estimated initial parameters: ";
+   qDebug() << comp_ini_par[0];
+   qDebug() << comp_ini_par[1];
+   qDebug() << comp_ini_par[2];
+   qDebug() << comp_ini_par[3];
+   qDebug() << comp_ini_par[4];
+   qDebug() << comp_ini_par[5];
+   qDebug() << comp_ini_par[6];
 
 }
 
