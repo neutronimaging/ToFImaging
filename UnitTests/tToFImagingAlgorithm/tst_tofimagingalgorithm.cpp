@@ -793,6 +793,27 @@ void ToFImagingAlgorithm::test_computeIniParWithPos()
    qDebug() << comp_ini_par[5];
    qDebug() << comp_ini_par[6];
 
+   myfit.intialize_params(comp_ini_par);
+   myfit.fit(x,y,N);
+
+   double *updated_params = new double[7];
+   myfit.get_params(updated_params);
+
+   double *expected_params = new double[7];
+   expected_params[0] = 0.05773708;
+   expected_params[1] = 6.2354e-05;
+   expected_params[2] = 3.5847e-04;
+   expected_params[3] = 0.78972162;
+   expected_params[4] = -4.0781558;
+   expected_params[5] = 0.48510798;
+   expected_params[6] = -5.14692195;
+
+   for (int i=0; i<7; ++i)
+   {
+       qDebug() << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
+//       QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
+   }
+
 }
 
 QTEST_APPLESS_MAIN(ToFImagingAlgorithm)
