@@ -14,7 +14,7 @@ public:
     void intialize_params(double *pars);
     /// \brief computes initial parameters given the estimated Bragg edge position
     void compute_initial_params(double *x, double *y, int N, double est_t0);
-    /// \brief computes intial parameters without the estimeated Bragg edge position
+    /// \brief computes intial parameters without the estimated Bragg edge position
     void compute_initial_params(double *x, double *y, int N);
     /// \brief return the current parameters
     void get_params(double *pars);

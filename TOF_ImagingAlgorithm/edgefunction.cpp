@@ -126,6 +126,17 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeGradientGaussian(doub
     return m_pars[2]*std::exp(-(x-m_pars[0])*(x-m_pars[0])/(m_pars[1]));
 }
 
+/// \param x The argument
+/// \param m_pars The fitting parameter
+/// \retval The method returns an expontial function with exponent equal to a linear function
+/// The exponential is decribed by two parameters as y= exp(-1.0*(m_pars[0]+m_pars[1]*x))
+/// m_pars[0] = first parameter
+/// m_pars[1] = second parameter
+double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::ExponentialFunction(double x, const double *m_pars)
+{
+    return std::exp(-1.0*(m_pars[0]+m_pars[1]*x));
+}
+
 TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, ToFImagingAlgorithms::eEdgeFunction &e)
 {
     std::string lowstr=kipl::strings::toLower(str);

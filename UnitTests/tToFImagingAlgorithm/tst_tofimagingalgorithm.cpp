@@ -810,9 +810,11 @@ void ToFImagingAlgorithm::test_computeIniParWithPos()
 
    for (int i=0; i<7; ++i)
    {
-       qDebug() << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
+       qDebug() << "initial: "<< comp_ini_par[i] << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
 //       QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
    }
+
+
 
 }
 
