@@ -137,6 +137,27 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::ExponentialFunction(doubl
     return std::exp(-1.0*(m_pars[0]+m_pars[1]*x));
 }
 
+/// \param x The argument
+/// \param m_pars The fitting parameter
+/// \retval The method returns an expontial function with exponent equal to a linear function
+/// The exponential is decribed by two parameters as y= exp(-1.0*(m_pars[0]+m_pars[1]*x))
+/// m_pars[0] = first parameter
+/// m_pars[1] = second parameter
+/// m_pars[2] = third parameter
+/// m_pars[3] = fourth parameter
+double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::CombinedExponentialFunction(double x, const double *m_pars)
+{
+    double *m_pars_after = new double[2];
+    m_pars_after[0] = m_pars[0];
+    m_pars_after[1] = m_pars[1];
+
+    double *m_pars_before = new double [2];
+    m_pars_before[0] = m_pars[2];
+    m_pars_before[1] = m_pars[3];
+
+    return ExponentialFunction(x,m_pars_after)*ExponentialFunction(x,m_pars_before);
+}
+
 TOF_IMAGINGALGORITHMSHARED_EXPORT void string2enum(std::string &str, ToFImagingAlgorithms::eEdgeFunction &e)
 {
     std::string lowstr=kipl::strings::toLower(str);

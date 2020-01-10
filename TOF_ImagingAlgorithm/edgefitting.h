@@ -28,6 +28,7 @@ private:
     double *m_pars; /// parameter arrays
     int m_Npars; /// number of parameters
     ToFImagingAlgorithms::eEdgeFunction myfun; /// type of function to be fitted
+    bool blinear;
 };
 
 

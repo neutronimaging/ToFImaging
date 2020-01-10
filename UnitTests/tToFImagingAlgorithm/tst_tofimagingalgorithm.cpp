@@ -31,6 +31,7 @@ private slots:
     void test_findclosest();
     void test_computeIniPars();
     void test_computeIniParWithPos();
+    void test_computeExponentialFunctions();
 
 };
 
@@ -735,7 +736,7 @@ void ToFImagingAlgorithm::test_computeIniPars()
 
    myfit.get_params(comp_ini_par);
 
-   qDebug() << " estimated initial parameters: ";
+   qDebug() << " estimated initial linear parameters: ";
    qDebug() << comp_ini_par[0];
    qDebug() << comp_ini_par[1];
    qDebug() << comp_ini_par[2];
@@ -743,6 +744,20 @@ void ToFImagingAlgorithm::test_computeIniPars()
    qDebug() << comp_ini_par[4];
    qDebug() << comp_ini_par[5];
    qDebug() << comp_ini_par[6];
+
+   ToFImagingAlgorithms::edgefitting myfit2(7,ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionExponential);
+   myfit2.compute_initial_params(x,y,N,0.056568);
+   myfit2.get_params(comp_ini_par);
+
+   qDebug() << " estimated initial exponential parameters: ";
+   qDebug() << comp_ini_par[0];
+   qDebug() << comp_ini_par[1];
+   qDebug() << comp_ini_par[2];
+   qDebug() << comp_ini_par[3];
+   qDebug() << comp_ini_par[4];
+   qDebug() << comp_ini_par[5];
+   qDebug() << comp_ini_par[6];
+
 
 }
 
@@ -815,6 +830,11 @@ void ToFImagingAlgorithm::test_computeIniParWithPos()
    }
 
 
+
+}
+
+void ToFImagingAlgorithm::test_computeExponentialFunctions()
+{
 
 }
 

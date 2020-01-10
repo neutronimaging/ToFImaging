@@ -16,6 +16,46 @@ edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
     m_Npars = n;
     myfun = ef;
     m_pars = new double[m_Npars];
+    blinear = true;
+
+//    EdgeTransmissionExponential,
+//    EdgeTransmissionLinear,
+//    EdgeAttenuationExponential,
+//    EdgeAttenuationLinear,
+//    EdgeGradientGaussian,
+
+    switch (myfun) {
+        case ToFImagingAlgorithms::EdgeTransmissionLinear :
+        {
+            blinear = true;
+            break;
+        }
+
+        case ToFImagingAlgorithms::EdgeAttenuationLinear :
+        {
+            blinear = true;
+            break;
+        }
+
+        case  ToFImagingAlgorithms::EdgeTransmissionExponential :
+        {
+            blinear = false;
+            break;
+        }
+
+        case ToFImagingAlgorithms::EdgeAttenuationExponential :
+        {
+            blinear = false;
+            break;
+        }
+
+        case ToFImagingAlgorithms::EdgeGradientGaussian :
+        {
+//            blinear = false; // this is not relavant in this case
+            break;
+        }
+
+    }
 
 }
 
@@ -104,7 +144,7 @@ void edgefitting::fit(double *x, double *y, int N)
 void edgefitting::compute_initial_params(double *x, double *y, int N, double est_t0)
 {
     int est_pos, size_1, size_2, buffer;
-    double *x1, *x2, *y1, *y2;
+    double *x1, *x2, *y1, *y2, *logy1, *logy2;
     m_pars[0] = est_t0;
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
@@ -129,8 +169,31 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
     double lin_par_before[2];
     double lin_par_after[2];
 
-    kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
-    kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
+    if (blinear){
+        kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
+        kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
+    }
+    else {
+        logy1 = new double[size_1];
+        logy2 = new double[size_2];
+
+        //compute the log of the ys
+        for (int i=0; i<size_2; ++i){
+            logy2[i] = std::log(y1[i]);
+        }
+
+        kipl::math::LinearLSFit(x2, logy2, size_2, lin_par_after, lin_par_after+1, nullptr);
+
+        for (int i=0; i<size_1; ++i)
+        {
+            logy1[i] = std::log(y1[i])+lin_par_after[0]*x[0]+lin_par_after[1];
+        }
+
+        kipl::math::LinearLSFit(x1, logy1, size_1, lin_par_before, lin_par_before+1, nullptr);
+
+
+    }
+
 
 
     m_pars[3] = lin_par_after[0];
@@ -157,7 +220,7 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
 void edgefitting::compute_initial_params(double *x, double *y, int N)
 {
     int est_pos, size_1, size_2, buffer;
-    double *x1, *x2, *y1, *y2;
+    double *x1, *x2, *y1, *y2, *logy1, *logy2;
 
     double *gradient = new double[N];
     double *gauss_param = new double[3];
@@ -197,8 +260,30 @@ void edgefitting::compute_initial_params(double *x, double *y, int N)
     double lin_par_before[2];
     double lin_par_after[2];
 
-    kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
-    kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
+    if (blinear){
+        kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
+        kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
+    }
+    else {
+        logy1 = new double[size_1];
+        logy2 = new double[size_2];
+
+        //compute the log of the ys
+        for (int i=0; i<size_2; ++i){
+            logy2[i] = std::log(y1[i]);
+        }
+
+        kipl::math::LinearLSFit(x2, logy2, size_2, lin_par_after, lin_par_after+1, nullptr);
+
+        for (int i=0; i<size_1; ++i)
+        {
+            logy1[i] = std::log(y1[i])+lin_par_after[0]*x[0]+lin_par_after[1];
+        }
+
+        kipl::math::LinearLSFit(x1, logy1, size_1, lin_par_before, lin_par_before+1, nullptr);
+
+
+    }
 
 
     m_pars[3] = lin_par_after[0];

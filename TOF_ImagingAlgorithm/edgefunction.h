@@ -33,8 +33,10 @@ public:
     static double EdgeFunctionALinear(double x, const double *m_pars);
     ///\brief Implements the Gaussian shape for simple fitting of the edge position (Gaussian fitting of the first derivative of the signal)
     static double EdgeGradientGaussian(double x, const double *m_pars);
-    ///\brief Implements the exponential functions to fit the lineshape before and after the edges
+    ///\brief Implements the exponential function to fit the lineshape after the edge
     static double ExponentialFunction(double x, const double *m_pars);
+    ///\brief Implements the combined exponential function to fit the lineshape before the edge
+    static double CombinedExponentialFunction(double x, const double *m_pars);
 
 
 
