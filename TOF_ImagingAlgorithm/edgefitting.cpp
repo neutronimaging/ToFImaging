@@ -149,7 +149,7 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
 
-    buffer = static_cast<int>(0.1*N);
+    buffer = static_cast<int>(0.1*N); // this is possibly to optimize
     est_pos = ToFImagingAlgorithms::findClosest(x,N, est_t0);
     size_1 = est_pos-buffer;
     size_2 = N-(est_pos+buffer);
@@ -179,14 +179,14 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
 
         //compute the log of the ys
         for (int i=0; i<size_2; ++i){
-            logy2[i] = std::log(y1[i]);
+            logy2[i] = -1.0*std::log(y2[i]);
         }
 
         kipl::math::LinearLSFit(x2, logy2, size_2, lin_par_after, lin_par_after+1, nullptr);
 
         for (int i=0; i<size_1; ++i)
         {
-            logy1[i] = std::log(y1[i])+lin_par_after[0]*x[0]+lin_par_after[1];
+            logy1[i] = -1.0*std::log(y1[i])-lin_par_after[0]-lin_par_after[1]*x[0];
         }
 
         kipl::math::LinearLSFit(x1, logy1, size_1, lin_par_before, lin_par_before+1, nullptr);
@@ -270,14 +270,14 @@ void edgefitting::compute_initial_params(double *x, double *y, int N)
 
         //compute the log of the ys
         for (int i=0; i<size_2; ++i){
-            logy2[i] = std::log(y1[i]);
+            logy2[i] = -1.0*std::log(y2[i]);
         }
 
         kipl::math::LinearLSFit(x2, logy2, size_2, lin_par_after, lin_par_after+1, nullptr);
 
         for (int i=0; i<size_1; ++i)
         {
-            logy1[i] = std::log(y1[i])+lin_par_after[0]*x[0]+lin_par_after[1];
+            logy1[i] = -1.0*std::log(y1[i])-lin_par_after[0]-lin_par_after[1]*x[0];
         }
 
         kipl::math::LinearLSFit(x1, logy1, size_1, lin_par_before, lin_par_before+1, nullptr);

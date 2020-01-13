@@ -799,7 +799,7 @@ void ToFImagingAlgorithm::test_computeIniParWithPos()
 
    myfit.get_params(comp_ini_par);
 
-   qDebug() << " estimated initial parameters: ";
+   qDebug() << " estimated initial linear parameters: ";
    qDebug() << comp_ini_par[0];
    qDebug() << comp_ini_par[1];
    qDebug() << comp_ini_par[2];
@@ -828,6 +828,36 @@ void ToFImagingAlgorithm::test_computeIniParWithPos()
        qDebug() << "initial: "<< comp_ini_par[i] << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
 //       QVERIFY(fabs(expected_params[i]-updated_params[i])<eps);
    }
+
+   ToFImagingAlgorithms::edgefitting myfit2(7,ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionExponential);
+
+   myfit2.compute_initial_params(x,y,N);
+
+   myfit2.get_params(comp_ini_par);
+
+   qDebug() << " estimated initial exponential parameters: ";
+   qDebug() << comp_ini_par[0];
+   qDebug() << comp_ini_par[1];
+   qDebug() << comp_ini_par[2];
+   qDebug() << comp_ini_par[3];
+   qDebug() << comp_ini_par[4];
+   qDebug() << comp_ini_par[5];
+   qDebug() << comp_ini_par[6];
+
+   myfit2.intialize_params(comp_ini_par);
+   myfit2.fit(x,y,N);
+
+   myfit2.get_params(updated_params);
+
+   qDebug() << " final exponential parameters: ";
+   qDebug() << updated_params[0];
+   qDebug() << updated_params[1];
+   qDebug() << updated_params[2];
+   qDebug() << updated_params[3];
+   qDebug() << updated_params[4];
+   qDebug() << updated_params[5];
+   qDebug() << updated_params[6];
+
 
 
 
