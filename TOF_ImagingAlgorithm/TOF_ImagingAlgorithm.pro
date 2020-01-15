@@ -71,6 +71,14 @@ unix {
     LIBS += -lm -lz -L/opt/usr/lib  -L/usr/local/lib -llmfit
 }
 
+win32 {
+    INCLUDEPATH +=  $$PWD/../../imagingsuite/external/lmfit_install/include $$PWD/../../imagingsuite/external/include
+    QMAKE_LIBDIR += $$PWD/../../imagingsuite/external/lmfit_install/lib $$PWD/../../imagingsuite/external/lmfit_install/bin  $$PWD/../../external/lib64
+
+    LIBS +=  -llmfit
+
+}
+
 
 CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms
 else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms
