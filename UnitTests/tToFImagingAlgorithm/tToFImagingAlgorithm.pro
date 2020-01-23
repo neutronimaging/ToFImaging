@@ -11,8 +11,7 @@ TEMPLATE = app
 
 SOURCES +=  tst_tofimagingalgorithm.cpp
 
-CONFIG(release, debug|release)           LIBS += -L$$PWD/../../../lib -lTOF_ImagingAlgorithm -lkipl -lImagingAlgorithms
-else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../../lib/debug/ -lTOF_ImagingAlgorithm -lkipl -lImagingAlgorithms
+
 
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../lib/release/ -lkipl
 #else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../lib/debug/ -lkipl
@@ -26,24 +25,21 @@ win32 {
 
 }
 
-
-INCLUDEPATH += $$PWD/../../../imagingsuite/core/kipl/kipl/include
-DEPENDPATH += $$PWD/../../../imagingsuite/core/kipl/kipl/include
-
-
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../lib/release/ -lImagingAlgorithms
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../lib/debug/ -lImagingAlgorithms
-#else:unix: LIBS += -L$$PWD/../../../lib/ -lImagingAlgorithms
-
-INCLUDEPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/include
-DEPENDPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/include
-
-
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../lib/release/ -lTOF_ImagingAlgorithm
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../lib/debug/ -lTOF_ImagingAlgorithm
-#else:unix: LIBS += -L$$PWD/../../../lib/ -lTOF_ImagingAlgorithm
+CONFIG(release, debug|release)           LIBS += -L$$PWD/../../../lib
+else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../../lib/debug/
 
 INCLUDEPATH += $$PWD/../../TOF_ImagingAlgorithm
 DEPENDPATH += $$PWD/../../TOF_ImagingAlgorithm
+LIBS += -lTOF_ImagingAlgorithm
+
+INCLUDEPATH += $$PWD/../../../imagingsuite/core/kipl/kipl/include
+DEPENDPATH += $$PWD/../../../imagingsuite/core/kipl/kipl/include
+LIBS += -lkipl
+
+INCLUDEPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/include
+DEPENDPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/include
+LIBS += -lImagingAlgorithms
+
+
 
 INCLUDEPATH += $$PWD/../../../imagingsuite/external/src/linalg

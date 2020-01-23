@@ -12,13 +12,13 @@
 #include <findclosest.h>
 
 
-class ToFImagingAlgorithm : public QObject
+class ToFImagingAlgorithmTest : public QObject
 {
     Q_OBJECT
 
 public:
-    ToFImagingAlgorithm();
-    ~ToFImagingAlgorithm();
+    ToFImagingAlgorithmTest();
+    ~ToFImagingAlgorithmTest();
 
 private slots:
     void test_TransmissionExp();
@@ -35,17 +35,17 @@ private slots:
 
 };
 
-ToFImagingAlgorithm::ToFImagingAlgorithm()
+ToFImagingAlgorithmTest::ToFImagingAlgorithmTest()
 {
 
 }
 
-ToFImagingAlgorithm::~ToFImagingAlgorithm()
+ToFImagingAlgorithmTest::~ToFImagingAlgorithmTest()
 {
 
 }
 
-void ToFImagingAlgorithm::test_TransmissionExp()
+void ToFImagingAlgorithmTest::test_TransmissionExp()
 {
     short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
@@ -152,7 +152,7 @@ void ToFImagingAlgorithm::test_TransmissionExp()
 
 }
 
-void ToFImagingAlgorithm::test_TransmissionLin()
+void ToFImagingAlgorithmTest::test_TransmissionLin()
 {
 
     double *param = new double[7]; // initial parameters
@@ -256,7 +256,7 @@ void ToFImagingAlgorithm::test_TransmissionLin()
 
 }
 
-void ToFImagingAlgorithm::test_GradientGaussian()
+void ToFImagingAlgorithmTest::test_GradientGaussian()
 {
     // Here I assume that the gradient is already smoothed
 
@@ -382,7 +382,7 @@ void ToFImagingAlgorithm::test_GradientGaussian()
 
 }
 
-void ToFImagingAlgorithm::test_AttenuationExp()
+void ToFImagingAlgorithmTest::test_AttenuationExp()
 {
     double *param = new double[7];
     double *expected_param = new double[7];
@@ -473,7 +473,7 @@ void ToFImagingAlgorithm::test_AttenuationExp()
 
 }
 
-void ToFImagingAlgorithm::test_AttenuationLin()
+void ToFImagingAlgorithmTest::test_AttenuationLin()
 {
 
     double *param = new double[7]; // initial parameters
@@ -565,7 +565,7 @@ void ToFImagingAlgorithm::test_AttenuationLin()
 
 }
 
-void ToFImagingAlgorithm::test_TOF2lambda()
+void ToFImagingAlgorithmTest::test_TOF2lambda()
 {
     // open the tof ifle
     ifstream myfile_tof("../ToFImaging/UnitTests/test_data/tof.txt"); //opening the file.
@@ -614,7 +614,7 @@ void ToFImagingAlgorithm::test_TOF2lambda()
     delete [] comp_lambda;
 }
 
-void ToFImagingAlgorithm::test_lambda2TOF()
+void ToFImagingAlgorithmTest::test_lambda2TOF()
 {
     ifstream myfile_tof("../ToFImaging/UnitTests/test_data/tof.txt"); //opening the file.
     ifstream myfile_lambda("../ToFImaging/UnitTests/test_data/lambda.txt"); //opening the file.
@@ -663,7 +663,7 @@ void ToFImagingAlgorithm::test_lambda2TOF()
 
 }
 
-void ToFImagingAlgorithm::test_findclosest()
+void ToFImagingAlgorithmTest::test_findclosest()
 {
    // read the tof data
     ifstream myfile_tof("../ToFImaging/UnitTests/test_data/tof.txt"); //opening the file.
@@ -698,7 +698,7 @@ void ToFImagingAlgorithm::test_findclosest()
 
 }
 
-void ToFImagingAlgorithm::test_computeIniPars()
+void ToFImagingAlgorithmTest::test_computeIniPars()
 {
     ifstream myfile_x("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
@@ -761,7 +761,7 @@ void ToFImagingAlgorithm::test_computeIniPars()
 
 }
 
-void ToFImagingAlgorithm::test_computeIniParWithPos()
+void ToFImagingAlgorithmTest::test_computeIniParWithPos()
 {
     ifstream myfile_x("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
@@ -863,11 +863,11 @@ void ToFImagingAlgorithm::test_computeIniParWithPos()
 
 }
 
-void ToFImagingAlgorithm::test_computeExponentialFunctions()
+void ToFImagingAlgorithmTest::test_computeExponentialFunctions()
 {
 
 }
 
-QTEST_APPLESS_MAIN(ToFImagingAlgorithm)
+QTEST_APPLESS_MAIN(ToFImagingAlgorithmTest)
 
 #include "tst_tofimagingalgorithm.moc"
