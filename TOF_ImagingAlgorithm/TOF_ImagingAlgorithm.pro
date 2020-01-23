@@ -72,8 +72,8 @@ unix {
 }
 
 win32 {
-    INCLUDEPATH +=  $$PWD/../../imagingsuite/external/lmfit_install/include $$PWD/../../imagingsuite/external/include
-    QMAKE_LIBDIR += $$PWD/../../imagingsuite/external/lmfit_install/lib $$PWD/../../imagingsuite/external/lmfit_install/bin  $$PWD/../../external/lib64
+    INCLUDEPATH +=  $$PWD/../../imagingsuite/external/include/lmfit $$PWD/../../imagingsuite/external/include
+    QMAKE_LIBDIR += $$PWD/../../imagingsuite/external/lib64/lmfit $$PWD/../../external/lib64
 
     LIBS +=  -llmfit
 

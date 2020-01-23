@@ -11,12 +11,21 @@ TEMPLATE = app
 
 SOURCES +=  tst_tofimagingalgorithm.cpp
 
-CONFIG(release, debug|release)           LIBS += -L$$PWD/../../../lib -lkipl -lImagingAlgorithms -lTOF_ImagingAlgorithm
-else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../../lib/debug/ -lkipl -lImagingAlgorithms -lTOF_ImagingAlgorithm
+CONFIG(release, debug|release)           LIBS += -L$$PWD/../../../lib -lTOF_ImagingAlgorithm -lkipl -lImagingAlgorithms
+else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../../lib/debug/ -lTOF_ImagingAlgorithm -lkipl -lImagingAlgorithms
 
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../lib/release/ -lkipl
 #else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../lib/debug/ -lkipl
 #else:unix: LIBS += -L$$PWD/../../../lib/ -lkipl
+
+win32 {
+    INCLUDEPATH +=  $$PWD/../../../imagingsuite/external/include/lmfit $$PWD/../../../imagingsuite/external/include
+    QMAKE_LIBDIR += $$PWD/../../../imagingsuite/external/lib64/lmfit $$PWD/../../../external/lib64
+
+    LIBS +=  -llmfit
+
+}
+
 
 INCLUDEPATH += $$PWD/../../../imagingsuite/core/kipl/kipl/include
 DEPENDPATH += $$PWD/../../../imagingsuite/core/kipl/kipl/include
