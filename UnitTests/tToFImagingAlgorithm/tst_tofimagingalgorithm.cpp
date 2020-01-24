@@ -575,7 +575,9 @@ void ToFImagingAlgorithmTest::test_TOF2lambda()
     double *comp_lambda = new double[N];
     double *tof = new double[N];
 
-    int loop=0;
+    unsigned loop;
+
+    loop=0;
     for (double a; myfile_tof>>a;)
     {
         tof[loop]=a;
@@ -623,7 +625,7 @@ void ToFImagingAlgorithmTest::test_lambda2TOF()
     double *comp_tof = new double[N];
     double *lambda = new double[N];
 
-    int loop=0;
+    unsigned int loop=0;
     for (double a; myfile_tof>>a;)
     {
         exp_tof[loop]=a;
