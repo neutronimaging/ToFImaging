@@ -12,7 +12,8 @@ DEST=$WORKSPACE/builds
 mkdir -p $DEST/build-tofimagingalgorithm
 cd $DEST/build-tofimagingalgorithm
 
-$QTBINPATH/qmake -makefile -r $SPECSTR -o Makefile ../../ToFImaging/TOF_ImagingAlgorithm
+$QTBINPATH/qmake -makefile -r $SPECSTR -o Makefile ../../ToFImaging/TOF_ImagingAlgorithm/TOF_ImagingAlgorithm.pro
+
 make -f Makefile clean
 make -f Makefile mocables all
 make -f Makefile
