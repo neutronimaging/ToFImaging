@@ -42,7 +42,6 @@ def image_edge_fitting(pathdata, pathob, filemask, pathspectrum, cal_parameters,
 
 
     spectrum_binned = spectrum[0::binning]
-    print(len(spectrum_binned))
 
     #here che calibration parameters
 #     t0=-0.0002618673892937752
@@ -78,31 +77,27 @@ def image_edge_fitting(pathdata, pathob, filemask, pathspectrum, cal_parameters,
     myrange =[]
     myrange.append(find_nearest(mylambda_bin, lambda_range[0])) # 3.7
     myrange.append(find_nearest(mylambda_bin, lambda_range[1])) # 4.4
-    print(myrange)
   
 
 
     est_sigma = est_parameters[0]#0.08
     est_alpha = est_parameters[1]#0.08
     est_pos = find_nearest(mylambda_bin[myrange[0]:myrange[1]], est_parameters[2]) # 4.05
-    print(est_pos)
     small_range = np.array([0, myrange[1]-myrange[0]-1])
     small_lambda = mylambda_bin[myrange[0]:myrange[1]]
-    print(small_range)
 
     #run once the fitting to check if everything works
-    AdvancedBraggEdgeFitting_v2.AdvancedBraggEdgeFitting(sp[myrange[0]:myrange[1]], small_range, small_lambda, est_pos, est_sigma, est_alpha, True, False, False, True)
+    AdvancedBraggEdgeFitting_v2.AdvancedBraggEdgeFitting(sp[myrange[0]:myrange[1]], small_range, small_lambda, est_pos, est_sigma, est_alpha, False, False, False, True)
 
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_heigth = np.zeros(np.shape(mymask))
-    print(np.shape(edge_position))
 
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
 
-        print('processing row n. ', i, 'of', np.shape(mymask)[0])
+#         print('processing row n. ', i, 'of', np.shape(mymask)[0])
 
         for j in range(0, np.shape(mymask)[1]):
 

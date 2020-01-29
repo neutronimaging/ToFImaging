@@ -88,13 +88,13 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     est_pos=est_pos-myrange[0] # I move the estimated position relative to the studied range, this is an index
     t0_f=myTOF[est_pos+myrange[0]] # this is the actual estimated first position in TOF [s]
 
-    plt.figure()
-    plt.plot(t, mybragg)
-    plt.plot(t0_f, mybragg[est_pos],'x', markeredgewidth=3, c='orange')
-    plt.title('Bragg edge')
-    plt.xlabel('Wavelenght [Å]')
-    plt.ylabel('Tranmission I/I$_{0}$')
-    #     plt.savefig('step1_fitting.pdf')
+#     plt.figure()
+#     plt.plot(t, mybragg)
+#     plt.plot(t0_f, mybragg[est_pos],'x', markeredgewidth=3, c='orange')
+#     plt.title('Bragg edge')
+#     plt.xlabel('Wavelenght [Å]')
+#     plt.ylabel('Tranmission I/I$_{0}$')
+#     #     plt.savefig('step1_fitting.pdf')
     
     t_before= t[0:est_pos]
     bragg_before=mybragg[0:est_pos]
@@ -176,7 +176,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos, est_sigma, est
     
         
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f, bool_trasmission=bool_transmission)
-    print(bool_transmission)
+#     print(bool_transmission)
     
     first_guess = gmodel.eval(params, t=t)
 #     plt.figure()
