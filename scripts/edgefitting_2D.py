@@ -131,7 +131,7 @@ def image_edge_fitting(pathdata, pathob, filemask, pathspectrum, cal_parameters,
     # plt.imshow(edge_position)
     # save the results
     np.save('edge_position.npy', edge_position)
-    np.save('edge_height.npy', edge_height)
+    np.save('edge_height.npy', edge_heigth)
     np.save('edge_width.npy', )
 
 
