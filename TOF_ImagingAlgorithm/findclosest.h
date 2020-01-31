@@ -12,7 +12,7 @@ int getClosest(T, T, T);
 
 // Returns element closest to target in arr
 template<typename T>
-int findClosest(T *arr, int n, T target)
+unsigned int findClosest(T *arr, int n, T target)
 {
 
     // Corner cases
@@ -85,7 +85,7 @@ int findClosest(T *arr, int n, T target)
 // that val2 is greater than val1 and target lies
 // between these two.
 template<typename T>
-int getClosest(T val1, T val2, T target)
+unsigned int getClosest(T val1, T val2, T target)
 {
     if (target - val1 >= val2 - target)
         return 1;
