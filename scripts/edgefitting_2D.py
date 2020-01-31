@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-import AdvancedBraggEdgeFitting_v2
+import AdvancedBraggEdgeFitting
 # from PIL import Image
 
 import tifffile
@@ -87,7 +87,7 @@ def image_edge_fitting(pathdata, pathob, filemask, pathspectrum, cal_parameters,
     small_lambda = mylambda_bin[myrange[0]:myrange[1]]
 
     #run once the fitting to check if everything works
-    AdvancedBraggEdgeFitting_v2.AdvancedBraggEdgeFitting(sp[myrange[0]:myrange[1]], small_range, small_lambda, est_pos, est_sigma, est_alpha, False, False, False, True)
+    AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(sp[myrange[0]:myrange[1]], small_range, small_lambda, est_pos, est_sigma, est_alpha, False, False, False, True)
 
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
