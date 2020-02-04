@@ -165,8 +165,8 @@ void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<dou
 
     std::copy_n(x.begin(), size_1, std::back_inserter(x1));
     std::copy_n(y.begin(), size_1, std::back_inserter(y1));
-    std::copy_n(x.at(est_pos+buffer), size_2, std::back_inserter(x2));
-    std::copy_n(y.at(est_pos+buffer), size_2, std::back_inserter(y2));
+    std::copy_n(x.begin()+(est_pos+buffer), size_2, std::back_inserter(x2));
+    std::copy_n(y.begin()+(est_pos+buffer), size_2, std::back_inserter(y2));
 
 
     double lin_par_before[2];
@@ -263,8 +263,8 @@ void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<dou
 
     std::copy_n(x.begin(), size_1, std::back_inserter(x1));
     std::copy_n(y.begin(), size_1, std::back_inserter(y1));
-    std::copy_n(x.at(est_pos+buffer), size_2, std::back_inserter(x2));
-    std::copy_n(y.at(est_pos+buffer), size_2, std::back_inserter(y2));
+    std::copy_n(x.begin()+(est_pos+buffer), size_2, std::back_inserter(x2));
+    std::copy_n(y.begin()+(est_pos+buffer), size_2, std::back_inserter(y2));
 
     double lin_par_before[2];
     double lin_par_after[2];
