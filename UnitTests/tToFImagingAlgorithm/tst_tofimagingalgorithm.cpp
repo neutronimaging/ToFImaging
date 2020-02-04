@@ -52,20 +52,13 @@ void ToFImagingAlgorithmTest::test_TransmissionExp()
     ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
     unsigned int N=1107;
-//    double *x = new double[N];
-//    double *first_guess = new double[N];
-//    double *y = new double[N];
-
     std::vector<double> x,y,first_guess, computed_firstedge;
 
     double eps=0.0001;
 
     for (double a; myfile>>a;)
     {
-//        x[loop]=a;
         x.push_back(a);
-//        qDebug() << x.back();
-//        loop++;
     }
     qDebug() << x.size();
 
@@ -73,26 +66,20 @@ void ToFImagingAlgorithmTest::test_TransmissionExp()
     ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Texp.txt"); //opening the file. //path should be related to the lib
     ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
 
-//    int loop_y=0;
     for (double a; myfile_y>>a;)
     {
-//        first_guess[loop_y]=a;
         first_guess.push_back(a);
-//        loop_y++;
-
     }
 
     int loop_y=0;
     for (double a; myfile_y2>>a;)
     {
-//        y[loop_y]=a;
         y.push_back(a);
         loop_y++;
     }
 
     QCOMPARE(loop_y, 1107);
 
-//    double *param = new double[7]; // initial parameters
     std::vector<double> param(7),updated_params(7), expected_params(7);
     param[0]=0.056568;
     param[1]=0.0001;
@@ -102,7 +89,6 @@ void ToFImagingAlgorithmTest::test_TransmissionExp()
     param[5]=-0.4700811;
     param[6]=26.929825;
 
-//    double *computed_firstedge = new double[N];
 
     ToFImagingAlgorithms::EdgeFunction myedge(7);
 
@@ -110,8 +96,6 @@ void ToFImagingAlgorithmTest::test_TransmissionExp()
     for (int i=0; i<N; ++i)
     {
         computed_firstedge.push_back( ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTExponential(x[i], &(param[0])));
-//        qDebug() << computed_firstedge.at(i);
-//        qDebug() << first_guess.at(i);
         QVERIFY(fabs(computed_firstedge.at(i)-first_guess.at(i))<eps); // compare the computed first edge with the loaded one, passed
 
         }
@@ -122,14 +106,10 @@ void ToFImagingAlgorithmTest::test_TransmissionExp()
    ToFImagingAlgorithms::edgefitting myfit(7, ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionExponential);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
-
-
-//    double *updated_params = new double[7];
     myfit.get_params(updated_params);
 
     // compare with expected output
 
-//    double *expected_params = new double[7];
     expected_params[0] = 0.05773708;
     expected_params[1] = 6.1353e-05;
     expected_params[2] = 3.6402e-04;
@@ -148,22 +128,11 @@ void ToFImagingAlgorithmTest::test_TransmissionExp()
     myfile_y.close();
     myfile_y2.close();
 
-
-//    delete [] x;
-//    delete [] y;
-//    delete [] expected_params;
-//    delete [] param;
-//    delete [] updated_params;
-//    delete [] first_guess;
-//    delete [] computed_firstedge;
-
-
 }
 
 void ToFImagingAlgorithmTest::test_TransmissionLin()
 {
 
-//    double *param = new double[7]; // initial parameters
 
     std::vector <double> param(7),expected_params(7);
     param[0]=0.056568;
@@ -175,7 +144,6 @@ void ToFImagingAlgorithmTest::test_TransmissionLin()
     param[6]=-6.692051420263259;
 
 
-//    double *expected_params = new double[7];
     expected_params[0] = 0.05773708;
     expected_params[1] = 6.2354e-05;
     expected_params[2] = 3.5847e-04;
@@ -184,26 +152,19 @@ void ToFImagingAlgorithmTest::test_TransmissionLin()
     expected_params[5] = 0.48510798;
     expected_params[6] = -5.14692195;
 
-//    short loop=0; //short for loop for input
-    string line; //this will contain the data read from the file
 
+    string line; //this will contain the data read from the file
     ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
 
     unsigned int N=1107;
-//    double *x = new double[N];
-//    double *first_guess = new double[N];
-//    double *y = new double[N];
-
     std::vector<double> x,first_guess, y,computed_firstedge,updated_params;
 
     double eps=0.0001;
 
     for (double a; myfile>>a;)
     {
-//        x[loop]=a;
         x.push_back(a);
-//        loop++;
     }
 
     ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_model_Tlin.txt"); //opening the file. //path should be related to the lib
@@ -213,18 +174,15 @@ void ToFImagingAlgorithmTest::test_TransmissionLin()
     int loop_y=0;
     for (double a; myfile_y>>a;)
     {
-//        first_guess[loop_y]=a;
         first_guess.push_back(a);
         loop_y++;
 
     }
 
-//    loop_y=0;
+
     for (double a; myfile_y2>>a;)
     {
-//        y[loop_y]=a;
         y.push_back(a);
-//        loop_y++;
     }
 
     QCOMPARE(loop_y, 1107);
@@ -233,7 +191,6 @@ void ToFImagingAlgorithmTest::test_TransmissionLin()
 
 
     ToFImagingAlgorithms::EdgeFunction myedge(7);
-//    double *computed_firstedge = new double[N];
     for (int i=0; i<N; ++i)
     {
         computed_firstedge.push_back (ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTLinear(x[i], &(param[0])));
@@ -246,7 +203,6 @@ void ToFImagingAlgorithmTest::test_TransmissionLin()
     myfit.fit(x,y,N);
 
 
-//    double *updated_params = new double[7];
     myfit.get_params(updated_params);
 
     for (int i=0; i<7; ++i)
@@ -260,22 +216,12 @@ void ToFImagingAlgorithmTest::test_TransmissionLin()
     myfile_y2.close();
 
 
-//    delete [] x;
-//    delete [] y;
-//    delete [] expected_params;
-//    delete [] param;
-//    delete [] updated_params;
-//    delete [] first_guess;
-//    delete [] computed_firstedge;
-
-
 }
 
 void ToFImagingAlgorithmTest::test_GradientGaussian()
 {
     // Here I assume that the gradient is already smoothed
 
-//    double *param = new double[3];
     std::vector<double> param(3), expected_params(3),updated_params(3);
     param[0] = 0.056568;
     param[1] = 0.0001;
@@ -286,12 +232,10 @@ void ToFImagingAlgorithmTest::test_GradientGaussian()
 //    param[1] = 1;
 //    param[2] = 1;
 
-//    double *expected_params = new double[3];
     expected_params[0] = 0.05793304;
     expected_params[1] = 4.6231e-08;
     expected_params[2] = 706.346498;
 
-//    short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
     ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
@@ -299,17 +243,11 @@ void ToFImagingAlgorithmTest::test_GradientGaussian()
     unsigned int N=1107;
 
     std::vector<double> x,y,first_guess,computed_firstedge,exp_gradient,gradient(N);
-//    double *x = new double[N];
-//    double *first_guess = new double[N];
-//    double *y = new double[N];
-
     double eps=0.0001;
 
     for (double a; myfile>>a;)
     {
-//        x[loop]=a;
         x.push_back(a);
-//        loop++;
     }
 
     ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_gauss.txt"); //opening the file. //path should be related to the lib
@@ -319,24 +257,20 @@ void ToFImagingAlgorithmTest::test_GradientGaussian()
     int loop_y=0;
     for (double a; myfile_y>>a;)
     {
-//        first_guess[loop_y]=a;
         first_guess.push_back(a);
         loop_y++;
 
     }
 
-//    loop_y=0;
+
     for (double a; myfile_y2>>a;)
     {
         y.push_back(a);
-//        y[loop_y]=a;
-//        loop_y++;
     }
 
     QCOMPARE(loop_y, 1107);
 
     ToFImagingAlgorithms::EdgeFunction myedge(3);
-//    double *computed_firstedge = new double[N];
     for (int i=0; i<N; ++i)
     {
         computed_firstedge.push_back (ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian(x[i], &(param[0])));
@@ -348,18 +282,13 @@ void ToFImagingAlgorithmTest::test_GradientGaussian()
 // check the gradient first
 
     ifstream myfile_y3 ("../ToFImaging/UnitTests/test_data/gradient.txt");
-//    double *exp_gradient = new double[N];
 
-//    loop_y=0;
     for (double a; myfile_y3>>a;)
     {
-//        exp_gradient[loop_y]=a;
-//        loop_y++;
         exp_gradient.push_back(a);
-
     }
 
-//    double *gradient = new double[N];
+
     kipl::math::num_gradient(&(y[0]),&(x[0]),N,&(gradient[0]));
 
     for (int i=0; i<N; ++i)
@@ -374,8 +303,6 @@ void ToFImagingAlgorithmTest::test_GradientGaussian()
     ToFImagingAlgorithms::edgefitting myfit(3, ToFImagingAlgorithms::eEdgeFunction::EdgeGradientGaussian);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
-
-//    double *updated_params = new double[3];
     myfit.get_params(updated_params);
 
     for (int i=0; i<3; ++i)
@@ -390,24 +317,10 @@ void ToFImagingAlgorithmTest::test_GradientGaussian()
     myfile_y3.close();
 
 
-//    delete [] x;
-//    delete [] y;
-//    delete [] expected_params;
-//    delete [] param;
-//    delete [] updated_params;
-//    delete [] first_guess;
-//    delete [] computed_firstedge;
-
-
-
-
 }
 
 void ToFImagingAlgorithmTest::test_AttenuationExp()
 {
-//    double *param = new double[7];
-//    double *expected_param = new double[7];
-
     std::vector<double> param(7), expected_param(7);
 
     param[0] = 0.056568;
@@ -426,17 +339,12 @@ void ToFImagingAlgorithmTest::test_AttenuationExp()
     expected_param[5] = 0.44088105;
     expected_param[6] = -16.6111563;
 
-//    short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
 
     ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
 
     unsigned int N=1107;
-//    double *x = new double[N];
-//    double *first_guess = new double[N];
-//    double *y = new double[N];
-
     std::vector<double> x,y,first_guess,computed_firstedge(N);
     std::vector<double> updated_params(7);
 
@@ -445,8 +353,6 @@ void ToFImagingAlgorithmTest::test_AttenuationExp()
     for (double a; myfile>>a;)
     {
         x.push_back(a);
-//        x[loop]=a;
-//        loop++;
     }
 
     ifstream myfile_y ("../ToFImaging/UnitTests/test_data/inimodel_Aexp.txt"); //opening the file. //path should be related to the lib
@@ -456,29 +362,22 @@ void ToFImagingAlgorithmTest::test_AttenuationExp()
     int loop_y=0;
     for (double a; myfile_y>>a;)
     {
-//        first_guess[loop_y]=a;
         first_guess.push_back(a);
         loop_y++;
 
     }
 
-//    loop_y=0;
     for (double a; myfile_y2>>a;)
     {
         y.push_back(a);
-//        y[loop_y]=a;
-//        loop_y++;
     }
 
     QCOMPARE(loop_y, 1107);
 
     ToFImagingAlgorithms::EdgeFunction myedge(7);
-//    double *computed_firstedge = new double[N];
     for (int i=0; i<N; ++i)
     {
         computed_firstedge[i] = ToFImagingAlgorithms::EdgeFunction::EdgeFunctionAExponential(x[i], &(param[0]));
-//        qDebug() << computed_firstedge[i];
-//        qDebug() << first_guess[i];
         QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
 
         }
@@ -487,9 +386,6 @@ void ToFImagingAlgorithmTest::test_AttenuationExp()
     ToFImagingAlgorithms::edgefitting myfit(7, ToFImagingAlgorithms::eEdgeFunction::EdgeAttenuationExponential);
     myfit.intialize_params(param);
     myfit.fit(x,y,N);
-
-
-//    double *updated_params = new double[7];
     myfit.get_params(updated_params);
 
     for (int i=0; i<7; ++i)
@@ -504,9 +400,6 @@ void ToFImagingAlgorithmTest::test_AttenuationExp()
 
 void ToFImagingAlgorithmTest::test_AttenuationLin()
 {
-
-//    double *param = new double[7]; // initial parameters
-
     std::vector<double> param(7), expected_params(7),updated_params(7);
     param[0]=0.056568;
     param[1]=0.0001;
@@ -516,8 +409,6 @@ void ToFImagingAlgorithmTest::test_AttenuationLin()
     param[5]=-0.12174127292834003;
     param[6]=31.65784345829804;
 
-
-//    double *expected_params = new double[7];
     expected_params[0] = 0.05788519;
     expected_params[1] = 2.1650e-04;
     expected_params[2] = 1.5581e-04;
@@ -526,26 +417,18 @@ void ToFImagingAlgorithmTest::test_AttenuationLin()
     expected_params[5] = 0.15162227;
     expected_params[6] = 26.4337443;
 
-//    short loop=0; //short for loop for input
     string line; //this will contain the data read from the file
-
     ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
 
 
     unsigned int N=1107;
 
     std::vector<double> x,first_guess,y,computed_firstedge(N);
-//    double *x = new double[N];
-//    double *first_guess = new double[N];
-//    double *y = new double[N];
-
     double eps=0.001;
 
     for (double a; myfile>>a;)
     {
         x.push_back(a);
-//        x[loop]=a;
-//        loop++;
     }
 
     ifstream myfile_y ("../ToFImaging/UnitTests/test_data/inimodel_Alinear.txt"); //opening the file. //path should be related to the lib
@@ -555,17 +438,13 @@ void ToFImagingAlgorithmTest::test_AttenuationLin()
     int loop_y=0;
     for (double a; myfile_y>>a;)
     {
-//        first_guess[loop_y]=a;
         first_guess.push_back(a);
         loop_y++;
-
     }
 
-//    loop_y=0;
+
     for (double a; myfile_y2>>a;)
     {
-//        y[loop_y]=a;
-//        loop_y++;
         y.push_back(a);
     }
 
@@ -573,7 +452,7 @@ void ToFImagingAlgorithmTest::test_AttenuationLin()
 
 
     ToFImagingAlgorithms::EdgeFunction myedge(7);
-//    double *computed_firstedge = new double[N];
+
     for (int i=0; i<N; ++i)
     {
         computed_firstedge[i] = ToFImagingAlgorithms::EdgeFunction::EdgeFunctionALinear(x[i], &(param[0]));
@@ -588,7 +467,6 @@ void ToFImagingAlgorithmTest::test_AttenuationLin()
     myfit.fit(x,y,N);
 
 
-//    double *updated_params = new double[7];
     myfit.get_params(updated_params);
 
     for (int i=0; i<7; ++i)
@@ -744,27 +622,18 @@ void ToFImagingAlgorithmTest::test_computeIniPars()
     int N=1107;
 
     std::vector<double> x,y;
-//    double *x = new double[N];
-//    double *y = new double[N];
-
     double eps=0.001;
-//    int loop = 0;
 
     for (double a; myfile_x>>a;)
     {
         x.push_back(a);
-//        x[loop]=a;
-//        loop++;
     }
 
 
     ifstream myfile_y ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
 
-//    loop = 0;
     for (double a; myfile_y>>a;)
     {
-//        y[loop]=a;
-//        loop++;
         y.push_back(a);
 
     }
@@ -773,8 +642,6 @@ void ToFImagingAlgorithmTest::test_computeIniPars()
     ToFImagingAlgorithms::edgefitting myfit(7,ToFImagingAlgorithms::eEdgeFunction::EdgeTransmissionLinear);
 
     myfit.compute_initial_params(x,y,N,0.056568);
-
-//    double *comp_ini_par = new double[7];
 
     std::vector<double> comp_ini_par(7);
 
@@ -811,31 +678,22 @@ void ToFImagingAlgorithmTest::test_computeIniParWithPos()
 
 
     unsigned int N=1107;
-//    double *x = new double[N];
-//    double *y = new double[N];
 
     std::vector<double> x,y;
 
     double eps=0.001;
-//    int loop = 0;
 
     for (double a; myfile_x>>a;)
     {
         x.push_back(a);
-//        x[loop]=a;
-//        loop++;
     }
 
 
     ifstream myfile_y ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
 
-//    loop = 0;
     for (double a; myfile_y>>a;)
     {
         y.push_back(a);
-//        y[loop]=a;
-//        loop++;
-
     }
 
     // test initial parameters computation, if it does not crash and gives meaningfull numbers
@@ -844,8 +702,6 @@ void ToFImagingAlgorithmTest::test_computeIniParWithPos()
     myfit.compute_initial_params(x,y,N);
 
     std::vector<double> comp_ini_par(7),updated_params(7),expected_params(7);
-
-//    double *comp_ini_par = new double[7];
 
    myfit.get_params(comp_ini_par);
 
@@ -860,11 +716,9 @@ void ToFImagingAlgorithmTest::test_computeIniParWithPos()
 
    myfit.intialize_params(comp_ini_par);
    myfit.fit(x,y,N);
-
-//   double *updated_params = new double[7];
    myfit.get_params(updated_params);
 
-//   double *expected_params = new double[7];
+
    expected_params[0] = 0.05773708;
    expected_params[1] = 6.2354e-05;
    expected_params[2] = 3.5847e-04;
