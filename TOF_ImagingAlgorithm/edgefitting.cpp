@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <math/gradient.h>
 #include <math/linfit.h>
+#include <filters/savitzkygolayfilter.h>
 #include <iterator>
 
 namespace ToFImagingAlgorithms {
@@ -17,6 +18,7 @@ edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
     m_Npars = n;
     myfun = ef;
     blinear = true;
+    m_pars.assign(m_Npars,1.0); // initialize container
 
 //    EdgeTransmissionExponential,
 //    EdgeTransmissionLinear,
@@ -111,10 +113,11 @@ void edgefitting::fit(std::vector<double> &x, std::vector<double> &y, int N)
     }
     case ToFImagingAlgorithms::EdgeGradientGaussian :
     {
-        double *gradient = new double[N];
-        kipl::math::num_gradient(&(y[0]),&(x[0]),N,gradient);
-        lmcurve(m_Npars, &(m_pars[0]), N, &(x[0]), gradient, ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian, &control, &status);
-        delete [] gradient;
+//        double *gradient = new double[N];
+        std::vector<double> gradient(N),smoothed(N);
+        kipl::math::num_gradient(&(y[0]),&(x[0]),N,&(gradient[0]));
+        lmcurve(m_Npars, &(m_pars[0]), N, &(x[0]), &(gradient[0]), ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian, &control, &status);
+//        delete [] gradient;
         break;
     }
     default :
@@ -163,10 +166,10 @@ void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<dou
 //    x2 = new double[size_2];
 //    y2 = new double[size_2];
 
-    std::copy_n(x.begin(), size_1, std::back_inserter(x1));
-    std::copy_n(y.begin(), size_1, std::back_inserter(y1));
-    std::copy_n(x.begin()+(est_pos+buffer), size_2, std::back_inserter(x2));
-    std::copy_n(y.begin()+(est_pos+buffer), size_2, std::back_inserter(y2));
+    std::copy_n(x.begin(), size_1, x1.begin());
+    std::copy_n(y.begin(), size_1, y1.begin());
+    std::copy_n(x.begin()+(est_pos+buffer), size_2, x2.begin());
+    std::copy_n(y.begin()+(est_pos+buffer), size_2, y2.begin());
 
 
     double lin_par_before[2];
@@ -231,13 +234,22 @@ void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<dou
 //    double *gradient = new double[N];
 //    double *gauss_param = new double[3];
 //    double *updated_gauss_params = new double[3];
-    std::vector <double> gradient, gauss_param, updated_gauss_params;
-    kipl::math::num_gradient(&(y[0]),&(x[0]),N,&(gradient[0]));
+    std::vector <double> gauss_param(3), updated_gauss_params(3);
+//    std::vector <double> gradient(N)
+//    kipl::math::num_gradient(&(y[0]),&(x[0]),N,&(gradient[0]));
 
-    gauss_param[0] = gauss_param[1] = gauss_param[2] = 1.0;
+//    gauss_param[0] = 0.05659;
+//    gauss_param[1] = 0.0001;
+//    gauss_param[2] = 500.0;
+
+//    gauss_param[0] = x[static_cast<int>(N/2)];
+//    gauss_param[1] = 0.001;
+//    gauss_param[2] = 200;
+
+//    gauss_param[0] = gauss_param[1] = gauss_param[2]
 
     ToFImagingAlgorithms::edgefitting myfit(3, ToFImagingAlgorithms::eEdgeFunction::EdgeGradientGaussian);
-    myfit.intialize_params(gauss_param);
+//    myfit.intialize_params(gauss_param);
     myfit.fit(x,y,N);
     myfit.get_params(updated_gauss_params);
 
@@ -245,7 +257,9 @@ void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<dou
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
 
-    std::cout << m_pars[0] << std::endl;
+    std::cout << updated_gauss_params[0] << std::endl;
+
+//    compute_initial_params(x,y,N,updated_gauss_params[0]);
 
     buffer = static_cast<unsigned int>(0.1*N);
     est_pos = ToFImagingAlgorithms::findClosest(&(x[0]),N, m_pars[0]);
@@ -261,10 +275,10 @@ void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<dou
 //    x2 = new double[size_2];
 //    y2 = new double[size_2];
 
-    std::copy_n(x.begin(), size_1, std::back_inserter(x1));
-    std::copy_n(y.begin(), size_1, std::back_inserter(y1));
-    std::copy_n(x.begin()+(est_pos+buffer), size_2, std::back_inserter(x2));
-    std::copy_n(y.begin()+(est_pos+buffer), size_2, std::back_inserter(y2));
+    std::copy_n(x.begin(), size_1, x1.begin());
+    std::copy_n(y.begin(), size_1, y1.begin());
+    std::copy_n(x.begin()+(est_pos+buffer), size_2, x2.begin());
+    std::copy_n(y.begin()+(est_pos+buffer), size_2, y2.begin());
 
     double lin_par_before[2];
     double lin_par_after[2];
