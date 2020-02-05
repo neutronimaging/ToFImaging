@@ -1,14 +1,16 @@
 #ifndef AUXILIARY_FUNCTIONS_H
 #define AUXILIARY_FUNCTIONS_H
 
+#include "tof_imagingalgorithm_global.h"
+
 namespace ToFImagingAlgorithms {
 
 ///\brief linear function
-double LinearFunction(double x, const double *m_pars); // possibly not used
+double TOF_IMAGINGALGORITHMSHARED_EXPORT LinearFunction(double x, const double *m_pars); // possibly not used
 ///\brief exponential function
-double ExponentialFunction(double x, const double *m_pars);
+double TOF_IMAGINGALGORITHMSHARED_EXPORT ExponentialFunction(double x, const double *m_pars);
 ///\brief product of exponentials function
-double CombinedExponentialFunction(double x, const double *m_pars);
+double TOF_IMAGINGALGORITHMSHARED_EXPORT CombinedExponentialFunction(double x, const double *m_pars);
 
 }
 

@@ -2,17 +2,17 @@
 #define FINDCLOSEST_H
 
 #include <iostream>
-
+#include "tof_imagingalgorithm_global.h"
 
 namespace ToFImagingAlgorithms {
 
 
 template<typename T>
-int getClosest(T, T, T);
+bool getClosest(T, T, T);
 
 // Returns element closest to target in arr
 template<typename T>
-int findClosest(T *arr, int n, T target)
+unsigned int findClosest(T *arr, int n, T target)
 {
 
     // Corner cases
@@ -62,7 +62,7 @@ int findClosest(T *arr, int n, T target)
         else {
             if (mid < n - 1 && target < arr[mid + 1])
             {
-                if (getClosest(arr[mid], arr[mid + 1], target)==0)
+                if (getClosest(arr[mid], arr[mid + 1], target))
                     return mid;
                 else {
                     return mid+1;
@@ -85,12 +85,12 @@ int findClosest(T *arr, int n, T target)
 // that val2 is greater than val1 and target lies
 // between these two.
 template<typename T>
-int getClosest(T val1, T val2, T target)
+bool getClosest(T val1, T val2, T target)
 {
     if (target - val1 >= val2 - target)
-        return 1;
+        return true;
     else
-        return 0;
+        return false;
 }
 
 }

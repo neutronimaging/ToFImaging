@@ -5,24 +5,21 @@
 #include <QDebug>
 #include <math/gradient.h>
 #include <math/linfit.h>
+#include <filters/savitzkygolayfilter.h>
+#include <iterator>
 
 namespace ToFImagingAlgorithms {
 
 /// class constructor, inputs:
 /// n = number of parameters to be fitted, 7 for the complete lineshape, 3 for the simplifies (gaussian of the signal gradient)
 /// ef = lineshape type
-edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
+TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
 {
     m_Npars = n;
     myfun = ef;
-    m_pars = new double[m_Npars];
     blinear = true;
+    m_pars.assign(m_Npars,1.0); // initialize container
 
-//    EdgeTransmissionExponential,
-//    EdgeTransmissionLinear,
-//    EdgeAttenuationExponential,
-//    EdgeAttenuationLinear,
-//    EdgeGradientGaussian,
 
     switch (myfun) {
         case ToFImagingAlgorithms::EdgeTransmissionLinear :
@@ -60,62 +57,62 @@ edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
 }
 
 /// class deconstructor
-edgefitting::~edgefitting()
+TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::~edgefitting()
 {
 
 }
 
 
 /// initialize parameters by copying the inputs in the m_pars
-void edgefitting::intialize_params(double *pars)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::intialize_params(std::vector<double> &pars)
 {   
-    std::copy_n(pars,m_Npars, m_pars);
+    m_pars.assign(pars.begin(), pars.end());
 }
 
-
 /// get parameters
-void edgefitting::get_params(double *pars)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::get_params(std::vector<double> &pars)
 {
-    std::copy_n(m_pars,m_Npars, pars);
+    pars.assign(m_pars.begin(), m_pars.end());
 }
 
 /// call the fitting routine, switching betweeen the different lineshape options
-void edgefitting::fit(double *x, double *y, int N)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::fit(std::vector<double> &x, std::vector<double> &y, int N)
 {
     lm_control_struct control = lm_control_double;
     lm_status_struct status;
     control.verbosity = 7;
 
     printf( "Fitting ...\n" );
-    qDebug() << "size of X" << (sizeof(x)/sizeof(*x));
+    qDebug() << "size of X" << x.size();
     qDebug() << N;
     switch (myfun){
     case ToFImagingAlgorithms::EdgeTransmissionExponential :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTExponential, &control, &status );
+        lmcurve(m_Npars, &(m_pars[0]), N, &(x[0]),&(y[0]), ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTExponential, &control, &status );
         break;
     }
     case ToFImagingAlgorithms::EdgeTransmissionLinear :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTLinear, &control, &status );
+        lmcurve(m_Npars, &(m_pars[0]), N, &(x[0]),&(y[0]), ToFImagingAlgorithms::EdgeFunction::EdgeFunctionTLinear, &control, &status );
         break;
     }
     case ToFImagingAlgorithms::EdgeAttenuationExponential :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionAExponential, &control, &status );
+        lmcurve(m_Npars, &(m_pars[0]), N, &(x[0]),&(y[0]), ToFImagingAlgorithms::EdgeFunction::EdgeFunctionAExponential, &control, &status );
         break;
     }
     case ToFImagingAlgorithms::EdgeAttenuationLinear :
     {
-        lmcurve(m_Npars, m_pars, N, x,y, ToFImagingAlgorithms::EdgeFunction::EdgeFunctionALinear, &control, &status );
+        lmcurve(m_Npars, &(m_pars[0]), N, &(x[0]),&(y[0]), ToFImagingAlgorithms::EdgeFunction::EdgeFunctionALinear, &control, &status );
         break;
     }
     case ToFImagingAlgorithms::EdgeGradientGaussian :
     {
-        double *gradient = new double[N];
-        kipl::math::num_gradient(y,x,N,gradient);
-        lmcurve(m_Npars, m_pars, N, x, gradient, ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian, &control, &status);
-        delete [] gradient;
+//        double *gradient = new double[N];
+        std::vector<double> gradient(N),smoothed(N);
+        kipl::math::num_gradient(&(y[0]),&(x[0]),N,&(gradient[0]));
+        lmcurve(m_Npars, &(m_pars[0]), N, &(x[0]), &(gradient[0]), ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian, &control, &status);
+//        delete [] gradient;
         break;
     }
     default :
@@ -141,55 +138,52 @@ void edgefitting::fit(double *x, double *y, int N)
 /// int N = length of the array
 /// est_t0 estimated value for the edge position (ToF or lambda)
 /// This computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
-void edgefitting::compute_initial_params(double *x, double *y, int N, double est_t0)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N, double est_t0)
 {
-    int est_pos, size_1, size_2, buffer;
-    double *x1, *x2, *y1, *y2, *logy1, *logy2;
+    unsigned int est_pos, size_1, size_2, buffer;
     m_pars[0] = est_t0;
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
 
-    buffer = static_cast<int>(0.1*N); // this is possibly to optimize
-    est_pos = ToFImagingAlgorithms::findClosest(x,N, est_t0);
+    buffer = static_cast<unsigned int>(0.1*N); // this is possibly to optimize
+    est_pos = ToFImagingAlgorithms::findClosest(&(x[0]),N, est_t0);
     size_1 = est_pos-buffer;
     size_2 = N-(est_pos+buffer);
 
+    std::vector<double> x1(size_1),x2(size_2),y1(size_1),y2(size_2),logy1(size_1),logy2(size_2);
+
     // divide the signal in two
 
-    x1 = new double[size_1];
-    y1 = new double[size_1];
-    x2 = new double[size_2];
-    y2 = new double[size_2];
 
-    std::copy_n(x, size_1, x1);
-    std::copy_n(y, size_1, y1);
-    std::copy_n(x+(est_pos+buffer), size_2, x2);
-    std::copy_n(y+(est_pos+buffer), size_2, y2);
+    std::copy_n(x.begin(), size_1, x1.begin());
+    std::copy_n(y.begin(), size_1, y1.begin());
+    std::copy_n(x.begin()+(est_pos+buffer), size_2, x2.begin());
+    std::copy_n(y.begin()+(est_pos+buffer), size_2, y2.begin());
+
 
     double lin_par_before[2];
     double lin_par_after[2];
 
     if (blinear){
-        kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
-        kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
+        kipl::math::LinearLSFit(&(x2[0]),&(y2[0]),size_2, lin_par_after, lin_par_after+1, nullptr);
+        kipl::math::LinearLSFit(&(x1[0]),&(y1[0]),size_1, lin_par_before, lin_par_before+1, nullptr);
     }
     else {
-        logy1 = new double[size_1];
-        logy2 = new double[size_2];
 
         //compute the log of the ys
-        for (int i=0; i<size_2; ++i){
+        for (unsigned int i=0; i<size_2; ++i){
             logy2[i] = -1.0*std::log(y2[i]);
         }
 
-        kipl::math::LinearLSFit(x2, logy2, size_2, lin_par_after, lin_par_after+1, nullptr);
 
-        for (int i=0; i<size_1; ++i)
+        kipl::math::LinearLSFit(&(x2[0]), &(logy2[0]), size_2, lin_par_after, lin_par_after+1, nullptr);
+
+        for (unsigned int i=0; i<size_1; ++i)
         {
             logy1[i] = -1.0*std::log(y1[i])-lin_par_after[0]-lin_par_after[1]*x[0];
         }
 
-        kipl::math::LinearLSFit(x1, logy1, size_1, lin_par_before, lin_par_before+1, nullptr);
+        kipl::math::LinearLSFit(&(x1[0]), &(logy1[0]), size_1, lin_par_before, lin_par_before+1, nullptr);
 
 
     }
@@ -200,12 +194,6 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
     m_pars[4] = lin_par_after[1];
     m_pars[5] = lin_par_before[0];
     m_pars[6] = lin_par_before[1];
-
-    delete [] x1;
-    delete [] x2;
-    delete [] y1;
-    delete [] y2;
-
 
 }
 
@@ -217,20 +205,12 @@ void edgefitting::compute_initial_params(double *x, double *y, int N, double est
 /// int N = length of the array
 /// It first run the gaussian of the gradient to estimate the edge position m_pars[0]
 /// Then it computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
-void edgefitting::compute_initial_params(double *x, double *y, int N)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N)
 {
-    int est_pos, size_1, size_2, buffer;
-    double *x1, *x2, *y1, *y2, *logy1, *logy2;
 
-    double *gradient = new double[N];
-    double *gauss_param = new double[3];
-    double *updated_gauss_params = new double[3];
-    kipl::math::num_gradient(y,x,N,gradient);
-
-    gauss_param[0] = gauss_param[1] = gauss_param[2] = 1.0;
-
+    unsigned int est_pos, size_1, size_2, buffer;
+    std::vector <double> gauss_param(3), updated_gauss_params(3);
     ToFImagingAlgorithms::edgefitting myfit(3, ToFImagingAlgorithms::eEdgeFunction::EdgeGradientGaussian);
-    myfit.intialize_params(gauss_param);
     myfit.fit(x,y,N);
     myfit.get_params(updated_gauss_params);
 
@@ -238,49 +218,44 @@ void edgefitting::compute_initial_params(double *x, double *y, int N)
     m_pars[1] = 0.0001; //default?
     m_pars[2] = 0.0015; //default?
 
-    std::cout << m_pars[0] << std::endl;
+//    std::cout << updated_gauss_params[0] << std::endl;
 
-    buffer = static_cast<int>(0.1*N);
-    est_pos = ToFImagingAlgorithms::findClosest(x,N, m_pars[0]);
+    buffer = static_cast<unsigned int>(0.1*N);
+    est_pos = ToFImagingAlgorithms::findClosest(&(x[0]),N, m_pars[0]);
 
 
     size_1 = est_pos-buffer;
     size_2 = N-(est_pos+buffer);
 
-    x1 = new double[size_1];
-    y1 = new double[size_1];
-    x2 = new double[size_2];
-    y2 = new double[size_2];
+    std::vector<double> x1(size_1), y1(size_1), x2(size_2), y2(size_2), logy1(size_1), logy2(size_2);
 
-    std::copy_n(x, size_1, x1);
-    std::copy_n(y, size_1, y1);
-    std::copy_n(x+(est_pos+buffer), size_2, x2);
-    std::copy_n(y+(est_pos+buffer), size_2, y2);
+    std::copy_n(x.begin(), size_1, x1.begin());
+    std::copy_n(y.begin(), size_1, y1.begin());
+    std::copy_n(x.begin()+(est_pos+buffer), size_2, x2.begin());
+    std::copy_n(y.begin()+(est_pos+buffer), size_2, y2.begin());
 
     double lin_par_before[2];
     double lin_par_after[2];
 
     if (blinear){
-        kipl::math::LinearLSFit(x2,y2,size_2, lin_par_after, lin_par_after+1, nullptr);
-        kipl::math::LinearLSFit(x1,y1,size_1, lin_par_before, lin_par_before+1, nullptr);
+        kipl::math::LinearLSFit(&(x2[0]),&(y2[0]),size_2, lin_par_after, lin_par_after+1, nullptr);
+        kipl::math::LinearLSFit(&(x1[0]),&(y1[0]),size_1, lin_par_before, lin_par_before+1, nullptr);
     }
     else {
-        logy1 = new double[size_1];
-        logy2 = new double[size_2];
 
         //compute the log of the ys
-        for (int i=0; i<size_2; ++i){
+        for (unsigned int i=0; i<size_2; ++i){
             logy2[i] = -1.0*std::log(y2[i]);
         }
 
-        kipl::math::LinearLSFit(x2, logy2, size_2, lin_par_after, lin_par_after+1, nullptr);
+        kipl::math::LinearLSFit(&(x2[0]), &(logy2[0]), size_2, lin_par_after, lin_par_after+1, nullptr);
 
-        for (int i=0; i<size_1; ++i)
+        for (unsigned int i=0; i<size_1; ++i)
         {
             logy1[i] = -1.0*std::log(y1[i])-lin_par_after[0]-lin_par_after[1]*x[0];
         }
 
-        kipl::math::LinearLSFit(x1, logy1, size_1, lin_par_before, lin_par_before+1, nullptr);
+        kipl::math::LinearLSFit(&(x1[0]), &(logy1[0]), size_1, lin_par_before, lin_par_before+1, nullptr);
 
 
     }
@@ -291,15 +266,6 @@ void edgefitting::compute_initial_params(double *x, double *y, int N)
     m_pars[5] = lin_par_before[0];
     m_pars[6] = lin_par_before[1];
 
-    delete [] x1;
-    delete [] x2;
-    delete [] y1;
-    delete [] y2;
-
-
-    delete [] gradient;
-    delete [] gauss_param;
-    delete [] updated_gauss_params;
 
 
 

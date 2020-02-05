@@ -42,14 +42,8 @@ public:
 
 
 protected:
-//    /// \brief Parameter array
-//    double *m_pars;
-//    /// \brief Parameter lock array
-//    bool *m_lock;
     /// \brief The number of parameters
     int m_Npars;
-//    /// \brief The number of parameters to be fitted
-//    int m_pars2fit;
 };
 
 }

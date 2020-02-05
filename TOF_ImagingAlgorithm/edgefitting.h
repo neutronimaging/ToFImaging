@@ -2,30 +2,33 @@
 #define EDGEFITTING_H
 
 #include <edgefunction.h>
+#include <vector>
+#include "tof_imagingalgorithm_global.h"
+
 namespace  ToFImagingAlgorithms
 
 {
-class edgefitting
+class TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting
 {
 public:
     /// \brief class constructor, initialize edge function with n parameters and ef lineshape
     edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef);
     /// \brief Initializes fitting parameters, given as input
-    void intialize_params(double *pars);
+    void intialize_params(std::vector<double> &pars);
     /// \brief computes initial parameters given the estimated Bragg edge position
-    void compute_initial_params(double *x, double *y, int N, double est_t0);
+    void compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N, double est_t0);
     /// \brief computes intial parameters without the estimated Bragg edge position
-    void compute_initial_params(double *x, double *y, int N);
+    void compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N);
     /// \brief return the current parameters
-    void get_params(double *pars);
+    void get_params(std::vector<double> &pars);
     /// \brief calls the fitting routine
-    void fit(double *x, double *y, int N);
+    void fit(std::vector<double> &x, std::vector<double> &y, int N);
     /// \brief class destructor
     ~edgefitting();
 
 
 private:
-    double *m_pars; /// parameter arrays
+    std::vector<double> m_pars; /// parameter arrays
     int m_Npars; /// number of parameters
     ToFImagingAlgorithms::eEdgeFunction myfun; /// type of function to be fitted
     bool blinear;
