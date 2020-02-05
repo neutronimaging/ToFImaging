@@ -3,11 +3,12 @@
 
 #include <edgefunction.h>
 #include <vector>
+#include "tof_imagingalgorithm_global.h"
 
 namespace  ToFImagingAlgorithms
 
 {
-class edgefitting
+class TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting
 {
 public:
     /// \brief class constructor, initialize edge function with n parameters and ef lineshape

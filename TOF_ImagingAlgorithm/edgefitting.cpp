@@ -13,7 +13,7 @@ namespace ToFImagingAlgorithms {
 /// class constructor, inputs:
 /// n = number of parameters to be fitted, 7 for the complete lineshape, 3 for the simplifies (gaussian of the signal gradient)
 /// ef = lineshape type
-edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
+TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
 {
     m_Npars = n;
     myfun = ef;
@@ -57,26 +57,26 @@ edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef)
 }
 
 /// class deconstructor
-edgefitting::~edgefitting()
+TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::~edgefitting()
 {
 
 }
 
 
 /// initialize parameters by copying the inputs in the m_pars
-void edgefitting::intialize_params(std::vector<double> &pars)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::intialize_params(std::vector<double> &pars)
 {   
     m_pars.assign(pars.begin(), pars.end());
 }
 
 /// get parameters
-void edgefitting::get_params(std::vector<double> &pars)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::get_params(std::vector<double> &pars)
 {
     pars.assign(m_pars.begin(), m_pars.end());
 }
 
 /// call the fitting routine, switching betweeen the different lineshape options
-void edgefitting::fit(std::vector<double> &x, std::vector<double> &y, int N)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::fit(std::vector<double> &x, std::vector<double> &y, int N)
 {
     lm_control_struct control = lm_control_double;
     lm_status_struct status;
@@ -138,7 +138,7 @@ void edgefitting::fit(std::vector<double> &x, std::vector<double> &y, int N)
 /// int N = length of the array
 /// est_t0 estimated value for the edge position (ToF or lambda)
 /// This computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
-void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N, double est_t0)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N, double est_t0)
 {
     unsigned int est_pos, size_1, size_2, buffer;
     m_pars[0] = est_t0;
@@ -205,7 +205,7 @@ void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<dou
 /// int N = length of the array
 /// It first run the gaussian of the gradient to estimate the edge position m_pars[0]
 /// Then it computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
-void edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N)
 {
 
     unsigned int est_pos, size_1, size_2, buffer;

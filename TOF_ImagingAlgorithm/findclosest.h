@@ -2,7 +2,7 @@
 #define FINDCLOSEST_H
 
 #include <iostream>
-
+#include "tof_imagingalgorithm_global.h"
 
 namespace ToFImagingAlgorithms {
 
