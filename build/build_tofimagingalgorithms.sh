@@ -5,9 +5,18 @@ else
     SPECSTR="-spec macx-clang CONFIG+=x86_64"
 fi
 
+
+#dependency: lmfit
+DEST_DEPENDENCY=$WORKSPACE/lib
 REPOSPATH=$WORKSPACE/ToFImaging
 DEST=$WORKSPACE/builds
 
+
+mkdir $WORKSPACE/imagingsuite/external/src/lmfit/build
+cd $WORKSPACE/imagingsuite/external/src/lmfit/build
+/usr/bin/cmake .. 
+make
+make DESTDIR=$DEST_DEPENDENCY install 
 
 mkdir -p $DEST/build-tofimagingalgorithm
 cd $DEST/build-tofimagingalgorithm
