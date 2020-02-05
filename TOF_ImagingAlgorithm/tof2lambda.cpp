@@ -13,7 +13,7 @@ namespace ToFImagingAlgorithms {
 /// N       = length of arrays
 /// t0      = trigger in the TOF measure [s]
 /// L       = flight path [m]
-void ToF2Lambda(double *tof, double *lambda, int N, double t0, double L)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT ToF2Lambda(double *tof, double *lambda, int N, double t0, double L)
 {
 
     for (int i=0; i<N; ++i)
@@ -33,7 +33,7 @@ void ToF2Lambda(double *tof, double *lambda, int N, double t0, double L)
 /// N       = length of arrays
 /// t0      = trigger in the TOF measure [s]
 /// L       = flight path [m]
-void Lambda2ToF(double *tof, double *lambda, int N, double t0, double L)
+void TOF_IMAGINGALGORITHMSHARED_EXPORT Lambda2ToF(double *tof, double *lambda, int N, double t0, double L)
 {
 
     for (int i=0; i<N; ++i)
