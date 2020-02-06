@@ -54,23 +54,25 @@ unix {
 
 unix {
     QMAKE_CXXFLAGS += -fPIC -O2
+
     unix:!macx {
         QMAKE_CXXFLAGS += -fopenmp
         QMAKE_LFLAGS += -lgomp
         LIBS += -lgomp
-        INCLUDEPATH += $$PWD/../../imagingsuite/external/src/lmfit/install/include
-        DEPENDPATH += $$PWD/../../imagingsuite/external/src/lmfit/install/include
 #        LIBS += -L$$PWD/../../lib -llmfit
     }
 
-#    unix:macx {
-#        INCLUDEPATH += /opt/local/include
-#        INCLUDEPATH += /usr/local/lib
-#        INCLUDEPATH += /usr/local/include
-#        QMAKE_LIBDIR += /opt/local/lib
-#    }
+    INCLUDEPATH += $$PWD/../../imagingsuite/external/src/lmfit/lmfit_install/include
+    DEPENDPATH += $$PWD/../../imagingsuite/external/src/lmfit/lmfit_install/include
 
-#    LIBS += -lm -lz -L/opt/usr/lib  -L/usr/local/lib -llmfit
+    unix:macx {
+        INCLUDEPATH += /opt/local/include
+        INCLUDEPATH += /usr/local/lib
+        INCLUDEPATH += /usr/local/include
+        QMAKE_LIBDIR += /opt/local/lib
+    }
+
+    LIBS += -lm -lz
 }
 
 win32 {
