@@ -52,14 +52,18 @@ unix {
 }
 
 
-## Do I need all of this?
 unix {
     QMAKE_CXXFLAGS += -fPIC -O2
+
     unix:!macx {
         QMAKE_CXXFLAGS += -fopenmp
         QMAKE_LFLAGS += -lgomp
         LIBS += -lgomp
+#        LIBS += -L$$PWD/../../lib -llmfit
     }
+
+    INCLUDEPATH += $$PWD/../../imagingsuite/external/src/lmfit/lmfit_install/include
+    DEPENDPATH += $$PWD/../../imagingsuite/external/src/lmfit/lmfit_install/include
 
     unix:macx {
         INCLUDEPATH += /opt/local/include
@@ -68,20 +72,18 @@ unix {
         QMAKE_LIBDIR += /opt/local/lib
     }
 
-    LIBS += -lm -lz -L/opt/usr/lib  -L/usr/local/lib -llmfit
+    LIBS += -lm -lz
 }
 
 win32 {
     INCLUDEPATH +=  $$PWD/../../imagingsuite/external/include/lmfit $$PWD/../../imagingsuite/external/include
     QMAKE_LIBDIR += $$PWD/../../imagingsuite/external/lib64/lmfit $$PWD/../../external/lib64
-
-    LIBS +=  -llmfit
-
+#    LIBS +=  -llmfit
 }
 
 
-CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms
-else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms
+CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms -llmfit
+else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms -llmfit
 
 INCLUDEPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 DEPENDPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
