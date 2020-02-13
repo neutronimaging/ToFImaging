@@ -7,6 +7,7 @@
 #include <edgefunction.h>
 #include <edgefitting.h>
 #include <fstream>
+#include <iostream>
 #include <math/gradient.h>
 #include <tof2lambda.h>
 #include <findclosest.h>
@@ -31,6 +32,7 @@ private slots:
     void test_findclosest();
     void test_computeIniPars();
     void test_computeIniParWithPos();
+    void test_smooth();
 //    void test_computeExponentialFunctions();
 
 };
@@ -764,6 +766,112 @@ void ToFImagingAlgorithmTest::test_computeIniParWithPos()
 
 
 
+
+}
+
+void ToFImagingAlgorithmTest::test_smooth()
+
+{
+
+    // Here I assume that the gradient is already smoothed
+
+    std::vector<double> param(3), expected_params(3),updated_params(3);
+    param[0] = 0.056568;
+    param[1] = 0.0001;
+    param[2] = 500.0;
+
+// In case of doubt: put just ones, for the gaussian it works
+//    param[0] = 1;
+//    param[1] = 1;
+//    param[2] = 1;
+
+    expected_params[0] = 0.05793304;
+    expected_params[1] = 4.6231e-08;
+    expected_params[2] = 706.346498;
+
+    string line; //this will contain the data read from the file
+    ifstream myfile("../ToFImaging/UnitTests/test_data/x.txt"); //opening the file.
+
+
+    unsigned int N=1107;
+
+    std::vector<double> x,y,first_guess,computed_firstedge,exp_gradient,gradient(N);
+    double eps=0.0001;
+
+    for (double a; myfile>>a;)
+    {
+        x.push_back(a);
+    }
+
+    ifstream myfile_y ("../ToFImaging/UnitTests/test_data/ini_gauss.txt"); //opening the file. //path should be related to the lib
+    ifstream myfile_y2 ("../ToFImaging/UnitTests/test_data/y.txt"); //opening the file. //path should be related to the lib
+
+
+    int loop_y=0;
+    for (double a; myfile_y>>a;)
+    {
+        first_guess.push_back(a);
+        loop_y++;
+
+    }
+
+
+    for (double a; myfile_y2>>a;)
+    {
+        y.push_back(a);
+    }
+
+    QCOMPARE(loop_y, 1107);
+
+    ToFImagingAlgorithms::EdgeFunction myedge(3);
+    for (int i=0; i<N; ++i)
+    {
+        computed_firstedge.push_back (ToFImagingAlgorithms::EdgeFunction::EdgeGradientGaussian(x[i], &(param[0])));
+//        QVERIFY(fabs(computed_firstedge[i]-first_guess[i])<eps); // compare the computed first edge with the loaded one, passed
+
+        }
+
+
+// check the gradient first
+
+    ifstream myfile_y3 ("../ToFImaging/UnitTests/test_data/gradient.txt");
+
+    for (double a; myfile_y3>>a;)
+    {
+        exp_gradient.push_back(a);
+    }
+
+
+
+
+
+
+    ToFImagingAlgorithms::edgefitting myfit(3, ToFImagingAlgorithms::eEdgeFunction::EdgeGradientGaussian);
+    myfit.intialize_params(param);
+    myfit.smooth(x,y);
+
+
+    ofstream smoothed_file;
+    smoothed_file.open ("../ToFImaging/UnitTests/test_data/smoothed.txt");
+    for (auto i : y)
+    {
+         smoothed_file << i <<"\n";
+    }
+    smoothed_file.close();
+
+    myfit.fit(x,y,N);
+    myfit.get_params(updated_params);
+
+    for (int i=0; i<3; ++i)
+    {
+        qDebug() << "expected: "  << expected_params[i] << ", computed: " << updated_params[i];
+
+    }
+
+    myfile.close();
+    myfile_y.close();
+    myfile_y2.close();
+    myfile_y3.close();
 
 }
 

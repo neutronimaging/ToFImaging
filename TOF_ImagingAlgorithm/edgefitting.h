@@ -13,8 +13,6 @@ class TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting
 public:
     /// \brief class constructor, initialize edge function with n parameters and ef lineshape
     edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef);
-    /// \brief Initializes fitting parameters, given as input
-    void intialize_params(std::vector<double> &pars);
     /// \brief computes initial parameters given the estimated Bragg edge position
     void compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N, double est_t0);
     /// \brief computes intial parameters without the estimated Bragg edge position
@@ -23,6 +21,10 @@ public:
     void get_params(std::vector<double> &pars);
     /// \brief calls the fitting routine
     void fit(std::vector<double> &x, std::vector<double> &y, int N);
+    /// \brief Initializes fitting parameters, given as input
+    void intialize_params(std::vector<double> &pars);
+    /// \brief applies sav-gol filter to smooth edge signal
+    void smooth(std::vector<double> &x, std::vector<double> &y);
     /// \brief class destructor
     ~edgefitting();
 
@@ -32,6 +34,7 @@ private:
     int m_Npars; /// number of parameters
     ToFImagingAlgorithms::eEdgeFunction myfun; /// type of function to be fitted
     bool blinear;
+    bool bsmooth;
 };
 
 
