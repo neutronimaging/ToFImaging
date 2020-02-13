@@ -11,8 +11,8 @@
 namespace ToFImagingAlgorithms {
 
 /// class constructor, inputs:
-/// n = number of parameters to be fitted, 7 for the complete lineshape, 3 for the simplifies (gaussian of the signal gradient)
-/// ef = lineshape type
+/// \param n number of parameters to be fitted, 7 for the complete lineshape, 3 for the simplifies (gaussian of the signal gradient)
+/// \param ef lineshape type
 TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef):
     m_Npars(n),
     myfun(ef),
@@ -70,9 +70,9 @@ TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::~edgefitting()
 /// compute initial parameters without knowing an estimated Bragg edge position
 /// this function is supposed to work only for the complex lineshape formulation (not the gaussian of the gradient)
 /// inputs:
-/// double *x = x array (ToF or lambda)
-/// double *y = actual array
-/// int N = length of the array
+/// \param x x-array for the edge signal (ToF or lambda)
+/// \param y edge signal
+/// \param N length of the array
 /// It first run the gaussian of the gradient to estimate the edge position m_pars[0]
 /// Then it computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
 void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N)
@@ -144,10 +144,10 @@ void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::compute_initial_params(std::
 /// compute initial parameters by knowing an estimated Bragg edge position (est_t0)
 /// this function is supposed to work only for the complex lineshape formulation (not the gaussian of the gradient)
 /// inputs:
-/// double *x = x array (ToF or lambda)
-/// double *y = actual array
-/// int N = length of the array
-/// est_t0 estimated value for the edge position (ToF or lambda)
+/// \param x x-array for the edge signal (ToF or lambda)
+/// \param y edge signal
+/// \param N length of the array
+/// \param est_t0 estimated value for the edge position (ToF or lambda)
 /// This computes the m_pars[3], m_pars[4], m_pars[5], m_pars[6] depending on the lineshape
 void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::compute_initial_params(std::vector<double> &x, std::vector<double> &y, int N, double est_t0)
 {
