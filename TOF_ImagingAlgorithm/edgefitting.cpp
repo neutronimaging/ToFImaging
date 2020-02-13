@@ -17,7 +17,9 @@ TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::edgefitting(int n, ToFImagingAlgo
     m_Npars(n),
     myfun(ef),
     blinear(true),
-    bsmooth(false)
+    bsmooth(false),
+    m_sgWin(5),
+    m_sgPoly(2)
 {
 
     m_pars.assign(m_Npars,1.0); // initialize container
@@ -275,7 +277,7 @@ void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::intialize_params(std::vector
 void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::smooth(std::vector<double> &x, std::vector<double> &y)
 {
     kipl::filters::SavitzkyGolayFilter<double> sg;
-    y = sg(y,5,2); // input is same as output. is it ok?
+    y = sg(y,m_sgWin,m_sgPoly); // input is same as output. is it ok?
 
 }
 

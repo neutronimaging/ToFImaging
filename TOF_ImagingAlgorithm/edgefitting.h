@@ -33,8 +33,10 @@ private:
     std::vector<double> m_pars; /// parameter arrays
     int m_Npars; /// number of parameters
     ToFImagingAlgorithms::eEdgeFunction myfun; /// type of function to be fitted
-    bool blinear;
-    bool bsmooth;
+    bool blinear; /// boolean value triggering the computation of linear functions before and after the edge
+    bool bsmooth; /// boolean value triggering the smoothing of the signal, currently not used
+    int m_sgWin; /// window_lenght for the S-G filter
+    int m_sgPoly; /// polynomial order for the S-G filter
 };
 
 
