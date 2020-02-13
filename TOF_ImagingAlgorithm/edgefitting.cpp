@@ -130,6 +130,13 @@ void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::fit(std::vector<double> &x, 
 
 }
 
+/// call the fitting routine, switching betweeen the different lineshape options, only on selected parameters
+void iterative_fit(std::vector<double> &x, std::vector<double> &y, int N, std::vector<double> &pars)
+{
+    // do the iterative fitting
+
+}
+
 /// compute initial parameters by knowing an estimated Bragg edge position (est_t0)
 /// this function is supposed to work only for the complex lineshape formulation (not the gaussian of the gradient)
 /// inputs:

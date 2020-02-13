@@ -23,6 +23,8 @@ public:
     void get_params(std::vector<double> &pars);
     /// \brief calls the fitting routine
     void fit(std::vector<double> &x, std::vector<double> &y, int N);
+    /// \brief calls the fitting routine on selected parameters
+    void iterative_fit(std::vector<double> &x, std::vector<double> &y, int N, std::vector<double> &pars);
     /// \brief class destructor
     ~edgefitting();
 
