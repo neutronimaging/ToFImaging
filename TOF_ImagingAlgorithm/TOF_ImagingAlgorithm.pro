@@ -77,7 +77,7 @@ unix {
 
 win32 {
     INCLUDEPATH +=  $$PWD/../../imagingsuite/external/include/lmfit $$PWD/../../imagingsuite/external/include
-    QMAKE_LIBDIR += $$PWD/../../imagingsuite/external/lib64/lmfit $$PWD/../../external/lib6
+    QMAKE_LIBDIR += $$PWD/../../imagingsuite/external/lib64/lmfit $$PWD/../../imagingsuite/external/lib64
     LIBS +=  -lliblapack
 }
 
