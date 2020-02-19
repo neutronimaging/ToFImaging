@@ -32,56 +32,6 @@ win32 {
 
 }
 
-#unix:!mac {
-#exists(/usr/lib/*NeXus*) {
-
-#    message("-lNeXus exists")
-#    DEFINES += HAVE_NEXUS
-#    LIBS += -lNeXus -lNeXusCPP
-#    SOURCES += ../src/io/io_nexus.cpp
-#    HEADERS += ../include/io/io_nexus.h
-#}
-#else {
-#message("-lNeXus does not exists $$HEADERS")
-#}
-
-#}
-
-#unix:mac {
-#exists($$PWD/../../../imagingsuite/external/mac/lib/*NeXus*) {
-
-#    message("-lNeXus exists")
-#    DEFINES += HAVE_NEXUS
-
-#    INCLUDEPATH += $$PWD/../../../imagingsuite/external/mac/include $$PWD/../../../imagingsuite/external/mac/include/nexus $$PWD/../../../imagingsuite/external/mac/include/hdf5
-#    DEPENDPATH += $$PWD/../../../imagingsuite/external/mac/include $$PWD/../../../imagingsuite/external/mac/include/nexus $$PWD/../../../imagingsuite/external/mac/include/hdf5
-
-#    LIBS += -L$$PWD/../../../imagingsuite/external/mac/lib -lNeXus.1.0.0 -lNeXusCPP.1.0.0
-
-#}
-#else {
-#message("-lNeXus does not exists $$HEADERS")
-#}
-
-#}
-
-#win32 {
-
-#exists($$PWD/../../../imagingsuite/external/lib64/nexus/*NeXus*) {
-
-#    message("-lNeXus exists")
-#    DEFINES += HAVE_NEXUS
-#    INCLUDEPATH += $$PWD/../../../imagingsuite/external/include/nexus $$PWD/../../../imagingsuite/external/include/hdf5
-#    QMAKE_LIBDIR += $$PWD/../../../imagingsuite/external/lib64/nexus $$PWD/../../../imagingsuite/external/lib64/hdf5
-
-#    LIBS +=  -lNeXus -lNeXusCPP
-
-#    SOURCES += ../src/io/io_nexus.cpp
-#    HEADERS += ../include/io/io_nexus.h
-#}
-
-#}
-
 CONFIG(release, debug|release)           LIBS += -L$$PWD/../../../lib
 else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../../lib/debug/
 
