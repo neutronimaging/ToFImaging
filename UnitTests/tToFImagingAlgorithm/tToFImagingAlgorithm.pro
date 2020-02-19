@@ -28,7 +28,7 @@ win32 {
     INCLUDEPATH +=  $$PWD/../../../imagingsuite/external/include/lmfit $$PWD/../../../imagingsuite/external/include
     QMAKE_LIBDIR += $$PWD/../../../imagingsuite/external/lib64/lmfit $$PWD/../../../external/lib64
 
-    LIBS +=  -llmfit
+    LIBS +=  -llmfit -lliblapack
 
 }
 
