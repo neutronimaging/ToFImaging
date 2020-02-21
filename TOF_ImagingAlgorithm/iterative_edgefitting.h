@@ -9,7 +9,7 @@
 namespace  ToFImagingAlgorithms
 
 {
-class iterative_edgefitting : public edgefitting
+class TOF_IMAGINGALGORITHMSHARED_EXPORT iterative_edgefitting : public edgefitting
 {
 public:
     iterative_edgefitting(int n, ToFImagingAlgorithms::eEdgeFunction ef);
