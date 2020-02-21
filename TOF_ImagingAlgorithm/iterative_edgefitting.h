@@ -17,6 +17,7 @@ public:
     void initialize_map(double est_pos);
     void initialize_map(std::vector<double> &param);
     void set_fixedparam(std::vector<std::string> &fixed_param);
+    void fit();
 
 private:
    std::map<std::string, double> m_MapPars; /// \brief map for the parmeters

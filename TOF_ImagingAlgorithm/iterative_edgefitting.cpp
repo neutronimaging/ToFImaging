@@ -33,6 +33,11 @@ TOF_IMAGINGALGORITHMSHARED_EXPORT iterative_edgefitting::~iterative_edgefitting(
 
 }
 
+void TOF_IMAGINGALGORITHMSHARED_EXPORT iterative_edgefitting::fit()
+{
+    //fit
+}
+
 void TOF_IMAGINGALGORITHMSHARED_EXPORT iterative_edgefitting::initialize_map(double est_pos)
 {
     m_MapPars["t0"] = est_pos;
@@ -51,7 +56,7 @@ void TOF_IMAGINGALGORITHMSHARED_EXPORT iterative_edgefitting::initialize_map(std
 
 void TOF_IMAGINGALGORITHMSHARED_EXPORT iterative_edgefitting::set_fixedparam(std::vector<std::string> &fixed_param)
 {
-    // do stuff
+    // set the fixed params
 }
 
 }
