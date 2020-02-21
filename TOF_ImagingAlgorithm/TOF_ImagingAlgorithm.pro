@@ -36,7 +36,8 @@ SOURCES += \
     edgefunction.cpp \
     edgefitting.cpp \
     tof2lambda.cpp \
-    auxiliary_functions.cpp
+    auxiliary_functions.cpp \
+    iterative_edgefitting.cpp
 
 HEADERS += \
         tof_imagingalgorithm_global.h \
@@ -44,7 +45,8 @@ HEADERS += \
     edgefitting.h \
     tof2lambda.h \
     findclosest.h \
-    auxiliary_functions.h
+    auxiliary_functions.h \
+    iterative_edgefitting.h
 
 unix {
     target.path = /usr/lib

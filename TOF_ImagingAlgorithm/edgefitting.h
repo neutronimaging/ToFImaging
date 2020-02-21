@@ -23,8 +23,6 @@ public:
     void fit(std::vector<double> &x, std::vector<double> &y, int N);
     /// \brief Initializes fitting parameters, given as input
     void initialize_params(std::vector<double> &pars);
-    /// \brief calls the fitting routine on selected parameters
-    void iterative_fit(std::vector<double> &x, std::vector<double> &y, int N, std::vector<double> &pars);
     /// \brief applies sav-gol filter to smooth edge signal
     void smooth(std::vector<double> &x, std::vector<double> &y);
     /// \brief class destructor
