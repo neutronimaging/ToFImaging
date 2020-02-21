@@ -30,7 +30,7 @@ if exist "%1\UnitTests\%2\%2.pro" (
 	mkdir %3\%2
 	cd %3\%2
 
-	%QTBINPATH%\qmake.exe -makefile ..\..\imagingsuite\core\modules\UnitTests\%2\%2.pro -o Makefile
+	%QTBINPATH%\qmake.exe -makefile ..\..\ToFImaging\UnitTests\%2\%2.pro -o Makefile
 	%QTBINPATH%\..\..\..\Tools\QtCreator\bin\jom.exe -f Makefile clean
 	%QTBINPATH%\..\..\..\Tools\QtCreator\bin\jom.exe -f Makefile mocables all
 	%QTBINPATH%\..\..\..\Tools\QtCreator\bin\jom.exe -f Makefile release
