@@ -4,17 +4,17 @@ import matplotlib.pyplot as plt
 import matplotlib.path as mplPath
 
 def BOA_spectrum():
-    BOA = np.loadtxt('C:\\Users\\busi_m\\Workspace\\neutronimaging\\ToFImaging\\toflib\\dats\\BOA_spectrum.dat')
+    BOA = np.loadtxt('\\dats\\BOA_spectrum.dat')
     return BOA
     
 def ICON_spectrum():
-    ICON = np.loadtxt('C:\\Users\\busi_m\\Workspace\\neutronimaging\\ToFImaging\\toflib\\dats\\ICON_spectrum.dat')
+    ICON = np.loadtxt('\\ICON_spectrum.dat')
     return ICON
 
 def NEUTRA_spectrum():
-    NEUTRA = np.loadtxt('C:\\Users\\busi_m\\Workspace\\neutronimaging\\ToFImaging\\toflib\\dats\\NEUTRA_spectrum.dat')
+    NEUTRA = np.loadtxt('\\dats\\NEUTRA_spectrum.dat')
     return NEUTRA
 
 def POLDI_spectrum():
-    POLDI = np.loadtxt('C:\\Users\\busi_m\\Workspace\\neutronimaging\\ToFImaging\\toflib\\dats\\POLDI_spectrum.dat')
+    POLDI = np.loadtxt('\\dats\\POLDI_spectrum.dat')
     return POLDI    
