@@ -8,13 +8,13 @@ from lmfit import Model
 from lmfit.printfuncs import *
 import lmfit
 from numpy import loadtxt
+
 from scipy.signal import argrelextrema
 from TOF_routines import find_nearest
 from TOF_routines import find_first
 from TOF_routines import find_last
 from TOF_routines import rotatedata
 from TOF_routines import savitzky_golay
-
 
 # def term0(t,a2,a6):
 #     return  a2 * (t - a6)
@@ -69,9 +69,9 @@ def BraggEdgeExponential_Attenuation(t,t0,alpha,sigma,a1,a2,a5,a6):
     return exp_before(t,a5,a6) * ( exp_after(t,a1,a2)+ (1-exp_after(t,a1,a2)) * B(t,t0,alpha,sigma) )
 
 def running_mean(x, w, n):
-    return savitzky_golay(y, w, n)
+    return savitzky_golay(x, w, n)
 
-def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_sigma=1, est_alpha=1, bool_print=0, bool_average=0, bool_linear=0): 
+def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1, est_alpha=1, bool_print=0, bool_average=0, bool_linear=0): 
 ## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is
 
     ##INPUTS:
@@ -98,14 +98,17 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_sigma=1, est_alpha=
     
     #get the part of the spectrum that I want to fit
     mybragg= myspectrum[myrange[0]:myrange[1]]
+    t = myTOF[myrange[0]:myrange[1]]
     
     if (bool_average):
-        mybragg = running_mean(mybragg,3)
+        mybragg = running_mean(mybragg,3,0)
     
-    t = myTOF[myrange[0]:myrange[1]]
-    #est_pos=est_pos-myrange[0] # I move the estimated position relative to the studied range, this is an index
-    est_pos = np.argmax(np.diff(mybragg))
-    t0_f=myTOF[est_pos+myrange[0]] # this is the actual estimated first position in TOF [s]
+    if(est_pos==0):
+        est_pos = np.argmax(np.diff(mybragg))
+    #else:
+        #est_pos = est_pos-myrange[0] # I move the estimated position relative to the studied range, this is an index
+   
+    t0_f=t[est_pos] # this is the actual estimated first position in TOF [s]
 
     if (bool_print):
         plt.figure()
