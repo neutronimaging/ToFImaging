@@ -166,11 +166,11 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     mybragg= myspectrum[myrange[0]:myrange[1]]
     t = myTOF[myrange[0]:myrange[1]]
     
-    if (bool_average):
-        mybragg = running_mean(mybragg,3,0)
+    if(bool_average):
+        mybragg = SG_filter(mybragg,3,0)
     
     if(est_pos==0):
-        est_pos = np.argmax(AdvancedBraggEdgeFitting.SG_filter(np.diff(mybragg)))
+        est_pos = np.argmax(SG_filter(np.diff(mybragg)))
     #else:
         #est_pos = est_pos-myrange[0] # I move the estimated position relative to the studied range, this is an index
    
@@ -391,7 +391,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
         fit_before = exp_combined(t,a1_f,a2_f,a5_f,a6_f)
         fit_after = exp_after(t,a1_f,a2_f)
 
-    fit_edge = B(t,t0_f,alpha_f,sigma_f)
+    #fit_edge = B(t,t0_f,alpha_f,sigma_f)
     
     if (bool_print):
         plt.figure()
