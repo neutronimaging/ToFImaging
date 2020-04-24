@@ -45,13 +45,23 @@ def binning_resolution (mysignal, spectrum, d_spectrum):
     
     return (binned_signal, new_spectrum)
 
-def interp_nans (mysignal):
-    nan_mask = np.isnan(mysignal)
-    return interp_signal
+def interp_T_image (mydata):
+    from scipy import interpolate
+    mydata = np.double(mydata)
+    mydata[mydata==0] = np.nan
+    mydata[np.isinf(mydata)] = np.nan
     
-def interp_infs (mysignal):
-    inf_mask = np.isinf(mysignal)
-    return interp_signal    
+    x = np.arange(0,mydata.shape[1])
+    y = np.arange(0,mydata.shape[0])
+    
+    mydata = np.ma.masked_invalid(mydata)
+    xx, yy = np.meshgrid(x, y)
+    x1 = xx[~mydata.mask]
+    y1 = yy[~mydata.mask]
+    newdata =  mydata[~mydata.mask]
+    
+    interp_data = interpolate.griddata((x1,y1), newdata.ravel(), (xx, yy), method='cubic')
+    return interp_data
 
 def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
     if(len(np.shape(mysignal))!=1):
