@@ -1,4 +1,3 @@
-
 import numpy as np
 
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
@@ -18,8 +17,100 @@ def binning (mysignal, newsize):
     for i in range(0, newsize):
         bin_value = np.median(mysignal[i*bin_size:i*bin_size+bin_size])
         binned_signal[i]=bin_value
-    
     return (binned_signal)
+    
+def binning_resolution (mysignal, spectrum, d_spectrum):
+    spectrum_range = spectrum[end]-spectrum[0]
+    n_range = np.round(spectrum_range/d_spectrum)
+    new_spectrum = np.arange(spectrum[0],spectrum[end]+spectrum_range/n_range,spectrum_range/n_range)
+    if(len(np.shape(mysignal))==3):
+        if(len(spectrum)!=np.shape(mysignal)[2]):
+            print('Length of spectrum does not match signal size')
+        binned_signal=np.zeros([np.shape(mysignal)[0], np.shape(mysignal)[1], len(new_spectrum)])
+        for i in range(0,np.shape(mysignal)[0]):
+            for j in range(0,np.shape(mysignal)[1]):
+                binned_signal[i,j,:] = np.interp(new_spectrum,spectrum,mysignal[i,j,:])
+                
+    if(len(np.shape(mysignal))==2):
+        if(len(spectrum)!=np.shape(mysignal)[1]):
+            print('Length of spectrum does not match signal size')
+        binned_signal=np.zeros([np.shape(mysignal)[0], len(new_spectrum)])
+        for i in range(0,np.shape(mysignal)[0]):
+                binned_signal[i,:] = np.interp(new_spectrum,spectrum,mysignal[i,:])
+                
+    if(len(np.shape(mysignal))==1):
+        if(len(spectrum)!=np.shape(mysignal)[0]):
+            print('Length of spectrum does not match signal size')
+        binned_signal = np.interp(new_spectrum,spectrum,mysignal)
+    
+    return (binned_signal, new_spectrum)
+
+def interp_T_image (mydata):
+    from scipy import interpolate
+    mydata = np.double(mydata)
+    mydata[mydata==0] = np.nan
+    mydata[np.isinf(mydata)] = np.nan
+    
+    x = np.arange(0,mydata.shape[1])
+    y = np.arange(0,mydata.shape[0])
+    
+    mydata = np.ma.masked_invalid(mydata)
+    xx, yy = np.meshgrid(x, y)
+    x1 = xx[~mydata.mask]
+    y1 = yy[~mydata.mask]
+    newdata =  mydata[~mydata.mask]
+    
+    interp_data = interpolate.griddata((x1,y1), newdata.ravel(), (xx, yy), method='cubic')
+    return interp_data
+
+def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
+    if(len(np.shape(mysignal))!=1):
+        print('Data size is not 1D')
+    if(custom_kernel):
+        K = custom_kernel
+    else:
+        K = np.ones((kernel_size))
+    K = K/np.sum(K)
+    outsignal = np.convolve(mysignal,K,'same')
+    return outsignal
+    
+def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
+    import scipy.signal
+    if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
+        print('Data size is not either a 2D or ToF 2D')
+    if(custom_kernel):
+        K = custom_kernel
+    else:
+        K = np.ones((kernel_size,kernel_size))
+    K = K/np.sum(K)
+    
+    if(len(np.shape(mysignal))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
+        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
+        for i in range(0,np.shape(mysignal)[2]):
+            outsignal[:,:,i] = scipy.signal.convolve2d(mysignal,K,'same')
+    else:
+        outsignal = scipy.signal.convolve2d(mysignal,K,'same')
+    return outsignal   
+
+def transmission_image (I,I0,dose_mask_path=0):
+    if(np.shape(I)!=np.shape(I0)):
+        print('The size of I and I0 does not match. Check input data')
+    if(len(np.shape(I))!=2):
+        print('The input data is not an image')
+    
+    dose = 1
+    if(dose_mask_path):
+        dose_mask = io.imread(dose_mask_path)
+        if(np.shape(I)!=np.shape(dose_mask)):
+            print('The size of the dose mask does not match the signal. Check input data')
+        dose_mask[dose_mask!=1]=np.nan
+        dose = np.median(I0)/np.median(I)
+    
+    T = np.divide(I,I0)*dose
+    T[T>1] = 1
+    T[np.isinf(T)] = np.nan
+    T[T<0] = np.nan
+    return T
 
 def find_nearest(array, value):
     array = np.asarray(array)
@@ -45,7 +136,6 @@ def rotatedata(x,y,a):
     x = x*cosa-y*sina
     y = x*sina+y*cosa
     return x,y
-
 
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
