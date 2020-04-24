@@ -19,7 +19,7 @@ def binning (mysignal, newsize):
         binned_signal[i]=bin_value
     return (binned_signal)
     
-def binning_resolution (mysignal, spectrum, d_spectrum): #make it so it matches
+def binning_resolution (mysignal, spectrum, d_spectrum):
     spectrum_range = spectrum[end]-spectrum[0]
     n_range = np.round(spectrum_range/d_spectrum)
     new_spectrum = np.arange(spectrum[0],spectrum[end]+spectrum_range/n_range,spectrum_range/n_range)
@@ -45,6 +45,14 @@ def binning_resolution (mysignal, spectrum, d_spectrum): #make it so it matches
     
     return (binned_signal, new_spectrum)
 
+def interp_nans (mysignal):
+    nan_mask = np.isnan(mysignal)
+    return interp_signal
+    
+def interp_infs (mysignal):
+    inf_mask = np.isinf(mysignal)
+    return interp_signal    
+
 def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
@@ -66,7 +74,7 @@ def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
         K = np.ones((kernel_size,kernel_size))
     K = K/np.sum(K)
     
-    if(len(np.shape(mysignal))==3):
+    if(len(np.shape(mysignal))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
         outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
         for i in range(0,np.shape(mysignal)[2]):
             outsignal[:,:,i] = scipy.signal.convolve2d(mysignal,K,'same')
