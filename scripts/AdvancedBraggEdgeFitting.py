@@ -68,8 +68,74 @@ def BraggEdgeExponential(t,t0,alpha,sigma,a1,a2,a5,a6):
 def BraggEdgeExponential_Attenuation(t,t0,alpha,sigma,a1,a2,a5,a6):
     return exp_before(t,a5,a6) * ( exp_after(t,a1,a2)+ (1-exp_after(t,a1,a2)) * B(t,t0,alpha,sigma) )
 
-def running_mean(x, w, n):
+def SG_filter(x, w=3, n=1):
     return savitzky_golay(x, w, n)
+
+def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smooth=0, smooth_w = 3, smooth_n = 0, bool_print=0):
+    from scipy.optimize import curve_fit
+    def gaussian(x, amp, cen, wid):
+        """1-d gaussian: gaussian(x, amp, cen, wid)"""
+        return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
+        
+    if(myrange):
+        myspectrum = myspectrum[myrange[0]:myrange[1]]
+        myTOF = myTOF[myrange[0]:myrange[1]]
+        
+    if (bool_smooth):
+        myspectrum = SG_filter(myspectrum,smooth_w,smooth_n)    
+        
+    d_signal = np.diff(myspectrum)
+    dtof = myTOF[0:-1]
+        
+    if (bool_smooth):
+        d_signal = SG_filter(d_signal,smooth_w,smooth_n)    
+    
+    if (bool_print):
+        plt.figure()
+        plt.plot(myTOF, myspectrum)
+        plt.plot(dtof, d_signal)
+    
+    ## 1st Appoach
+    #init_vals = [myspectrum[-2]-myspectrum[2], est_pos, 0.01]  # for [amp, cen, wid]
+    #best_vals, covar = curve_fit(gaussian, dtof, d_signal)
+    #fitted_data = gaussian(dtof,best_vals[0],best_vals[1],best_vals[2])        
+    #t0 = best_vals[1]
+    #edge_width = best_vals[2]
+
+    ## 2nd Appoach
+    method ='least_squares' # default and it implements the Levenberg-Marquardt
+    gmodel = Model(gaussian)
+    if(est_pos):
+        params = gmodel.make_params(cen=est_pos, amp=myspectrum[-2]-myspectrum[2], wid=0.01)
+    else:
+        params = gmodel.make_params(cen=dtof[np.int(len(dtof)/2)], amp = myspectrum[-2]-myspectrum[2], wid = 0.01)
+    result = gmodel.fit(d_signal, params, x=dtof, method=method, nan_policy='propagate')
+    t0 = result.best_values.get('cen')
+    edge_width = result.best_values.get('wid')
+    fitted_data = result.best_fit       
+    
+    id_low = find_nearest(dtof, t0-edge_width) # 3.7
+    id_high = find_nearest(dtof, t0+edge_width) # 3.7
+    edge_height = np.sum(fitted_data[id_low:id_high])
+    
+    if (bool_print):
+        print('t0 = ',t0)
+        print('width = ',edge_width)
+        print('id_low = ',id_low,'id_high = ',id_high,'height = ',edge_height)
+        plt.plot(t0, myspectrum[find_nearest(dtof, t0)],'x', markeredgewidth=3, c='orange')
+        plt.plot(t0-edge_width, myspectrum[find_nearest(dtof, t0-edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.plot(t0+edge_width, myspectrum[find_nearest(dtof, t0+edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.plot(dtof, fitted_data)
+        plt.plot(t0, d_signal[find_nearest(dtof, t0)],'x', markeredgewidth=3, c='orange')
+        plt.plot(t0-edge_width, d_signal[find_nearest(dtof, t0-edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.plot(t0+edge_width, d_signal[find_nearest(dtof, t0+edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.title('Bragg edge')
+        plt.xlabel('Wavelenght [Å]')
+        plt.ylabel('Transmission I/I$_{0}$')
+        #plt.savefig('step1_fitting.pdf')
+        plt.show()
+        plt.close()
+    return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height}
 
 def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1, est_alpha=1, bool_print=0, bool_average=0, bool_linear=0): 
 ## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is
@@ -104,7 +170,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
         mybragg = running_mean(mybragg,3,0)
     
     if(est_pos==0):
-        est_pos = np.argmax(np.diff(mybragg))
+        est_pos = np.argmax(AdvancedBraggEdgeFitting.SG_filter(np.diff(mybragg)))
     #else:
         #est_pos = est_pos-myrange[0] # I move the estimated position relative to the studied range, this is an index
    
@@ -373,6 +439,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
 #         print('fourth iteration: ', result4.fit_report())
 #         print('fifth iteration: ', result5.fit_report())
 #         print('sixth iteration: ', result6.fit_report())
+        print(pos_extrema)
         plt.figure()
         plt.plot(t, mybragg)
         #     plt.plot(t, result7.init_fit, 'k--')
