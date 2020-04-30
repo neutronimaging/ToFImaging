@@ -3,8 +3,11 @@ import numpy as np
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
 
-def tof2l(tof, lambda0, L):
-    l=lambda0+h/m*(tof)/(L)/1e-10
+def tof2l(tof, L, lambda_0 = 0, tof_0 = 0):
+    if(lambda_0):
+        l=lambda_0+h/m*(tof)/(L)/1e-10
+    if(tof_0):
+        l=0.3956*(tof*1e6 +tof_0)/(L/100) #converts L to cm and tof0 must be in ms
     return l
 
 def l2tof(l, t0, L):
@@ -20,12 +23,12 @@ def binning (mysignal, newsize):
     return (binned_signal)
     
 def binning_resolution (mysignal, spectrum, d_spectrum):
-    spectrum_range = spectrum[end]-spectrum[0]
+    spectrum_range = spectrum[-1]-spectrum[0]
     n_range = np.round(spectrum_range/d_spectrum)
-    new_spectrum = np.arange(spectrum[0],spectrum[end]+spectrum_range/n_range,spectrum_range/n_range)
+    new_spectrum = np.arange(spectrum[0],spectrum[-1]+spectrum_range/n_range,spectrum_range/n_range)
     if(len(np.shape(mysignal))==3):
         if(len(spectrum)!=np.shape(mysignal)[2]):
-            print('Length of spectrum does not match signal size')
+            print('WARNING: Length of spectrum does not match signal size')
         binned_signal=np.zeros([np.shape(mysignal)[0], np.shape(mysignal)[1], len(new_spectrum)])
         for i in range(0,np.shape(mysignal)[0]):
             for j in range(0,np.shape(mysignal)[1]):
@@ -33,66 +36,50 @@ def binning_resolution (mysignal, spectrum, d_spectrum):
                 
     if(len(np.shape(mysignal))==2):
         if(len(spectrum)!=np.shape(mysignal)[1]):
-            print('Length of spectrum does not match signal size')
+            print('WARNING: Length of spectrum does not match signal size')
         binned_signal=np.zeros([np.shape(mysignal)[0], len(new_spectrum)])
         for i in range(0,np.shape(mysignal)[0]):
                 binned_signal[i,:] = np.interp(new_spectrum,spectrum,mysignal[i,:])
                 
     if(len(np.shape(mysignal))==1):
         if(len(spectrum)!=np.shape(mysignal)[0]):
-            print('Length of spectrum does not match signal size')
+            print('WARNING: Length of spectrum does not match signal size')
         binned_signal = np.interp(new_spectrum,spectrum,mysignal)
     
     return (binned_signal, new_spectrum)
+    
+def load_fits (pathdata,cut_last=0):
+    from astropy.io import fits
+    import os, fnmatch
+    from os import listdir
+    
+    subfolders = sorted(listdir(pathdata))
+    
+    #load 1st subfolder and image to figure det shape and number of frames
+    files = sorted(fnmatch.filter(listdir(pathdata+'\\'+subfolders[0]),'*.fits'))
+    testim = fits.getdata(pathdata+'\\'+subfolders[0]+'\\'+files[0])
+    det_shape = np.shape(testim)
+    n_tof = len(files)
+    data = np.zeros([det_shape[0], det_shape[1], n_tof-cut_last])
+    
+    #load all
+    for j in range(0,len(subfolders)):
+        files = sorted(fnmatch.filter(listdir(pathdata+'\\'+subfolders[j]),'*.fits'))
+        if(len(files)!=n_tof):
+            print('WARNING: Data has non-equal tof frames!')
+        for i in range(0,len(files)-cut_last):
+            data_t = fits.getdata(pathdata+'\\'+subfolders[j]+'\\'+files[i])
+            if(np.shape(data_t)!=det_shape):
+                print('WARNING: Data has different Detector shape!')
+            data[:,:,i] += data_t
+        
+    #would maybe nice to add check before this stage that the signals are similar before merging  
+    data /= len(subfolders)
+    return data
 
-def interp_T_image (mydata):
-    from scipy import interpolate
-    mydata = np.double(mydata)
-    mydata[mydata==0] = np.nan
-    mydata[np.isinf(mydata)] = np.nan
-    
-    x = np.arange(0,mydata.shape[1])
-    y = np.arange(0,mydata.shape[0])
-    
-    mydata = np.ma.masked_invalid(mydata)
-    xx, yy = np.meshgrid(x, y)
-    x1 = xx[~mydata.mask]
-    y1 = yy[~mydata.mask]
-    newdata =  mydata[~mydata.mask]
-    
-    interp_data = interpolate.griddata((x1,y1), newdata.ravel(), (xx, yy), method='cubic')
-    return interp_data
 
-def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
-    if(len(np.shape(mysignal))!=1):
-        print('Data size is not 1D')
-    if(custom_kernel):
-        K = custom_kernel
-    else:
-        K = np.ones((kernel_size))
-    K = K/np.sum(K)
-    outsignal = np.convolve(mysignal,K,'same')
-    return outsignal
-    
-def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
-    import scipy.signal
-    if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
-        print('Data size is not either a 2D or ToF 2D')
-    if(custom_kernel):
-        K = custom_kernel
-    else:
-        K = np.ones((kernel_size,kernel_size))
-    K = K/np.sum(K)
-    
-    if(len(np.shape(mysignal))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
-        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
-        for i in range(0,np.shape(mysignal)[2]):
-            outsignal[:,:,i] = scipy.signal.convolve2d(mysignal,K,'same')
-    else:
-        outsignal = scipy.signal.convolve2d(mysignal,K,'same')
-    return outsignal   
-
-def transmission_image (I,I0,dose_mask_path=0):
+def transmission_normalization (I,I0,dose_mask_path=0):
+    from skimage import io
     if(np.shape(I)!=np.shape(I0)):
         print('The size of I and I0 does not match. Check input data')
     if(len(np.shape(I))!=2):
@@ -112,6 +99,24 @@ def transmission_image (I,I0,dose_mask_path=0):
     T[T<0] = np.nan
     return T
 
+def interp_image_T (mydata):
+    from scipy import interpolate
+    mydata = np.double(mydata)
+    mydata[mydata==0] = np.nan #can't be 0 transmission
+    mydata[np.isinf(mydata)] = np.nan #caused by 0 counts in open beam
+    
+    x = np.arange(0,mydata.shape[1])
+    y = np.arange(0,mydata.shape[0])
+    
+    mydata = np.ma.masked_invalid(mydata)
+    xx, yy = np.meshgrid(x, y)
+    x1 = xx[~mydata.mask]
+    y1 = yy[~mydata.mask]
+    newdata =  mydata[~mydata.mask]
+    
+    interp_data = interpolate.griddata((x1,y1), newdata.ravel(), (xx, yy), method='cubic')
+    return interp_data
+    
 def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
@@ -208,3 +213,64 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     lastvals = y[-1] + np.abs(y[-half_window-1:-1][::-1] - y[-1])
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve( m[::-1], y, mode='valid')
+
+def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
+    if(len(np.shape(mysignal))!=1):
+        print('Data size is not 1D')
+    if(custom_kernel):
+        K = custom_kernel
+    else:
+        K = np.ones((kernel_size))
+    K = K/np.sum(K)
+    outsignal = np.convolve(mysignal,K,'same')
+    return outsignal
+    
+def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
+    import scipy.signal
+    if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
+        print('Data size is not either a 2D or ToF 2D')
+    if(custom_kernel):
+        K = custom_kernel
+    else:
+        K = np.ones((kernel_size,kernel_size))
+    K = K/np.sum(K)
+    
+    if(len(np.shape(mysignal))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
+        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
+        for i in range(0,np.shape(mysignal)[2]):
+            outsignal[:,:,i] = scipy.signal.convolve2d(mysignal,K,'same')
+    else:
+        outsignal = scipy.signal.convolve2d(mysignal,K,'same')
+    return outsignal   
+
+def fullspectrum_T (path_sample, path_ob, cut_last=0):
+    #load rawdata
+    I = load_fits(path_sample,cut_last)
+    I0 = load_fits(path_ob,cut_last)
+    #normalize
+    T = transmission_normalization(I.sum(axis=2),I0.sum(axis=2))
+    #clean from nans/infs
+    T = interp_image_T(T)   
+    return(T)
+    
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0):
+    #load rawdata
+    I = load_fits(path_sample,cut_last)
+    I0 = load_fits(path_ob,cut_last)
+    spectrum = np.loadtxt(path_spectrum, usecols=0)
+    if(bool_lambda):
+        spectrum = tof2l(spectrum, L, lambda_0, tof_0)
+    #rebinning
+    if(d_spectrum):
+        I = binning_resolution(I,spectrum,d_spectrum)
+        I0 = binning_resolution(I0,spectrum,d_spectrum)
+    if(bin_size):
+        I = binning(I,bin_size)
+        I0 = binning(I0,bin_size)
+    #normalize
+    T = transmission_normalization(I,I0,dose_mask_path)
+    #clean from nans/infs
+    for i in range(0,np.shape(T)[2]):
+        T[:,:,i] = interp_image_T(T[:,:,i])
+        
+    return{'T':T, 'spectrum':spectrum}
