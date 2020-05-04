@@ -1,5 +1,6 @@
 import numpy as np
 
+
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
 
@@ -13,7 +14,37 @@ def tof2l(tof, L, lambda_0 = 0, tof_0 = 0):
 def l2tof(l, t0, L):
     tof=t0+(l*1e-10)*(L)*m/h
     return tof
-
+    
+#these tools average stacks of image into a single one (axis =2)    
+def averageimage(imgs):
+    img=imgs.mean(axis=2)
+    return img
+    
+def medianimage(imgs):
+    img=np.median(imgs,axis=2)
+    return img
+    
+def weightedaverageimage(imgs,size=5):
+    import scipy.ndimage
+    dims=imgs.shape
+    w=np.zeros(imgs.shape)
+    M=size**2
+    for i in np.arange(dims[2]) :
+        f=scipy.ndimage.uniform_filter(imgs[:,:,i], size=size)*M
+        f2=scipy.ndimage.uniform_filter(imgs[:,:,i]**2, size=size)*M
+        sigma=np.sqrt(1/(M-1)*(f2-(f**2)/M))
+        
+        w[:,:,i]=1.0/sigma
+        
+    wsum=w.sum(axis=2)
+    for i in np.arange(dims[2]) :
+        w[:,:,i]=w[:,:,i]/wsum
+        
+    imgs=w*imgs
+    img=imgs.sum(axis=2)
+    
+    return img
+    
 def binning (mysignal, newsize):
     binned_signal = np.zeros(newsize)
     bin_size = int(len(mysignal)/newsize)
@@ -48,7 +79,7 @@ def binning_resolution (mysignal, spectrum, d_spectrum):
     
     return (binned_signal, new_spectrum)
     
-def load_fits (pathdata,cut_last=0):
+def load_fits (pathdata,cut_last=0,wavg_flag = False):
     from astropy.io import fits
     import os, fnmatch
     from os import listdir
@@ -62,21 +93,29 @@ def load_fits (pathdata,cut_last=0):
     n_tof = len(files)
     data = np.zeros([det_shape[0], det_shape[1], n_tof-cut_last])
     
-    #load all
-    for j in range(0,len(subfolders)):
-        files = sorted(fnmatch.filter(listdir(pathdata+'\\'+subfolders[j]),'*.fits'))
-        if(len(files)!=n_tof):
-            print('WARNING: Data has non-equal tof frames!')
-        for i in range(0,len(files)-cut_last):
-            data_t = fits.getdata(pathdata+'\\'+subfolders[j]+'\\'+files[i])
-            if(np.shape(data_t)!=det_shape):
-                print('WARNING: Data has different Detector shape!')
-            data[:,:,i] += data_t
+    # load all
+    # for j in range(0,len(subfolders)):
+        # files = sorted(fnmatch.filter(listdir(pathdata+'\\'+subfolders[j]),'*.fits'))
+        # if(len(files)!=n_tof):
+            # print('WARNING: Data has non-equal tof frames!')
+        # for i in range(0,len(files)-cut_last):
+            # data_t = fits.getdata(pathdata+'\\'+subfolders[j]+'\\'+files[i])
+            # if(np.shape(data_t)!=det_shape):
+                # print('WARNING: Data has different Detector shape!')
+            # data[:,:,i] += data_t
         
-    #would maybe nice to add check before this stage that the signals are similar before merging  
-    data /= len(subfolders)
+    # would maybe nice to add check before this stage that the signals are similar before merging  
+    # data /= len(subfolders)
+    data_t = np.zeros([det_shape[0], det_shape[1],len(subfolders)])
+    for i in range(0,len(files)-cut_last):
+        for j in range(0,len(subfolders)):
+            files = sorted(fnmatch.filter(listdir(pathdata+'\\'+subfolders[j]),'*.fits'))
+            data_t[:,:,j] = fits.getdata(pathdata+'\\'+subfolders[j]+'\\'+files[i])
+        if (wavg_flag):
+            data[:,:,i] = weightedaverageimage(data_t)    
+        else:
+            data[:,:,i] = medianimage(data_t)    
     return data
-
 
 def transmission_normalization (I,I0,dose_mask_path=0):
     from skimage import io
@@ -105,8 +144,8 @@ def interp_image_T (mydata):
     mydata[mydata==0] = np.nan #can't be 0 transmission
     mydata[np.isinf(mydata)] = np.nan #caused by 0 counts in open beam
     
-    x = np.arange(0,mydata.shape[1])
-    y = np.arange(0,mydata.shape[0])
+    x = np.arange(0,np.shape(mydata)[1])
+    y = np.arange(0,np.shape(mydata)[0])
     
     mydata = np.ma.masked_invalid(mydata)
     xx, yy = np.meshgrid(x, y)
@@ -253,10 +292,10 @@ def fullspectrum_T (path_sample, path_ob, cut_last=0):
     T = interp_image_T(T)   
     return(T)
     
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, wavg_flag = False):
     #load rawdata
-    I = load_fits(path_sample,cut_last)
-    I0 = load_fits(path_ob,cut_last)
+    I = load_fits(path_sample,cut_last,wavg_flag)
+    I0 = load_fits(path_ob,cut_last,wavg_flag)
     spectrum = np.loadtxt(path_spectrum, usecols=0)
     if(bool_lambda):
         spectrum = tof2l(spectrum, L, lambda_0, tof_0)
