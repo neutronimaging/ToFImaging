@@ -61,7 +61,7 @@ def image_edge_fitting(pathdata, pathob, pathspectrum, lambda_range, filemask=0,
     
     mylambda_bin = tof2l(spectrum_binned,t0_cal,L_cal)
 
-    ìob = io.imread(pathob+'/'+files_ob[0])
+    ob = io.imread(pathob+'/'+files_ob[0])
     #ob = fits.getdata(pathob+'/'+files_ob[0])
     
     ob_image = np.zeros([np.shape(ob)[0], np.shape(ob)[1], len(files_ob)])
@@ -350,3 +350,130 @@ def image_edge_fitting_T_gauss(pathdata, pathspectrum, lambda_range, filemask=0,
         np.save('edge_width.npy', edge_width)
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
+    
+def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
+    if(filemask):
+        mymask = io.imread(filemask)
+        if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+            print('WARNING: Mask size does not match frames size')
+    else:
+        mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
+
+    myrange = []
+    myrange.append(find_nearest(spectrum_l, lambda_range[0])) # 3.7
+    myrange.append(find_nearest(spectrum_l, lambda_range[1])) # 4.4
+    if(est_pos):
+        est_pos = find_nearest(spectrum_l[myrange[0]:myrange[1]], est_pos) # 4.05
+    if(debug_flag): #testing on a single pixel    
+        plt.imshow(Ttof.sum(axis=2))
+        plt.show()
+        plt.close()
+        sp = np.zeros(len(spectrum_l))
+        for i in range(0,len(spectrum_l)):
+            sp[i] = np.median(Ttof[400,400,i]) # This is for the first Bragg edge fitting
+        #run once the fitting to check if everything works
+        AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(myspectrum=sp, myrange=myrange, myTOF=spectrum_l, est_pos=est_pos, est_sigma=est_sigma, est_alpha=est_alpha, bool_print=debug_flag, bool_average=bool_average, bool_linear=bool_linear)
+
+    edge_position = np.zeros(np.shape(mymask))
+    edge_width = np.zeros(np.shape(mymask))
+    edge_height = np.zeros(np.shape(mymask))
+    #loop for all pixel position, where the mask is equal to one
+    start_time = time.time()
+    for i in range(0, np.shape(mymask)[0]):
+        if(debug_flag):
+            print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        for j in range(0, np.shape(mymask)[1]):
+            if (mymask[i,j]):
+                print(i,j)
+                mysignal = np.zeros(len(spectrum_l))
+                for ind in range(0,len(spectrum_l)):
+                    mysignal[ind] = np.median(Ttof[i,j,ind])
+                try:
+                    edge_fit = AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(myspectrum=mysignal, myrange=myrange, myTOF=spectrum_l, est_pos=est_pos, est_sigma=est_sigma, est_alpha=est_alpha, bool_print=debug_flag, bool_average=bool_average, bool_linear=bool_linear)
+                    edge_position[i,j] = edge_fit['t0']
+                    edge_height[i,j] = edge_fit['height']
+                    if (len(edge_fit['pos_extrema'])==2):
+                        edge_width[i,j] = spectrum_l[edge_fit['pos_extrema'][1]]-spectrum_l [edge_fit['pos_extrema'][0]]
+                    else:
+                        edge_width[i,j] = -2.0
+                except:
+                    print("Unexpected error at :", i, j)
+                    edge_position[i,j] = -2.0
+                    edge_width[i,j] = -2.0
+                    edge_height[i,j] = -2.0
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    if(bool_print):
+        plt.figure()
+        plt.imshow(edge_position)
+        plt.figure()
+        plt.imshow(edge_width)
+        plt.figure()
+        plt.imshow(edge_height)        
+    if(bool_save):
+        np.save('edge_position.npy', edge_position)
+        np.save('edge_height.npy', edge_height)
+        np.save('edge_width.npy', edge_width)
+   
+    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}        
+    
+def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
+    if(filemask):
+        mymask = io.imread(filemask)
+        if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+            print('WARNING: Mask size does not match frames size')
+    else:
+        mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
+
+    myrange = []
+    myrange.append(find_nearest(spectrum_l, lambda_range[0])) # 3.7
+    myrange.append(find_nearest(spectrum_l, lambda_range[1])) # 4.4
+    if(debug_flag): #testing on a single pixel    
+        plt.imshow(Ttof.sum(axis=2))
+        plt.show()
+        plt.close()
+        sp = np.zeros(len(spectrum_l))
+        for i in range(0,len(spectrum_l)):
+            sp[i] = np.median(Ttof[400,400,i]) # This is for the first Bragg edge fitting
+        #run once the fitting to check if everything works
+        AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=sp, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=debug_flag)
+
+    edge_position = np.zeros(np.shape(mymask))
+    edge_width = np.zeros(np.shape(mymask))
+    edge_height = np.zeros(np.shape(mymask))
+    #loop for all pixel position, where the mask is equal to one
+    start_time = time.time()
+    for i in range(0, np.shape(mymask)[0]):
+        if(debug_flag):
+            print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        for j in range(0, np.shape(mymask)[1]):
+            if (mymask[i,j]):
+                #print(i,j)
+                mysignal = np.zeros(len(spectrum_l))
+                for ind in range(0,len(spectrum_l)):
+                    mysignal[ind] = np.median(Ttof[i,j,ind])
+                try:
+                    edge_fit = AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=mysignal, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=debug_flag)
+                    edge_position[i,j] = edge_fit['t0']
+                    edge_height[i,j] = edge_fit['edge_height']
+                    edge_width[i,j] = edge_fit['edge_width']
+                except:
+                    print("Unexpected error at :", i, j)
+                    edge_position[i,j] = -2.0
+                    edge_width[i,j] = -2.0
+                    edge_height[i,j] = -2.0
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    if(bool_print):
+        plt.figure()
+        plt.imshow(edge_position)
+        plt.figure()
+        plt.imshow(edge_width)
+        plt.figure()
+        plt.imshow(edge_height)        
+    if(bool_save):
+        np.save('edge_position.npy', edge_position)
+        np.save('edge_height.npy', edge_height)
+        np.save('edge_width.npy', edge_width)
+   
+    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}            

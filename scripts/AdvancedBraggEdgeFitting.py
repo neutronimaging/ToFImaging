@@ -71,7 +71,7 @@ def BraggEdgeExponential_Attenuation(t,t0,alpha,sigma,a1,a2,a5,a6):
 def SG_filter(x, w=3, n=1):
     return savitzky_golay(x, w, n)
 
-def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smooth=0, smooth_w = 3, smooth_n = 0, bool_print=0):
+def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_print=False):
     from scipy.optimize import curve_fit
     def gaussian(x, amp, cen, wid):
         """1-d gaussian: gaussian(x, amp, cen, wid)"""
@@ -137,7 +137,7 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smoot
         plt.close()
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height}
 
-def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1, est_alpha=1, bool_print=0, bool_average=0, bool_linear=0): 
+def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1, est_alpha=1, bool_print=False, bool_average=False, bool_linear=False): 
 ## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is
 
     ##INPUTS:
