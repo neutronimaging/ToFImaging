@@ -79,7 +79,7 @@ def binning_resolution (mysignal, spectrum, d_spectrum):
     
     return (binned_signal, new_spectrum)
     
-def load_fits (pathdata,cut_last=0,wavg_flag = False):
+def load_fits (pathdata, cut_last=0, bool_wavg = False):
     from astropy.io import fits
     import os, fnmatch
     from os import listdir
@@ -111,7 +111,7 @@ def load_fits (pathdata,cut_last=0,wavg_flag = False):
         for j in range(0,len(subfolders)):
             files = sorted(fnmatch.filter(listdir(pathdata+'\\'+subfolders[j]),'*.fits'))
             data_t[:,:,j] = fits.getdata(pathdata+'\\'+subfolders[j]+'\\'+files[i])
-        if (wavg_flag):
+        if (bool_wavg):
             data[:,:,i] = weightedaverageimage(data_t)    
         else:
             data[:,:,i] = medianimage(data_t)    
@@ -292,10 +292,10 @@ def fullspectrum_T (path_sample, path_ob, cut_last=0):
     T = interp_image_T(T)   
     return(T)
     
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, wavg_flag = False):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_interp = False):
     #load rawdata
-    I = load_fits(path_sample,cut_last,wavg_flag)
-    I0 = load_fits(path_ob,cut_last,wavg_flag)
+    I = load_fits(path_sample,cut_last,bool_wavg)
+    I0 = load_fits(path_ob,cut_last,bool_wavg)
     spectrum = np.loadtxt(path_spectrum, usecols=0)
     if(bool_lambda):
         spectrum = tof2l(spectrum, L, lambda_0, tof_0)
@@ -309,8 +309,8 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
     #normalize
     T = transmission_normalization(I,I0,dose_mask_path)
     #clean from nans/infs
-    for i in range(0,np.shape(T)[2]):
-        print(i)
-        T[:,:,i] = interp_image_T(T[:,:,i])
+    if(bool_interp):
+        for i in range(0,np.shape(T)[2]):
+            T[:,:,i] = interp_image_T(T[:,:,i])
         
     return{'T':T, 'spectrum':spectrum}
