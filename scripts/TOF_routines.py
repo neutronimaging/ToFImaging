@@ -1,6 +1,5 @@
 import numpy as np
 
-
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
 
@@ -277,7 +276,7 @@ def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
     if(len(np.shape(mysignal))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
         outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
         for i in range(0,np.shape(mysignal)[2]):
-            outsignal[:,:,i] = scipy.signal.convolve2d(mysignal,K,'same')
+            outsignal[:,:,i] = scipy.signal.convolve2d(mysignal[:,:,i],K,'same')
     else:
         outsignal = scipy.signal.convolve2d(mysignal,K,'same')
     return outsignal   
@@ -291,6 +290,12 @@ def fullspectrum_T (path_sample, path_ob, cut_last=0):
     #clean from nans/infs
     T = interp_image_T(T)   
     return(T)
+
+def fullspectrum_im (path_data, cut_last=0):
+    #load rawdata
+    I = load_fits(path_data,cut_last)
+    T = I.sum(axis=2)
+    return(T)    
     
 def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_interp = False):
     #load rawdata
