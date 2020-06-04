@@ -10,6 +10,7 @@ from astropy.io import fits
 
 import AdvancedBraggEdgeFitting
 # from PIL import Image
+import TOF_routines
 from TOF_routines import tof2l
 from TOF_routines import find_nearest
 
@@ -112,7 +113,7 @@ def image_edge_fitting(pathdata, pathob, pathspectrum, lambda_range, filemask=0,
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-#         print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        #print('processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
     #             print(i,j,' ciao')
@@ -153,7 +154,7 @@ def image_edge_fitting(pathdata, pathob, pathspectrum, lambda_range, filemask=0,
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
 
-def image_edge_fitting_T(pathdata, pathspectrum, lambda_range, filemask=0, t0_cal=-0.0002618673892937752, L_cal=18.961609065251505, est_pos=0, est_sigma=1, est_alpha=1, bool_save=0, bool_print=1):
+def image_edge_fitting_Ttof(pathdata, pathspectrum, lambda_range, filemask=0, t0_cal=-0.0002618673892937752, L_cal=18.961609065251505, est_pos=0, est_sigma=1, est_alpha=1, bool_save=0, bool_print=1):
     """ Run edge_fitting on provided 3D image, the third dimension is supposed to be lambda(A) or TOF 
     #INPUTS:
     #pathdata: path to sample transmission images
@@ -190,8 +191,10 @@ def image_edge_fitting_T(pathdata, pathspectrum, lambda_range, filemask=0, t0_ca
     
     if(filemask):
         mymask = io.imread(filemask)
+        if( [np.shape(sample_image)[0], np.shape(sample_image)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+            print('WARNING: Mask size does not match frames size')
     else:
-        mymask = np.ones([np.shape(ob)[0], np.shape(ob)[1]])
+        mymask = np.ones([np.shape(sample_image)[0], np.shape(sample_image)[1]])
 
     #read the images, in this example they are already selected in a neighborhood of the studied edge 
     for i in range(0,len(files_sample)):
@@ -220,7 +223,7 @@ def image_edge_fitting_T(pathdata, pathspectrum, lambda_range, filemask=0, t0_ca
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-#         print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        #print('processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 print(i,j)
@@ -256,7 +259,7 @@ def image_edge_fitting_T(pathdata, pathspectrum, lambda_range, filemask=0, t0_ca
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
 
-def image_edge_fitting_T_gauss(pathdata, pathspectrum, lambda_range, filemask=0, t0_cal=-0.0002618673892937752, L_cal=18.961609065251505, est_pos = 0, bool_save=0, bool_print=1):
+def image_edge_fitting_Ttof_gauss(pathdata, pathspectrum, lambda_range, filemask=0, t0_cal=-0.0002618673892937752, L_cal=18.961609065251505, est_pos = 0, bool_save=0, bool_print=1):
     """ Run edge_fitting on provided 3D image, the third dimension is supposed to be lambda(A) or TOF     
     ##INPUTS:
     #pathdata: path to sample transmission images
@@ -291,8 +294,10 @@ def image_edge_fitting_T_gauss(pathdata, pathspectrum, lambda_range, filemask=0,
     
     if(filemask):
         mymask = io.imread(filemask)
+        if( [np.shape(sample_image)[0], np.shape(sample_image)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+            print('WARNING: Mask size does not match frames size')
     else:
-        mymask = np.ones([np.shape(ob)[0], np.shape(ob)[1]])
+        mymask = np.ones([np.shape(sample_image)[0], np.shape(sample_image)[1]])
 
     #read the images, in this example they are already selected in a neighborhood of the studied edge 
     for i in range(0,len(files_sample)):
@@ -318,7 +323,7 @@ def image_edge_fitting_T_gauss(pathdata, pathspectrum, lambda_range, filemask=0,
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-#         print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        #print('processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 print(i,j)
@@ -351,11 +356,18 @@ def image_edge_fitting_T_gauss(pathdata, pathspectrum, lambda_range, filemask=0,
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
     
-def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
+def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
+    elif(auto_mask):
+        mymask = TOF_routines.medianimage(Ttof)
+        mymask[mymask>0.95] = 0.0
+        mymask[mymask<0.05] = 0.0
+        mymask[mymask>0] = 1.0
+        mymask[np.isinf(mymask)] = 0.0
+        mymask[np.isnan(mymask)] = 0.0
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
@@ -417,11 +429,18 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, est_p
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}        
     
-def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
+def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
+    elif(auto_mask):
+        mymask = TOF_routines.medianimage(Ttof)
+        mymask[mymask>0.95] = 0.0
+        mymask[mymask<0.05] = 0.0
+        mymask[mymask>0] = 1.0
+        mymask[np.isinf(mymask)] = 0.0
+        mymask[np.isnan(mymask)] = 0.0
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
