@@ -368,6 +368,10 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
+        plt.figure()
+        plt.subplot(1,2,1), plt.imshow(TOF_routines.medianimage(Ttof)), plt.title('Full-spectrum Image')
+        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.show(), plt.close()        
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
@@ -441,6 +445,10 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
+        plt.figure()
+        plt.subplot(1,2,1), plt.imshow(TOF_routines.medianimage(Ttof)), plt.title('Full-spectrum Image')
+        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.show(), plt.close()        
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
