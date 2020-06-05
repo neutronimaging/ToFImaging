@@ -117,6 +117,7 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smoot
     id_low = find_nearest(dtof, t0-edge_width) # 3.7
     id_high = find_nearest(dtof, t0+edge_width) # 3.7
     edge_height = np.sum(fitted_data[id_low:id_high])
+    edge_slope = result.best_values.get('amp')
     
     if (bool_print):
         print('t0 = ',t0)
@@ -135,7 +136,7 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smoot
         #plt.savefig('step1_fitting.pdf')
         plt.show()
         plt.close()
-    return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height}
+    return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
 
 def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1, est_alpha=1, bool_print=False, bool_average=False, bool_linear=False): 
 ## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is

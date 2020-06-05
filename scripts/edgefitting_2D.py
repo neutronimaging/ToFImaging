@@ -356,14 +356,14 @@ def image_edge_fitting_Ttof_gauss(pathdata, pathspectrum, lambda_range, filemask
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
     
-def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
+def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = 0.95, est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         mymask = TOF_routines.medianimage(Ttof)
-        mymask[mymask>0.95] = 0.0
+        mymask[mymask>mask_thresh] = 0.0
         mymask[mymask<0.05] = 0.0
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
@@ -433,14 +433,14 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}        
     
-def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
+def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = 0.95, est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         mymask = TOF_routines.medianimage(Ttof)
-        mymask[mymask>0.95] = 0.0
+        mymask[mymask>mask_thresh] = 0.0,
         mymask[mymask<0.05] = 0.0
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
@@ -468,6 +468,7 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
+    edge_slope = np.zeros(np.shape(mymask))
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
@@ -484,23 +485,24 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['edge_height']
                     edge_width[i,j] = edge_fit['edge_width']
+                    edge_slope[i,j] = edge_fit['edge_slope']
                 except:
                     print("Unexpected error at :", i, j)
                     edge_position[i,j] = -2.0
                     edge_width[i,j] = -2.0
                     edge_height[i,j] = -2.0
+                    edge_slope[i,j] = -2.0
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if(bool_print):
-        plt.figure()
-        plt.imshow(edge_position)
-        plt.figure()
-        plt.imshow(edge_width)
-        plt.figure()
-        plt.imshow(edge_height)        
+        plt.figure(), plt.imshow(edge_position)
+        plt.figure(), plt.imshow(edge_width)
+        plt.figure(), plt.imshow(edge_height)        
+        plt.figure(), plt.imshow(edge_slope)        
     if(bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
+        np.save('edge_slope.npy', edge_slope)
    
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}            
+    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope}            
