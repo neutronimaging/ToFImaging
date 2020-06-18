@@ -356,22 +356,26 @@ def image_edge_fitting_Ttof_gauss(pathdata, pathspectrum, lambda_range, filemask
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
     
-def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = 0.95, est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
+def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
+        import skimage.filters
         mymask = TOF_routines.medianimage(Ttof)
-        mymask[mymask>mask_thresh] = 0.0
-        mymask[mymask<0.05] = 0.0
+        plt.figure()
+        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
+        mymask[mymask>mask_thresh[1]] = 0.0
+        mymask[mymask<mask_thresh[0]] = 0.0
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.figure()
-        plt.subplot(1,2,1), plt.imshow(TOF_routines.medianimage(Ttof)), plt.title('Full-spectrum Image')
-        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
-        plt.show(), plt.close()        
+        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
+        mymask = skimage.filters.gaussian(mymask,sigma=2)
+        mymask[mymask>0] = 1.0
+        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
+        plt.show(), plt.close()           
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
@@ -433,21 +437,25 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}        
     
-def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = 0.95, est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
+def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
+        import skimage.filters
         mymask = TOF_routines.medianimage(Ttof)
-        mymask[mymask>mask_thresh] = 0.0,
-        mymask[mymask<0.05] = 0.0
+        plt.figure()
+        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
+        mymask[mymask>mask_thresh[1]] = 0.0
+        mymask[mymask<mask_thresh[0]] = 0.0
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.figure()
-        plt.subplot(1,2,1), plt.imshow(TOF_routines.medianimage(Ttof)), plt.title('Full-spectrum Image')
-        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
+        mymask = skimage.filters.gaussian(mymask,sigma=2)
+        mymask[mymask>0] = 1.0
+        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
         plt.show(), plt.close()        
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
