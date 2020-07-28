@@ -354,7 +354,7 @@ def image_edge_fitting_Ttof_gauss(pathdata, pathspectrum, lambda_range, filemask
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
    
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}
+    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
     
 def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag=False, debug_idx=[160,200], bool_average=False, bool_linear=False):    
     if(filemask):
@@ -394,6 +394,7 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
         #run once the fitting to check if everything works
         AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(myspectrum=sp, myrange=myrange, myTOF=spectrum_l, est_pos=est_pos, est_sigma=est_sigma, est_alpha=est_alpha, bool_print=debug_flag, bool_average=bool_average, bool_linear=bool_linear)
 
+    median_image = TOF_routines.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
