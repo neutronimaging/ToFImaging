@@ -317,7 +317,6 @@ def image_edge_fitting_Ttof_gauss(pathdata, pathspectrum, lambda_range, filemask
         #run once the fitting to check if everything works
         AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=sp, myTOF=mylambda_bin, myrange=myrange, est_pos = est_pos, bool_smooth=1, smooth_w = 3, smooth_n = 0, bool_print=1)
 
-    median_image = TOF_routines.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
