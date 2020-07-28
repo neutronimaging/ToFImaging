@@ -281,6 +281,49 @@ def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
         outsignal = scipy.signal.convolve2d(mysignal,K,'same')
     return outsignal   
 
+def rebin_image(image, new_shape, operation='sum'):
+    """
+    Bins an ndarray in all axes based on the target shape, by summing or
+        averaging.
+
+    Number of output dimensions must match number of input dimensions and 
+        new axes must divide old ones.
+
+    Example
+    -------
+    >>> m = np.arange(0,100,1).reshape((10,10))
+    >>> n = bin_ndarray(m, new_shape=(5,5), operation='sum')
+    >>> print(n)
+
+    [[ 22  30  38  46  54]
+     [102 110 118 126 134]
+     [182 190 198 206 214]
+     [262 270 278 286 294]
+     [342 350 358 366 374]]
+
+    """
+    operation = operation.lower()
+    if not operation in ['sum', 'mean']:
+        raise ValueError("Operation not supported.")
+    if image.ndim != len(new_shape):
+        raise ValueError("Shape mismatch: {} -> {}".format(image.shape,
+                                                           new_shape))
+    compression_pairs = [(d, c//d) for d,c in zip(new_shape,
+                                                  image.shape)]
+    flattened = [l for p in compression_pairs for l in p]
+    image = image.reshape(flattened)
+    for i in range(len(new_shape)):
+        op = getattr(image, operation)
+        image = op(-1*(i+1))
+    return image    
+
+def rebin_image_tof(image, new_shape, operation='sum'):
+    n_tof = np.shape(image)[2]
+    image_rebin = np.zeros((new_shape[0],new_shape[1],n_tof))
+    for i in range(0,n_tof):
+        image_rebin[:,:,i] = rebin_image(image[:,:,i],new_shape,operation)
+    return image_rebin
+
 def fullspectrum_T (path_sample, path_ob, cut_last=0):
     #load rawdata
     I = load_fits(path_sample,cut_last)

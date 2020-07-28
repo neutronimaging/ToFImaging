@@ -317,6 +317,7 @@ def image_edge_fitting_Ttof_gauss(pathdata, pathspectrum, lambda_range, filemask
         #run once the fitting to check if everything works
         AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=sp, myTOF=mylambda_bin, myrange=myrange, est_pos = est_pos, bool_smooth=1, smooth_w = 3, smooth_n = 0, bool_print=1)
 
+    median_image = TOF_routines.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
@@ -354,9 +355,9 @@ def image_edge_fitting_Ttof_gauss(pathdata, pathspectrum, lambda_range, filemask
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
    
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}
+    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}
     
-def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag = False, bool_average=False, bool_linear=False):    
+def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_sigma=1, est_alpha=1, bool_save=True, bool_print=True, debug_flag=False, debug_idx=[160,200], bool_average=False, bool_linear=False):    
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
@@ -390,10 +391,11 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
         plt.close()
         sp = np.zeros(len(spectrum_l))
         for i in range(0,len(spectrum_l)):
-            sp[i] = np.median(Ttof[400,400,i]) # This is for the first Bragg edge fitting
+            sp[i] = np.median(Ttof[debug_idx[0],debug_idx[1],i]) # This is for the first Bragg edge fitting
         #run once the fitting to check if everything works
         AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(myspectrum=sp, myrange=myrange, myTOF=spectrum_l, est_pos=est_pos, est_sigma=est_sigma, est_alpha=est_alpha, bool_print=debug_flag, bool_average=bool_average, bool_linear=bool_linear)
 
+    median_image = TOF_routines.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
@@ -435,9 +437,9 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
    
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width}        
+    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}        
     
-def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag = False):        
+def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_sigma=1, est_alpha=1, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag=False, debug_idx=[160,200]):        
     if(filemask):
         mymask = io.imread(filemask)
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
@@ -469,10 +471,11 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
         plt.close()
         sp = np.zeros(len(spectrum_l))
         for i in range(0,len(spectrum_l)):
-            sp[i] = np.median(Ttof[400,400,i]) # This is for the first Bragg edge fitting
+            sp[i] = np.median(Ttof[debug_idx[0],debug_idx[1],i]) # This is for the first Bragg edge fitting
         #run once the fitting to check if everything works
         AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=sp, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=debug_flag)
 
+    median_image = TOF_routines.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
@@ -513,4 +516,4 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
         np.save('edge_width.npy', edge_width)
         np.save('edge_slope.npy', edge_slope)
    
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope}            
+    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}            
