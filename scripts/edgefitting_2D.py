@@ -394,7 +394,6 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
         #run once the fitting to check if everything works
         AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(myspectrum=sp, myrange=myrange, myTOF=spectrum_l, est_pos=est_pos, est_sigma=est_sigma, est_alpha=est_alpha, bool_print=debug_flag, bool_average=bool_average, bool_linear=bool_linear)
 
-    median_image = TOF_routines.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
