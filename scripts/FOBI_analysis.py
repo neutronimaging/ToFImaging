@@ -1,8 +1,24 @@
 import numpy as np
 
-def chopper_time_delays(time, nslits=8, nrep=2, mode='pseudorandom', rng = 0.25):
+def chopper_time_delays_generator(time, nslits=8, nrep=2, mode='pseudorandom', rng = 0.25):
+    """
+    Generates time delays for a multi-slits chopper:
+    
+    INPUTS:
+    time = time-of-flight bins 
+    nslits = number of slits per pattern repetitions
+    nrep = number of slit pattern repetitions
+    mode = how slits are generated:
+            - even = evenly distributed
+            - random = randomly distributed
+            - pseudorandom = for each pattern the slits are evenly distributed and then offset randomly scaled by the "rng" parameter
+    
+    OUTPUT:
+    D =  array with discretized dirac deltas at the chopper time delays.
+    """
     Nt = int(np.shape(time)[0])
     angles = np.zeros(nslits)
+
     if mode=='even':
         angles = np.linspace(0,360,nslits+1)/nrep
         angles = angles[1:-2]
@@ -27,10 +43,44 @@ def chopper_time_delays(time, nslits=8, nrep=2, mode='pseudorandom', rng = 0.25)
         sfloor = int(sfloor+1)
         D[sfloor] = 1-rest
         D[sfloor+1] = rest
-        
+    return D
+
+def poldi_time_delays(time):
+    """
+    Generates time delays for the POLDI chopper:
+    
+    INPUTS:
+    time = time-of-flight bins
+    
+    OUTPUT:
+    D =  array with discretized dirac deltas at the chopper time delays.
+    """
+    Nt = int(np.shape(time)[0])
+    angles = [0, 9.363, 21.475, 37.039, 50.417, 56.664, 67.422, 75.406]
+    angles = [angles, angles+1*90, angles+2*90, angles+3*90]/360
+    shifts = Nt*angles
+    D = np.zeros((Nt,1))
+    for i in range(0,np.shape(shifts)[0]):
+        sfloor = np.floor(shifts[i])
+        rest = shifts[i]-sfloor
+        sfloor = sfloor+1
+        D[sfloor] = 1-rest
+        D[sfloor+1] = rest
+
     return D
 
 def wiener_decorrelation(f, g, c=1e-2):
+    """
+    Perform the decorrelation of FOBI overlap patterns
+    
+    INPUTS:
+    f =  measured signal
+    g = time delays
+    c = Wiener coefficient
+    
+    OUTPUT:
+    H = reconstructed signal
+    """    
     F = np.fft.fft(f) 
     G = np.fft.fft(g)
     arg = np.divide(F*G,(np.power(np.abs(G),2) + c))
@@ -38,6 +88,17 @@ def wiener_decorrelation(f, g, c=1e-2):
     return H
 
 def merge_reconstruction(x0,idx_l,nrep):
+    """
+    Merge repeated pattern signals into a single one
+    
+    INPUTS:
+    x0 = repeated signal
+    idx_l = index where the repeated signal starts
+    nrep = number of pattern repetitions
+
+    OUTPUT:
+    x0_rec = merged signal
+    """    
     nt = int(int(np.shape(x0)[0])/nrep)
     x0 = np.roll(x0,-idx_l)
     x0_rec = np.zeros(nt)
@@ -46,3 +107,26 @@ def merge_reconstruction(x0,idx_l,nrep):
     x0_rec = x0_rec/nrep
 
     return x0_rec
+
+def interp_noreadoutgaps(y,t,tmax,nrep=0,bool_plot=0):
+    dt = np.nanmean(np.diff(t))
+    t_tot = np.arange(t[0],t[-1]+dt,dt)
+    app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
+    y[0] = np.nan
+    y[-1] = np.nan
+    y = np.concatenate((y,app))
+
+    replen = np.floor(np.shape(y)[0]/nrep)
+    y_overlap = np.zeros((replen,nrep))
+
+    for i in range(0,nrep):
+        y_overlap[:,0] = y[replen*(i-1):replen*i]
+
+    y_merged = np.nanmean(y_overlap,axis=1)
+    y_extended = y_merged
+    for i in range(0,nrep-1):
+        y_extended = np.concatenate((y_extended, y_merged))
+    
+    t_merged = t_tot[0:replen*nrep]
+
+    return y_extended,t_merged
