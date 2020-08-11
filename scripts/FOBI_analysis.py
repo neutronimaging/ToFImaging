@@ -1,4 +1,5 @@
 import numpy as np
+import TOF_routines
 
 def chopper_time_delays_generator(time, nslits=8, nrep=2, mode='pseudorandom', rng = 0.25):
     """
@@ -130,3 +131,29 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0,bool_plot=0):
     t_merged = t_tot[0:replen*nrep]
 
     return y_extended,t_merged
+
+def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1):
+    [y,tn] = interp_noreadoutgaps(y,t,tmax,nrep)
+    [y0,tn] = interp_noreadoutgaps(y0,t,tmax,nrep)
+
+    D = poldi_time_delays(tn)
+
+    x0rec = TOF_routines.savitzky_golay(wiener_decorrelation(y0,D,c))
+    yrec = np.divide(TOF_routines.savitzky_golay(wiener_decorrelation(y,D,c)),x0rec)
+
+    min_id = np.argmin(x0rec[0:np.shape(x0rec)[0]/nrep])
+    x0rec = np.roll(x0rec,-min_id)
+    yrec = np.roll(yrec,-min_id)
+
+    replen = np.shape(y)[0]/nrep
+    x0_over = np.zeros((replen,nrep))
+    y_over = np.zeros((replen,nrep))
+    for i in range(0,nrep):
+        x0_over[:,i] = x0rec[replen*(i-1)+1:replen*i]
+        y_over[:,i] = yrec[replen*(i-1)+1:replen*i]
+
+    x0rec_merged = np.nanmean(x0_over,2)
+    yrec_merged = np.nanmean(y_over,2)
+    t_merged = tn[0:replen]
+
+    return yrec_merged,x0rec_merged,t_merged

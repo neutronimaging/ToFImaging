@@ -162,7 +162,7 @@ def rotatedata(x,y,a):
     y = x*sina+y*cosa
     return x,y
 
-def savitzky_golay(y, window_size, order, deriv=0, rate=1):
+def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
