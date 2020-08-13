@@ -110,6 +110,18 @@ def merge_reconstruction(x0,idx_l,nrep):
     return x0_rec
 
 def interp_noreadoutgaps(y,t,tmax,nrep=0,bool_plot=0):
+    """ Merge multislit chopper data interpolating readout gaps (in this case only at each chopper full rotation) then repeat the signal for the chopper pattern repetitions
+    INPUTS:
+    y = spectrum
+    t = time-of-flight bins
+    tmax = maximum time of flight (this parameter is dependent on the chopper frequency: tmax = 1/f  with f = chopper frequency)
+    nrep = number of times the pattern is repeated (chopper)
+    
+    OUTPUTS:
+    dictionary with the following fit in the dimension of the mask
+    'y_extended': edge position
+    't_merged': edge height
+    """ 
     dt = np.nanmean(np.diff(t))
     t_tot = np.arange(t[0],t[-1]+dt,dt)
     app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
@@ -128,11 +140,28 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0,bool_plot=0):
     for i in range(0,nrep-1):
         y_extended = np.concatenate((y_extended, y_merged))
     
-    t_merged = t_tot[0:replen*nrep]
+    t_extended = t_tot[0:replen*nrep]
 
-    return y_extended,t_merged
+    return y_extended,t_extended
 
-def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1):
+def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1,bool_roll=False):
+    """ Performs FOBI reduction from open beam and sample spectrum    
+    
+    INPUTS:
+    y = sample spectrum (I)
+    y0 = open beam spectrum (I0)
+    t = time-of-flight bins
+    tmax = maximum time of flight (this parameter is dependent on the chopper frequency: tmax = 1/f  with f = chopper frequency)
+    nrep = number of times the pattern is repeated (chopper)
+    c = Wiener constant
+    bool_roll = if this is activated the spectra are offset to have the minimum of the I0 spectrum as first time bin
+
+    OUTPUTS:
+    #dictionary with the following fit in the dimension of the mask
+    #'y_fobi': edge position
+    #'x_fobi': edge height
+    #'t_fobi': edge width
+    """ 
     [y,tn] = interp_noreadoutgaps(y,t,tmax,nrep)
     [y0,tn] = interp_noreadoutgaps(y0,t,tmax,nrep)
 
@@ -140,10 +169,11 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1):
 
     x0rec = TOF_routines.savitzky_golay(wiener_decorrelation(y0,D,c))
     yrec = np.divide(TOF_routines.savitzky_golay(wiener_decorrelation(y,D,c)),x0rec)
-
-    min_id = np.argmin(x0rec[0:np.shape(x0rec)[0]/nrep])
-    x0rec = np.roll(x0rec,-min_id)
-    yrec = np.roll(yrec,-min_id)
+    
+    if(bool_roll==True):
+        min_id = np.argmin(x0rec[0:np.shape(x0rec)[0]/nrep])
+        x0rec = np.roll(x0rec,-min_id)
+        yrec = np.roll(yrec,-min_id)
 
     replen = np.shape(y)[0]/nrep
     x0_over = np.zeros((replen,nrep))
@@ -152,8 +182,8 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1):
         x0_over[:,i] = x0rec[replen*(i-1)+1:replen*i]
         y_over[:,i] = yrec[replen*(i-1)+1:replen*i]
 
-    x0rec_merged = np.nanmean(x0_over,2)
-    yrec_merged = np.nanmean(y_over,2)
-    t_merged = tn[0:replen]
+    x_fobi = np.nanmean(x0_over,2)
+    y_fobi = np.nanmean(y_over,2)
+    t_fobi = tn[0:replen]
 
-    return yrec_merged,x0rec_merged,t_merged
+    return y_fobi,x_fobi,t_fobi

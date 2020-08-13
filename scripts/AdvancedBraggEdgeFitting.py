@@ -1,19 +1,19 @@
 import numpy as np
 from numpy import pi, r_, math, random
 import matplotlib.pyplot as plt
-from scipy import optimize
-from scipy.optimize import curve_fit
+#from scipy import optimize
+#from scipy.optimize import curve_fit
 from scipy.special import erfc, erf
 from lmfit import Model
-from lmfit.printfuncs import *
-import lmfit
-from numpy import loadtxt
+#from lmfit.printfuncs import *
+#import lmfit
+#from numpy import loadtxt
 
-from scipy.signal import argrelextrema
+#from scipy.signal import argrelextrema
 from TOF_routines import find_nearest
-from TOF_routines import find_first
-from TOF_routines import find_last
-from TOF_routines import rotatedata
+#from TOF_routines import find_first
+#from TOF_routines import find_last
+#from TOF_routines import rotatedata
 from TOF_routines import savitzky_golay
 
 # def term0(t,a2,a6):
@@ -71,8 +71,8 @@ def BraggEdgeExponential_Attenuation(t,t0,alpha,sigma,a1,a2,a5,a6):
 def SG_filter(x, w=3, n=1):
     return savitzky_golay(x, w, n)
 
-def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_print=False):
-    from scipy.optimize import curve_fit
+def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0, est_h=0, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_print=False):
+    
     def gaussian(x, amp, cen, wid):
         """1-d gaussian: gaussian(x, amp, cen, wid)"""
         return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
@@ -105,10 +105,14 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, bool_smoot
     ## 2nd Appoach
     method ='least_squares' # default and it implements the Levenberg-Marquardt
     gmodel = Model(gaussian)
-    if(est_pos):
-        params = gmodel.make_params(cen=est_pos, amp=myspectrum[-2]-myspectrum[2], wid=0.01)
-    else:
-        params = gmodel.make_params(cen=dtof[np.int(len(dtof)/2)], amp = myspectrum[-2]-myspectrum[2], wid = 0.01)
+    if(est_pos==0):
+        est_pos = dtof[np.int(len(dtof)/2)]
+    if(est_wid==0):
+        est_wid = 0.01
+    if(est_h==0):
+        est_h = myspectrum[-2]-myspectrum[2]
+
+    params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
     result = gmodel.fit(d_signal, params, x=dtof, method=method, nan_policy='propagate')
     t0 = result.best_values.get('cen')
     edge_width = result.best_values.get('wid')
