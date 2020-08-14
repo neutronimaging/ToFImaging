@@ -57,17 +57,18 @@ def poldi_time_delays(time):
     D =  array with discretized dirac deltas at the chopper time delays.
     """
     Nt = int(np.shape(time)[0])
-    angles = [0, 9.363, 21.475, 37.039, 50.417, 56.664, 67.422, 75.406]
-    angles = [angles, angles+1*90, angles+2*90, angles+3*90]/360
+    angles = np.array([0, 9.363, 21.475, 37.039, 50.417, 56.664, 67.422, 75.406])
+    angles = np.concatenate((angles, angles+1.0*90.0, angles+2.0*90.0, angles+3.0*90.0))/360.0
     shifts = Nt*angles
     D = np.zeros((Nt,1))
     for i in range(0,np.shape(shifts)[0]):
         sfloor = np.floor(shifts[i])
         rest = shifts[i]-sfloor
-        sfloor = sfloor+1
+        sfloor = np.int(sfloor+1)
         D[sfloor] = 1-rest
         D[sfloor+1] = rest
 
+    D = np.squeeze(D)
     return D
 
 def wiener_decorrelation(f, g, c=1e-2):
@@ -109,7 +110,7 @@ def merge_reconstruction(x0,idx_l,nrep):
 
     return x0_rec
 
-def interp_noreadoutgaps(y,t,tmax,nrep=0,bool_plot=0):
+def interp_noreadoutgaps(y,t,tmax,nrep=0):
     """ Merge multislit chopper data interpolating readout gaps (in this case only at each chopper full rotation) then repeat the signal for the chopper pattern repetitions
     INPUTS:
     y = spectrum
@@ -122,18 +123,19 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0,bool_plot=0):
     'y_extended': edge position
     't_merged': edge height
     """ 
-    dt = np.nanmean(np.diff(t))
-    t_tot = np.arange(t[0],t[-1]+dt,dt)
+    
+    dt = np.nanmean(np.diff(t),axis=0)
+    t_tot = np.arange(t[0],tmax+dt,dt)
     app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
     y[0] = np.nan
     y[-1] = np.nan
     y = np.concatenate((y,app))
 
-    replen = np.floor(np.shape(y)[0]/nrep)
+    replen = np.int(np.floor(np.shape(y)[0]/nrep))
     y_overlap = np.zeros((replen,nrep))
 
     for i in range(0,nrep):
-        y_overlap[:,0] = y[replen*(i-1):replen*i]
+        y_overlap[:,i] = y[replen*i:replen*(i+1)]
 
     y_merged = np.nanmean(y_overlap,axis=1)
     y_extended = y_merged
@@ -175,15 +177,15 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1,bool_roll=False):
         x0rec = np.roll(x0rec,-min_id)
         yrec = np.roll(yrec,-min_id)
 
-    replen = np.shape(y)[0]/nrep
+    replen = np.int(np.floor(np.shape(y)[0]/nrep))
     x0_over = np.zeros((replen,nrep))
     y_over = np.zeros((replen,nrep))
     for i in range(0,nrep):
-        x0_over[:,i] = x0rec[replen*(i-1)+1:replen*i]
-        y_over[:,i] = yrec[replen*(i-1)+1:replen*i]
+        x0_over[:,i] = x0rec[replen*i:replen*(i+1)]
+        y_over[:,i] = yrec[replen*i:replen*(i+1)]
 
-    x_fobi = np.nanmean(x0_over,2)
-    y_fobi = np.nanmean(y_over,2)
+    x_fobi = np.nanmean(x0_over,axis=1)
+    y_fobi = np.nanmean(y_over,axis=1)
     t_fobi = tn[0:replen]
 
-    return y_fobi,x_fobi,t_fobi
+    return {'x_fobi' : x_fobi, 'y_fobi': y_fobi, 't_fobi': t_fobi}
