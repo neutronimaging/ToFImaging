@@ -410,7 +410,7 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
                 for ind in range(0,len(spectrum_l)):
                     mysignal[ind] = np.median(Ttof[i,j,ind])
                 try:
-                    edge_fit = AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(myspectrum=mysignal, myrange=myrange, myTOF=spectrum_l, est_pos=est_pos, est_sigma=est_sigma, est_alpha=est_alpha, bool_print=debug_flag, bool_average=bool_average, bool_linear=bool_linear)
+                    edge_fit = AdvancedBraggEdgeFitting.AdvancedBraggEdgeFitting(myspectrum=mysignal, myrange=myrange, myTOF=spectrum_l, est_pos=est_pos, est_sigma=est_sigma, est_alpha=est_alpha, bool_print=False, bool_average=bool_average, bool_linear=bool_linear)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['height']
                     if (len(edge_fit['pos_extrema'])==2):
@@ -491,7 +491,7 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
                 for ind in range(0,len(spectrum_l)):
                     mysignal[ind] = np.median(Ttof[i,j,ind])
                 try:
-                    edge_fit = AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=mysignal, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, est_wid=est_wid, est_h=est_h, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=debug_flag)
+                    edge_fit = AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=mysignal, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, est_wid=est_wid, est_h=est_h, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=False)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['edge_height']
                     edge_width[i,j] = edge_fit['edge_width']
