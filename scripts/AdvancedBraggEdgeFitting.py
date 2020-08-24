@@ -468,3 +468,59 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
         plt.show()
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
+
+def phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,bool_plot=0): 
+    ##INPUTS:
+    #lac: measured LAC spectrum to fit
+    #spectrum_lambda: lambda spectrum of the lac
+    #phase1lac: LAC of the 1st phase to fit
+    #phase2lac: LAC of the 2nd phase to fit
+    #phase_spectrum: lambda spectrum of the theoretical phases LAC
+    #lambda_range_norm: lambda range used to normalize data
+    #lambda_range_edges: lambda range where to perform the fitting
+    #bool_plot: flag to activate plotting
+    
+    ##OUTPUTS:
+    #phi: fitted phase fraction
+
+    #cutting to selected range for normalization
+    idx_low = find_nearest(spectrum_lambda,lambda_range_norm[0])
+    idx_high = find_nearest(spectrum_lambda,lambda_range_norm[1])
+    lac = lac[idx_low:idx_high]
+    spectrum_lambda = spectrum_lambda[idx_low:idx_high]
+
+    idx_low = find_nearest(phase_spectrum,lambda_range_norm(1))
+    idx_high = find_nearest(phase_spectrum,lambda_range_norm(2))
+    lambda_table = phase_spectrum[idx_low:idx_high]
+    phase1lac = phase1lac[idx_low:idx_high]
+    phase2lac = phase2lac[idx_low:idx_high]
+
+    phase1lac = np.interp(lambda_table,phase1lac,spectrum_lambda)
+    phase2lac =  np.interp(lambda_table,phase2lac,spectrum_lambda)
+    phase1lac = phase1lac*(np.nanmean(lac)/np.nanmean(phase1lac))
+    phase2lac = phase2lac*(np.nanmean(lac)/np.nanmean(phase2lac))
+
+    # initial conditions
+    idx_l = find_nearest(spectrum_lambda,lambda_range_edges[0])
+    idx_h = find_nearest(spectrum_lambda,lambda_range_edges[1])
+
+    # method='trust_exact'
+    # method='nelder' #not bad
+    # method='differential_evolution' # needs bounds
+    # method='basinhopping' # not bad
+    # method='lmsquare' # this should implement the Levemberq-Marquardt but it says Nelder-Mead method (which should be Amoeba)
+    method ='least_squares' # default and it implements the Levenberg-Marquardt
+    def phase_linearcomb(ph1,ph2,f):
+        return f*ph1+(1-f)*ph2
+
+    gmodel = Model(phase_linearcomb)
+    params = gmodel.make_params(f = 0.5, ph1 = phase1lac[idx_l:idx_h], ph2 = phase2lac[idx_l:idx_h])    
+    params['ph1'].vary = False
+    params['ph2'].vary = False
+    params['f'].vary = True
+    params['f'].min = 0.0
+    params['f'].max = 1.0
+    result = gmodel.fit(data = lac[idx_l:idx_h], params = params, method=method, nan_policy='propagate')
+    phi=result.best_values.get('f')    
+
+    return {'phi': phi}
