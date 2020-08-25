@@ -94,13 +94,6 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
         plt.figure()
         plt.plot(myTOF, myspectrum)
         plt.plot(dtof, d_signal)
-    
-    ## 1st Appoach
-    #init_vals = [myspectrum[-2]-myspectrum[2], est_pos, 0.01]  # for [amp, cen, wid]
-    #best_vals, covar = curve_fit(gaussian, dtof, d_signal)
-    #fitted_data = gaussian(dtof,best_vals[0],best_vals[1],best_vals[2])        
-    #t0 = best_vals[1]
-    #edge_width = best_vals[2]
 
     ## 2nd Appoach
     method ='least_squares' # default and it implements the Levenberg-Marquardt
@@ -143,7 +136,6 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
 
 def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1, est_alpha=1, bool_print=False, bool_average=False, bool_linear=False): 
-## my range should be now the index position of the spectra that I want to study, est_pos is also the index position where the expected peak is
 
     ##INPUTS:
     #myspectrum: spectrum to fit
@@ -192,8 +184,8 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     
     t_before= t[0:est_pos]
     bragg_before=mybragg[0:est_pos]
-    #     t_after= t[est_pos+int(est_pos*0.2):-1]
-    #     bragg_after=mybragg[est_pos+int(est_pos*0.2):-1]
+    #t_after= t[est_pos+int(est_pos*0.2):-1]
+    #bragg_after=mybragg[est_pos+int(est_pos*0.2):-1]
     t_after= t[est_pos+int(est_pos*0.2):-1]
     bragg_after=mybragg[est_pos+int(est_pos*0.2):-1]
     
@@ -276,11 +268,11 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     params['a5'].vary = False
     
     result1 = gmodel.fit(mybragg, params, t=t, method=method, nan_policy='propagate') 
-    #    print(result1.fit_report())
+    #print(result1.fit_report())
     a1_f=result1.best_values.get('a1')
     a6_f=result1.best_values.get('a6')
     
-    # 2nd round to fit a2 and a5 (slope of before and intercept of after)
+    #2nd round to fit a2 and a5 (slope of before and intercept of after)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
     params['alpha'].vary = False
     params['sigma'].vary = False
@@ -292,7 +284,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     a2_f = result2.best_values.get('a2')
     a5_f = result2.best_values.get('a5')
     
-    # 3rd round to fit t0 (position)
+    #3rd round to fit t0 (position)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
     params['a2'].vary = False
     params['a5'].vary = False
@@ -324,7 +316,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     alpha_f=result4.best_values.get('alpha')
     t0_f=result4.best_values.get('t0')
     
-    # 5th round to fit a1 a2 a5 and a6 (slope of intercepts of before and after)
+    #5th round to fit a1 a2 a5 and a6 (slope of intercepts of before and after)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
     params['t0'].vary = False
     params['sigma'].vary = False
@@ -336,7 +328,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     a5_f = result5.best_values.get('a5')
     a6_f = result5.best_values.get('a6')
 
-    # 6th round to fit sigma alpha and t0 (broadening, decay and position)
+    #6th round to fit sigma alpha and t0 (broadening, decay and position)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
     params['a2'].vary = False
     params['a5'].vary = False
@@ -354,7 +346,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     alpha_f=result6.best_values.get('alpha')
     t0_f=result6.best_values.get('t0')
     
-    # 7th round to fit sigma alpha and t0 a1 a2 a5 a6 (all)
+    #7th round to fit sigma alpha and t0 a1 a2 a5 a6 (all)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
     params['t0'].min = myTOF[myrange[0]]
     params['t0'].max = myTOF[myrange[1]]
@@ -378,7 +370,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
         print('bool value, Boolean for whether error bars were estimated by fit.', result7.errorbars)
         print(result7.ci_out) # print out the interval confidence
    
-    #    Get the extrema for edge height fitting
+    #Get the extrema for edge height fitting
     fitted_data = result7.best_fit
     pos_extrema = []
     
@@ -414,13 +406,13 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     ## Attempt n.3 ------ This approach is based on the difference between the fit before and after the edge and the fitted data itself. so far, it gives the nicest results on the calibration sample, however the value used as threshold is not general and should probably be adjusted from case to case. So again it is not yet the final solution
 
     for i in range(0, len(fitted_data)):
-#         print(i,(fitted_data[i]-fit_before[i]))
+        #print(i,(fitted_data[i]-fit_before[i]))
         if (np.abs(fitted_data[i]-fit_before[i])>1e-4):            
             pos_extrema.append(i-1)
             break
 
     for i in range(len(fitted_data)-1,0,-1): # here I am moving backwards
-#         print(i,(fitted_data[i]-fit_after[i]))
+        #print(i,(fitted_data[i]-fit_after[i]))
         if (np.abs(fitted_data[i]-fit_after[i])>1e-3):            
             pos_extrema.append(i)
             break
@@ -438,16 +430,16 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     height = np.abs(mybragg[pos_extrema[0]]-mybragg[pos_extrema[1]])  
     
     if (bool_print):
-#         print('first iteration: ' ,result1.fit_report())
-#         print('second iteration: ', result2.fit_report())
-#         print('third iteration: ', result3.fit_report())
-#         print('fourth iteration: ', result4.fit_report())
-#         print('fifth iteration: ', result5.fit_report())
-#         print('sixth iteration: ', result6.fit_report())
+        #print('first iteration: ' ,result1.fit_report())
+        #print('second iteration: ', result2.fit_report())
+        #print('third iteration: ', result3.fit_report())
+        #print('fourth iteration: ', result4.fit_report())
+        #print('fifth iteration: ', result5.fit_report())
+        #print('sixth iteration: ', result6.fit_report())
         print(pos_extrema)
         plt.figure()
         plt.plot(t, mybragg)
-        #     plt.plot(t, result7.init_fit, 'k--')
+        #plt.plot(t, result7.init_fit, 'k--')
 
         plt.plot(t, result1.best_fit, '--', color='gray', label='intermediate steps')
         plt.plot(t, result1.init_fit, '--', color='gray')
@@ -489,8 +481,8 @@ def phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectru
     lac = lac[idx_low:idx_high]
     spectrum_lambda = spectrum_lambda[idx_low:idx_high]
 
-    idx_low = find_nearest(phase_spectrum,lambda_range_norm(1))
-    idx_high = find_nearest(phase_spectrum,lambda_range_norm(2))
+    idx_low = find_nearest(phase_spectrum,lambda_range_norm[0])
+    idx_high = find_nearest(phase_spectrum,lambda_range_norm[1])
     lambda_table = phase_spectrum[idx_low:idx_high]
     phase1lac = phase1lac[idx_low:idx_high]
     phase2lac = phase2lac[idx_low:idx_high]
@@ -503,24 +495,27 @@ def phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectru
     # initial conditions
     idx_l = find_nearest(spectrum_lambda,lambda_range_edges[0])
     idx_h = find_nearest(spectrum_lambda,lambda_range_edges[1])
-
+    lac = lac[idx_l:idx_h]
+    ph1 = phase1lac[idx_l:idx_h]
+    ph2 = phase2lac[idx_l:idx_h]
     # method='trust_exact'
     # method='nelder' #not bad
     # method='differential_evolution' # needs bounds
     # method='basinhopping' # not bad
     # method='lmsquare' # this should implement the Levemberq-Marquardt but it says Nelder-Mead method (which should be Amoeba)
     method ='least_squares' # default and it implements the Levenberg-Marquardt
+
     def phase_linearcomb(ph1,ph2,f):
         return f*ph1+(1-f)*ph2
 
     gmodel = Model(phase_linearcomb)
-    params = gmodel.make_params(f = 0.5, ph1 = phase1lac[idx_l:idx_h], ph2 = phase2lac[idx_l:idx_h])    
-    params['ph1'].vary = False
-    params['ph2'].vary = False
+    params = gmodel.make_params(f = 0.5)    
+    #params['ph1'].vary = False
+    #params['ph2'].vary = False
     params['f'].vary = True
     params['f'].min = 0.0
     params['f'].max = 1.0
-    result = gmodel.fit(data = lac[idx_l:idx_h], params = params, method=method, nan_policy='propagate')
+    result = gmodel.fit(lac, params, ph1 = ph1, ph2 = ph2, method=method, nan_policy='propagate')
     phi=result.best_values.get('f')    
 
     return {'phi': phi}
