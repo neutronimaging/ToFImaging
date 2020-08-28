@@ -198,7 +198,7 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SG_o=1):
 
     return x_fobi,y_fobi,T_fobi,t_fobi
 
-def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SW_o=1):
+def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,roll_value=142.0,SG_w=5,SG_o=1):
     """ Performs FOBI reduction from open beam and sample spectrum    
     
     INPUTS:
@@ -208,7 +208,9 @@ def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SW_o=1):
     tmax = maximum time of flight (this parameter is dependent on the chopper frequency: tmax = 1/f  with f = chopper frequency)
     nrep = number of times the pattern is repeated (chopper)
     c = Wiener constant
-    bool_roll = if this is activated the spectra are offset to have the minimum of the I0 spectrum as first time bin
+    roll_value = shift the retrieved fobi spectra by this value 
+    (this is necessary because the output from Wiener decorrelation places the peak of 
+    the spectrum approximately in the middle of the array)
     SG_w = Savitzky Golay filter window
     SG_o = Savitzky Golay filter order
 
@@ -221,7 +223,7 @@ def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SW_o=1):
     #get reference
     Iref = np.nanmean(np.nanmean(I,axis=0),axis=0)
     I0ref = np.nanmean(np.nanmean(I0,axis=0),axis=0)
-    [xref,yref,Tref,tref] = full_fobi_reduction(Iref,I0ref,t,tmax,nrep,c,bool_roll,SG_w,SW_o)
+    [xref,yref,Tref,tref] = full_fobi_reduction(Iref,I0ref,t=t,tmax=tmax,nrep=nrep,c=c,SG_w=SG_w,SG_o=SG_o)
     id_ref = np.argmin(xref)
 
     id_i = np.shape(I)[0]
@@ -232,9 +234,9 @@ def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SW_o=1):
     I_fobi = np.zeros((id_i,id_j,id_t))
     for i in range(0,id_i):
         for j in range(0,id_j):
-            [x_rec,y_rec,T_rec,t_fobi] = full_fobi_reduction(I[i,j,:],I0[i,j,:],t,tmax,nrep,c,bool_roll,SG_w,SW_o)
-            T_fobi[i,j,:] = np.roll(T_rec,-id_ref)
-            I0_fobi[i,j,:] = np.roll(x_rec,-id_ref)
-            I_fobi[i,j,:] = np.roll(y_rec,-id_ref)
+            [x_rec,y_rec,T_rec,t_fobi] = full_fobi_reduction(I[i,j,:],I0[i,j,:],t=t,tmax=tmax,nrep=nrep,c=c,SG_w=SG_w,SG_o=SG_o)
+            T_fobi[i,j,:] = np.roll(T_rec,-roll_value)
+            I0_fobi[i,j,:] = np.roll(x_rec,-roll_value)
+            I_fobi[i,j,:] = np.roll(y_rec,-roll_value)
 
     return T_fobi,I0_fobi,I_fobi
