@@ -14,6 +14,9 @@ def l2tof(l, t0, L):
     tof=t0+(l*1e-10)*(L)*m/h
     return tof
     
+def tof2l_calibration(t,t0,k):
+    return t0+k*t
+
 #these tools average stacks of image into a single one (axis =2)    
 def averageimage(imgs):
     img=imgs.mean(axis=2)

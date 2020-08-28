@@ -107,7 +107,7 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
 
     params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
     params['cen'].min = myTOF[0]
-    params['cen'].max = myTOF[1]
+    params['cen'].max = myTOF[-1]
     params['amp'].min = 0
     params['amp'].max = 1e10
     params['wid'].min = 0
