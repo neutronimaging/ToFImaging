@@ -461,7 +461,7 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
-def phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,bool_plot=0): 
+def phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,est_phi=0.5,bool_plot=0): 
     ##INPUTS:
     #lac: measured LAC spectrum to fit
     #spectrum_lambda: lambda spectrum of the lac
@@ -470,6 +470,7 @@ def phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectru
     #phase_spectrum: lambda spectrum of the theoretical phases LAC
     #lambda_range_norm: lambda range used to normalize data
     #lambda_range_edges: lambda range where to perform the fitting
+    #est_phi: estimated phase fraction
     #bool_plot: flag to activate plotting
     
     ##OUTPUTS:
@@ -508,8 +509,8 @@ def phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectru
     def phase_linearcomb(ph1,ph2,f):
         return f*ph1+(1-f)*ph2
 
-    gmodel = Model(phase_linearcomb)
-    params = gmodel.make_params(f = 0.5)    
+    gmodel = Model(phase_linearcomb,independent_vars=['ph1', 'ph2'])
+    params = gmodel.make_params(f = est_phi)    
     #params['ph1'].vary = False
     #params['ph2'].vary = False
     params['f'].vary = True
