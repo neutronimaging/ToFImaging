@@ -109,9 +109,9 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
     params['cen'].min = myTOF[0]
     params['cen'].max = myTOF[-1]
     params['amp'].min = 0
-    params['amp'].max = 1e10
+    params['amp'].max = 1e2
     params['wid'].min = 0
-    params['wid'].max = 1e10
+    params['wid'].max = 1e2
     result = gmodel.fit(d_signal, params, x=dtof, method=method, nan_policy='propagate')
     t0 = result.best_values.get('cen')
     edge_width = result.best_values.get('wid')
@@ -125,7 +125,8 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
     if (bool_print):
         print('t0 = ',t0)
         print('width = ',edge_width)
-        print('id_low = ',id_low,'id_high = ',id_high,'height = ',edge_height)
+        print('height = ',edge_height)
+        print('id_low = ',id_low,'id_high = ',id_high)
         plt.plot(t0, myspectrum[find_nearest(dtof, t0)],'x', markeredgewidth=3, c='orange')
         plt.plot(t0-edge_width, myspectrum[find_nearest(dtof, t0-edge_width)],'+', markeredgewidth=3, c='orange')
         plt.plot(t0+edge_width, myspectrum[find_nearest(dtof, t0+edge_width)],'+', markeredgewidth=3, c='orange')

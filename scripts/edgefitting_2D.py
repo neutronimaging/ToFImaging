@@ -283,11 +283,13 @@ def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
+    if (np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0] | np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1]):
+        print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
     if(debug_flag): #testing on a single pixel    
         plt.imshow(Ttof.sum(axis=2))
         plt.show()
         plt.close()
-        lambd = TOF_routines.tof2l_calibration(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],0],calibration_matrix[debug_idx[0],debug_idx[1],1])
+        lambd = TOF_routines.tof2l_calibration(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
         myrange = []
         myrange.append(find_nearest(lambd, lambda_range[0])) 
         myrange.append(find_nearest(lambd, lambda_range[1])) 
@@ -304,18 +306,16 @@ def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-        if(debug_flag):
-            print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        print('processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
-                #print(i,j)
                 T = Ttof[i,j,:]
-                lambd = TOF_routines.tof2l_calibration(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],0],calibration_matrix[debug_idx[0],debug_idx[1],1])
+                lambd = TOF_routines.tof2l_calibration(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
                 myrange = []
                 myrange.append(find_nearest(lambd, lambda_range[0])) 
                 myrange.append(find_nearest(lambd, lambda_range[1])) 
                 try:
-                    edge_fit = AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=T, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, est_wid=est_wid, est_h=est_h, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=False)
+                    edge_fit = AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=T, myTOF=lambd, myrange=myrange, est_pos = est_pos, est_wid=est_wid, est_h=est_h, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=False)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['edge_height']
                     edge_width[i,j] = edge_fit['edge_width']
