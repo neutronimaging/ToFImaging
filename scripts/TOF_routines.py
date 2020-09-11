@@ -14,6 +14,9 @@ def l2tof(l, t0, L):
     tof=t0+(l*1e-10)*(L)*m/h
     return tof
     
+def tof2l_calibration(t,t0,k):
+    return t0+k*t
+
 #these tools average stacks of image into a single one (axis =2)    
 def averageimage(imgs):
     img=imgs.mean(axis=2)
@@ -137,24 +140,6 @@ def transmission_normalization (I,I0,dose_mask_path=0):
     T[T<0] = np.nan
     return T
 
-def interp_image_T (mydata):
-    from scipy import interpolate
-    mydata = np.double(mydata)
-    mydata[mydata==0] = np.nan #can't be 0 transmission
-    mydata[np.isinf(mydata)] = np.nan #caused by 0 counts in open beam
-    
-    x = np.arange(0,np.shape(mydata)[1])
-    y = np.arange(0,np.shape(mydata)[0])
-    
-    mydata = np.ma.masked_invalid(mydata)
-    xx, yy = np.meshgrid(x, y)
-    x1 = xx[~mydata.mask]
-    y1 = yy[~mydata.mask]
-    newdata =  mydata[~mydata.mask]
-    
-    interp_data = interpolate.griddata((x1,y1), newdata.ravel(), (xx, yy), method='cubic')
-    return interp_data
-    
 def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
@@ -180,7 +165,7 @@ def rotatedata(x,y,a):
     y = x*sina+y*cosa
     return x,y
 
-def savitzky_golay(y, window_size, order, deriv=0, rate=1):
+def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
@@ -255,7 +240,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
 def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
-    if(custom_kernel):
+    if(custom_kernel.any()):
         K = custom_kernel
     else:
         K = np.ones((kernel_size))
@@ -267,7 +252,7 @@ def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
     import scipy.signal
     if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
         print('Data size is not either a 2D or ToF 2D')
-    if(custom_kernel):
+    if(custom_kernel.any()):
         K = custom_kernel
     else:
         K = np.ones((kernel_size,kernel_size))
@@ -330,8 +315,6 @@ def fullspectrum_T (path_sample, path_ob, cut_last=0):
     I0 = load_fits(path_ob,cut_last)
     #normalize
     T = transmission_normalization(I.sum(axis=2),I0.sum(axis=2))
-    #clean from nans/infs
-    T = interp_image_T(T)   
     return(T)
 
 def fullspectrum_im (path_data, cut_last=0):
@@ -340,7 +323,7 @@ def fullspectrum_im (path_data, cut_last=0):
     T = I.sum(axis=2)
     return(T)    
     
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_interp = False):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False):
     #load rawdata
     I = load_fits(path_sample,cut_last,bool_wavg)
     I0 = load_fits(path_ob,cut_last,bool_wavg)
@@ -356,9 +339,5 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         I0 = binning(I0,bin_size)
     #normalize
     T = transmission_normalization(I,I0,dose_mask_path)
-    #clean from nans/infs
-    if(bool_interp):
-        for i in range(0,np.shape(T)[2]):
-            T[:,:,i] = interp_image_T(T[:,:,i])
         
     return{'T':T, 'spectrum':spectrum}
