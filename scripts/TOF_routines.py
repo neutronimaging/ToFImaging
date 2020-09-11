@@ -237,10 +237,10 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve( m[::-1], y, mode='valid')
 
-def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
+def moving_average_1D (mysignal, kernel_size = 3, custom_kernel_flag = False, custom_kernel = 0):
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
-    if(custom_kernel.any()):
+    if(custom_kernel_flag):
         K = custom_kernel
     else:
         K = np.ones((kernel_size))
@@ -248,11 +248,11 @@ def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = 0):
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
     
-def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = 0):
+def moving_average_2D (mysignal, kernel_size = 3, custom_kernel_flag = False, custom_kernel = 0):
     import scipy.signal
     if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
         print('Data size is not either a 2D or ToF 2D')
-    if(custom_kernel.any()):
+    if(custom_kernel_flag):
         K = custom_kernel
     else:
         K = np.ones((kernel_size,kernel_size))
