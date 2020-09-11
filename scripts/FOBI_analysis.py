@@ -46,7 +46,7 @@ def chopper_time_delays_generator(time, nslits=8, nrep=2, mode='pseudorandom', r
         D[sfloor+1] = rest
     return D
 
-def poldi_time_delays(time):
+def time_delays_poldi(time):
     """
     Generates time delays for the POLDI chopper:
     
@@ -58,6 +58,11 @@ def poldi_time_delays(time):
     """
     Nt = int(np.shape(time)[0])
     angles = np.array([0, 9.363, 21.475, 37.039, 50.417, 56.664, 67.422, 75.406])
+    angles = 90-angles
+    angles = np.flipud(angles)
+    angles =  angles-angles[0]
+    # angles = a
+
     angles = np.concatenate((angles, angles+1.0*90.0, angles+2.0*90.0, angles+3.0*90.0))/360.0
     shifts = Nt*angles
     D = np.zeros((Nt,1))
@@ -71,7 +76,34 @@ def poldi_time_delays(time):
     D = np.squeeze(D)
     return D
 
-def wiener_decorrelation(f, g, c=1e-2):
+def time_delays_4x10(time):
+    """
+    Generates time delays for the 4x10 disk chopper:
+    
+    INPUTS:
+    time = time-of-flight bins
+    
+    OUTPUT:
+    D =  array with discretized dirac deltas at the chopper time delays.
+    """    
+    Nt = int(np.shape(time)[0])
+    angles = np.array([7.579, 13.316, 18.1825, 30.831, 36.201, 53.363, 61.1375, 67.332, 76.674, 87.573])
+    angles =  angles-angles[0]
+
+    angles = np.concatenate((angles, angles+1.0*90.0, angles+2.0*90.0, angles+3.0*90.0))/360.0
+    shifts = Nt*angles
+    D = np.zeros((Nt,1))
+    for i in range(0,np.shape(shifts)[0]):
+        sfloor = np.floor(shifts[i])
+        rest = shifts[i]-sfloor
+        sfloor = np.int(sfloor+1)
+        D[sfloor] = 1-rest
+        D[sfloor+1] = rest
+
+    D = np.squeeze(D)
+    return D
+
+def wiener_decorrelation(f, g, c=1e-1):
     """
     Perform the decorrelation of FOBI overlap patterns
     
@@ -86,6 +118,24 @@ def wiener_decorrelation(f, g, c=1e-2):
     F = np.fft.fft(f) 
     G = np.fft.fft(g)
     arg = np.divide(F*G,(np.power(np.abs(G),2) + c))
+    H = np.fft.ifft(arg)
+    return H
+
+def wiener_deconvolution(f, g, c=1e-1):
+    """
+    Perform the decorrelation of FOBI overlap patterns
+    
+    INPUTS:
+    f =  measured signal
+    g = time delays
+    c = Wiener coefficient
+    
+    OUTPUT:
+    H = reconstructed signal
+    """    
+    F = np.fft.fft(f) 
+    G = np.fft.fft(g)
+    arg = np.divide(F*np.conj(G),(np.power(np.abs(G),2) + c))
     H = np.fft.ifft(arg)
     return H
 
@@ -124,18 +174,20 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0):
     't_merged': edge height
     """ 
     
-    dt = np.nanmean(np.diff(t),axis=0)
-    t_tot = np.arange(t[0],tmax+dt,dt)
-    app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
-    y[0] = np.nan
-    y[-1] = np.nan
-    y = np.concatenate((y,app))
+    #dt = np.nanmean(np.diff(t),axis=0)
+    #t_tot = np.arange(t[0],tmax+dt,dt)
+    #app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
+    #y[0] = np.nan
+    #y[-1] = np.nan
+    #y = np.concatenate((y,app))
+    #replen = np.int(np.floor(np.shape(y)[0]/nrep))
 
-    replen = np.int(np.floor(np.shape(y)[0]/nrep))
+    replen = np.int(np.ceil(np.shape(y)[0]/nrep))
+    t_tot = np.linspace(t[0],tmax,nrep*replen)
+    y_int = np.interp(t_tot,t,y)
     y_overlap = np.zeros((replen,nrep))
-
     for i in range(0,nrep):
-        y_overlap[:,i] = y[replen*i:replen*(i+1)]
+        y_overlap[:,i] = y_int[replen*i:replen*(i+1)]
 
     y_merged = np.nanmean(y_overlap,axis=1)
     y_extended = y_merged
@@ -146,7 +198,7 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0):
 
     return y_extended,t_extended
 
-def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SG_o=1):
+def full_fobi_reduction(y,y0,t,tmax,nrep,chopper_id,c=1e-1,bool_roll=False,bool_smooth=True,SG_w=5,SG_o=1):
     """ Performs FOBI reduction from open beam and sample spectrum    
     
     INPUTS:
@@ -168,13 +220,24 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SG_o=1):
     """ 
     [y,tn] = interp_noreadoutgaps(y,t,tmax,nrep)
     [y0,tn] = interp_noreadoutgaps(y0,t,tmax,nrep)
+    if(chopper_id=='poldi'):
+        D = time_delays_poldi(tn)
+    if(chopper_id=='4x10'):
+        D = time_delays_4x10(tn)
 
-    D = poldi_time_delays(tn)
+    # FIXED POLDI angles: now it's working as deconvolution!
+    # x0rec = TOF_routines.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
+    # yrec = TOF_routines.savitzky_golay(wiener_decorrelation(y,D,c),SG_w,SG_o)
+    # Trec = np.divide(yrec,x0rec)
+    # #Trec = TOF_routines.savitzky_golay(wiener_decorrelation(np.divide(y,y0),D,c),SG_w,SG_o)
 
-    x0rec = TOF_routines.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
-    yrec = TOF_routines.savitzky_golay(wiener_decorrelation(y,D,c),SG_w,SG_o)
+    x0rec = wiener_deconvolution(y0,D,c)
+    yrec = wiener_deconvolution(y,D,c)
+    if(bool_smooth):
+        x0rec = TOF_routines.savitzky_golay(x0rec,SG_w,SG_o)
+        yrec = TOF_routines.savitzky_golay(yrec,SG_w,SG_o)
     Trec = np.divide(yrec,x0rec)
-    #Trec = TOF_routines.savitzky_golay(wiener_decorrelation(np.divide(y,y0),D,c),SG_w,SG_o)
+    # Trec = TOF_routines.savitzky_golay(wiener_deconvolution(np.divide(y,y0),D,c),SG_w,SG_o)
 
     if(bool_roll==True):
         min_id = np.argmin(x0rec[0:np.shape(x0rec)[0]/nrep])
@@ -198,7 +261,7 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,c=1e-1,bool_roll=False,SG_w=5,SG_o=1):
 
     return x_fobi,y_fobi,T_fobi,t_fobi
 
-def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,roll_value=142,SG_w=5,SG_o=1):
+def fobi_2d(I,I0,t,tmax,nrep,chopper_id,c=1e-1,roll_value=201,bool_smooth=True,SG_w=5,SG_o=1):
     """ Performs FOBI reduction from open beam and sample spectrum to a stack of images  
     
     INPUTS:
@@ -223,7 +286,7 @@ def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,roll_value=142,SG_w=5,SG_o=1):
     #get reference
     Iref = np.nanmean(np.nanmean(I,axis=0),axis=0)
     I0ref = np.nanmean(np.nanmean(I0,axis=0),axis=0)
-    [xref,yref,Tref,tref] = full_fobi_reduction(Iref,I0ref,t=t,tmax=tmax,nrep=nrep,c=c,SG_w=SG_w,SG_o=SG_o)
+    [xref,yref,Tref,tref] = full_fobi_reduction(Iref,I0ref,t=t,tmax=tmax,nrep=nrep,c=c,chopper_id=chopper_id,bool_smooth=bool_smooth,SG_w=SG_w,SG_o=SG_o)
     id_ref = np.argmin(xref)
 
     id_i = np.shape(I)[0]
@@ -234,7 +297,7 @@ def fobi_2d(I,I0,t,tmax,nrep,c=1e-1,roll_value=142,SG_w=5,SG_o=1):
     I_fobi = np.zeros((id_i,id_j,id_t))
     for i in range(0,id_i):
         for j in range(0,id_j):
-            [x_rec,y_rec,T_rec,t_fobi] = full_fobi_reduction(I[i,j,:],I0[i,j,:],t=t,tmax=tmax,nrep=nrep,c=c,SG_w=SG_w,SG_o=SG_o)
+            [x_rec,y_rec,T_rec,t_fobi] = full_fobi_reduction(I[i,j,:],I0[i,j,:],t=t,tmax=tmax,nrep=nrep,c=c,chopper_id=chopper_id,bool_smooth=bool_smooth,SG_w=SG_w,SG_o=SG_o)
             T_fobi[i,j,:] = np.roll(T_rec,-np.int(roll_value))
             I0_fobi[i,j,:] = np.roll(x_rec,-np.int(roll_value))
             I_fobi[i,j,:] = np.roll(y_rec,-np.int(roll_value))
