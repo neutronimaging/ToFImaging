@@ -182,6 +182,7 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0):
     #y = np.concatenate((y,app))
     #replen = np.int(np.floor(np.shape(y)[0]/nrep))
 
+    nrep = np.int(nrep)
     replen = np.int(np.ceil(np.shape(y)[0]/nrep))
     t_tot = np.linspace(t[0],tmax,nrep*replen)
     y_int = np.interp(t_tot,t,y)
