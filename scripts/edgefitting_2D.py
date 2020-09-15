@@ -71,9 +71,6 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
     if(est_pos):
         est_pos = find_nearest(spectrum_l[myrange[0]:myrange[1]], est_pos) # 4.05
     if(debug_flag): #testing on a single pixel    
-        plt.imshow(Ttof.sum(axis=2))
-        plt.show()
-        plt.close()
         sp = np.zeros(len(spectrum_l))
         for i in range(0,len(spectrum_l)):
             sp[i] = np.median(Ttof[debug_idx[0],debug_idx[1],i]) # This is for the first Bragg edge fitting
@@ -180,9 +177,6 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
     myrange.append(find_nearest(spectrum_l, lambda_range[0])) # 3.7
     myrange.append(find_nearest(spectrum_l, lambda_range[1])) # 4.4
     if(debug_flag): #testing on a single pixel    
-        plt.imshow(Ttof.sum(axis=2))
-        plt.show()
-        plt.close()
         sp = Ttof[debug_idx[0],debug_idx[1],:]
         #run once the fitting to check if everything works
         AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=sp, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, est_wid=est_wid, est_h=est_h, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=debug_flag)
@@ -286,9 +280,6 @@ def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_
     if (np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0] | np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1]):
         print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
     if(debug_flag): #testing on a single pixel    
-        plt.imshow(Ttof.sum(axis=2))
-        plt.show()
-        plt.close()
         lambd = TOF_routines.tof2l_calibration(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
         myrange = []
         myrange.append(find_nearest(lambd, lambda_range[0])) 
