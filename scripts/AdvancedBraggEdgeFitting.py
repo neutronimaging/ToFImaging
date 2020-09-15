@@ -124,8 +124,8 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
     
     if (bool_print):
         print('t0 = ',t0)
-        print('width = ',edge_width)
         print('height = ',edge_height)
+        print('width = ',edge_width)
         print('id_low = ',id_low,'id_high = ',id_high)
         plt.plot(t0, myspectrum[find_nearest(dtof, t0)],'x', markeredgewidth=3, c='orange')
         plt.plot(t0-edge_width, myspectrum[find_nearest(dtof, t0-edge_width)],'+', markeredgewidth=3, c='orange')

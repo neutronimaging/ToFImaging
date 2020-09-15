@@ -84,11 +84,12 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-        if(debug_flag):
-            print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+        print('---------------$$$$---------------')
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
-                print(i,j)
+                if(debug_flag):
+                    print(i,j)
                 mysignal = np.zeros(len(spectrum_l))
                 for ind in range(0,len(spectrum_l)):
                     mysignal[ind] = np.median(Ttof[i,j,ind])
@@ -109,11 +110,10 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
 
     if(bool_print):
         plt.figure()
-        plt.imshow(edge_position)
-        plt.figure()
-        plt.imshow(edge_width)
-        plt.figure()
-        plt.imshow(edge_height)        
+        plt.subplot(1,3,1), plt.imshow(edge_position), plt.title('Edge position')
+        plt.subplot(1,3,2), plt.imshow(edge_width), plt.title('Edge width')
+        plt.subplot(1,3,3), plt.imshow(edge_height), plt.title('Edge height')
+        plt.show(), plt.close()        
     if(bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
@@ -159,16 +159,16 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
         import skimage.filters
         mymask = TOF_routines.medianimage(Ttof)
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(mymask), plt.colorbar(), plt.title('Full-spectrum Image')
+        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
         mymask[mymask<mask_thresh[0]] = 0.0
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.subplot(1,3,2), plt.imshow(mymask), plt.colorbar(), plt.title('Mask')
+        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
         mymask = skimage.filters.gaussian(mymask,sigma=2)
         mymask[mymask>0] = 1.0
-        plt.subplot(1,3,3), plt.imshow(mymask), plt.colorbar(), plt.title('Mask - gauss')
+        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
         plt.show(), plt.close()        
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
@@ -189,11 +189,12 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-        if(debug_flag):
-            print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+        print('---------------$$$$---------------')
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
-                #print(i,j)
+                if(debug_flag):
+                    print(i,j)
                 mysignal = Ttof[i,j,:]
                 try:
                     edge_fit = AdvancedBraggEdgeFitting.GaussianBraggEdgeFitting(myspectrum=mysignal, myTOF=spectrum_l, myrange=myrange, est_pos = est_pos, est_wid=est_wid, est_h=est_h, bool_smooth=bool_smooth, smooth_w = smooth_w, smooth_n = smooth_n, bool_print=False)
@@ -210,10 +211,11 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if(bool_print):
-        plt.figure(), plt.imshow(edge_position)
-        plt.figure(), plt.imshow(edge_width)
-        plt.figure(), plt.imshow(edge_height)        
-        plt.figure(), plt.imshow(edge_slope)        
+        plt.figure()
+        plt.subplot(1,3,1), plt.imshow(edge_position), plt.title('Edge position')
+        plt.subplot(1,3,2), plt.imshow(edge_width), plt.title('Edge width')
+        plt.subplot(1,3,3), plt.imshow(edge_height), plt.title('Edge height')
+        plt.show(), plt.close()        
     if(bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
@@ -297,9 +299,12 @@ def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-        print('processing row n. ', i, 'of', np.shape(mymask)[0])
+        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+        print('---------------$$$$---------------')
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
+                if(debug_flag):
+                    print(i,j)
                 T = Ttof[i,j,:]
                 lambd = TOF_routines.tof2l_calibration(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
                 myrange = []
@@ -320,10 +325,11 @@ def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if(bool_print):
-        plt.figure(), plt.imshow(edge_position)
-        plt.figure(), plt.imshow(edge_width)
-        plt.figure(), plt.imshow(edge_height)        
-        plt.figure(), plt.imshow(edge_slope)        
+        plt.figure()
+        plt.subplot(1,3,1), plt.imshow(edge_position), plt.title('Edge position')
+        plt.subplot(1,3,2), plt.imshow(edge_width), plt.title('Edge width')
+        plt.subplot(1,3,3), plt.imshow(edge_height), plt.title('Edge height')
+        plt.show(), plt.close()       
     if(bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
