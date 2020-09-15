@@ -162,16 +162,16 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
         import skimage.filters
         mymask = TOF_routines.medianimage(Ttof)
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
+        plt.subplot(1,3,1), plt.imshow(mymask), plt.colorbar(), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
         mymask[mymask<mask_thresh[0]] = 0.0
         mymask[mymask>0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
+        plt.subplot(1,3,2), plt.imshow(mymask), plt.colorbar(), plt.title('Mask')
         mymask = skimage.filters.gaussian(mymask,sigma=2)
         mymask[mymask>0] = 1.0
-        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
+        plt.subplot(1,3,3), plt.imshow(mymask), plt.colorbar(), plt.title('Mask - gauss')
         plt.show(), plt.close()        
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])

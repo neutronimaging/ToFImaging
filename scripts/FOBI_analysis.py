@@ -173,19 +173,20 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0):
     'y_extended': edge position
     't_merged': edge height
     """ 
-    
+    nrep = np.int(nrep)
+
     #dt = np.nanmean(np.diff(t),axis=0)
     #t_tot = np.arange(t[0],tmax+dt,dt)
     #app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
     #y[0] = np.nan
     #y[-1] = np.nan
-    #y = np.concatenate((y,app))
+    #y_int = np.concatenate((y,app))
     #replen = np.int(np.floor(np.shape(y)[0]/nrep))
-
-    nrep = np.int(nrep)
+    
     replen = np.int(np.ceil(np.shape(y)[0]/nrep))
     t_tot = np.linspace(t[0],tmax,nrep*replen)
-    y_int = np.interp(t_tot,t,y)
+    y_int = np.interp(t_tot,t,y,left=np.nan,right=np.nan)
+
     y_overlap = np.zeros((replen,nrep))
     for i in range(0,nrep):
         y_overlap[:,i] = y_int[replen*i:replen*(i+1)]
