@@ -10,3 +10,11 @@ Currently implemented packages:
 Please find the instruction for how to use the functions as comments in the modules.
 All the relevant files, with python modules and example jupyter notebooks are in /scripts/.
 For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch
+
+# How to Use
+Clone or download the codes to your local machine, then insert the following two lines to your python codes:
+
+import sys  
+sys.path.insert(0, "path-to-repository")
+
+This may require furhter installation of external modules.
