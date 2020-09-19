@@ -84,8 +84,8 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         print('---------------$$$$---------------')
+        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 if(debug_flag):
@@ -121,7 +121,7 @@ def image_edge_fitting_Tlambda(Ttof, spectrum_l, lambda_range, filemask=0, auto_
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}        
     
-def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_wid=0, est_h=0, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag=False, debug_idx=[160,200]):        
+def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_wid=0, est_h=0, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_log = False, bool_save=True, bool_print=True, debug_flag=False, debug_idx=[160,200]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     !!! IMPORTANT the data must be transmission or it won't work due to boundary conditions !!!
     
@@ -138,6 +138,7 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
     bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative
     smooth_w = window size of S-G filter
     smooth_n = order of S-G filter
+    bool_log = set to True to convert T to mu
     bool_save = set to True to save output
     bool_print = set to True to print output
     debug_flag = set to True to test on single pixel (will actually also perform the whole image fitting if not stopped)
@@ -173,6 +174,9 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
+    if(bool_log):
+        Ttof = np.log(Ttof)
+
     myrange = []
     myrange.append(find_nearest(spectrum_l, lambda_range[0])) # 3.7
     myrange.append(find_nearest(spectrum_l, lambda_range[1])) # 4.4
@@ -189,8 +193,8 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         print('---------------$$$$---------------')
+        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 if(debug_flag):
@@ -224,7 +228,7 @@ def image_edge_fitting_Tlambda_gauss(Ttof, spectrum_l, lambda_range, filemask=0,
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_wid=0, est_h=0, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_save=True, bool_print=True, debug_flag=False, debug_idx=[160,200]):                
+def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_range, filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], est_pos=0, est_wid=0, est_h=0, bool_smooth=False, smooth_w = 3, smooth_n = 0, bool_log = False, bool_save=True, bool_print=True, debug_flag=False, debug_idx=[160,200]):                
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     !!! IMPORTANT the data must be transmission or it won't work due to boundary conditions !!!
     
@@ -279,6 +283,9 @@ def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
+    if(bool_log):
+        Ttof = np.log(Ttof)
+
     if (np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0] | np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1]):
         print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
     if(debug_flag): #testing on a single pixel    
@@ -299,8 +306,8 @@ def image_edge_fitting_T_gauss_calib(Ttof, spectrum, calibration_matrix, lambda_
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
     for i in range(0, np.shape(mymask)[0]):
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         print('---------------$$$$---------------')
+        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 if(debug_flag):

@@ -3,17 +3,12 @@ from numpy import pi, r_, math, random
 import matplotlib.pyplot as plt
 #from scipy import optimize
 #from scipy.optimize import curve_fit
-from scipy.special import erfc, erf
+from scipy import special
 from lmfit import Model
-#from lmfit.printfuncs import *
-#import lmfit
-#from numpy import loadtxt
+import math
 
-#from scipy.signal import argrelextrema
+
 from TOF_routines import find_nearest
-#from TOF_routines import find_first
-#from TOF_routines import find_last
-#from TOF_routines import rotatedata
 from TOF_routines import savitzky_golay
 
 # def term0(t,a2,a6):
@@ -23,19 +18,19 @@ from TOF_routines import savitzky_golay
 #     return ((a5 - a2) / 2) * (t - a6)
 
 def term3(t,t0,sigma):
-    return erfc(-((t-t0)/(sigma * math.sqrt(2))))
+    return math.erfc(-((t-t0)/(sigma * math.sqrt(2))))
 
 def term3_1(t,t0,sigma):
-    return erf(-((t-t0)/(sigma * math.sqrt(2))))
+    return math.erf(-((t-t0)/(sigma * math.sqrt(2))))
 
 def term4(t,t0,alpha,sigma):
     return np.exp(-((t-t0)/alpha) + ((sigma*sigma)/(2*alpha*alpha)))
 
 def term5(t,t0,alpha,sigma):
-    return erfc(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
+    return math.erfc(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
 
 def term5_1(t,t0,alpha,sigma):
-    return erf(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
+    return math.erf(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
 
 def line_after(t,a1,a2):
     return a1+a2*t
@@ -89,11 +84,6 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
         
     if (bool_smooth):
         d_signal = SG_filter(d_signal,smooth_w,smooth_n)    
-    
-    if (bool_print):
-        plt.figure()
-        plt.plot(myTOF, myspectrum)
-        plt.plot(dtof, d_signal)
 
     ## 2nd Appoach
     method ='least_squares' # default and it implements the Levenberg-Marquardt
@@ -127,17 +117,19 @@ def GaussianBraggEdgeFitting(myspectrum, myTOF, myrange=0, est_pos=0, est_wid=0,
         print('height = ',edge_height)
         print('width = ',edge_width)
         print('id_low = ',id_low,'id_high = ',id_high)
+        plt.figure()
+        plt.subplot(2,1,1), 
+        plt.plot(myTOF, myspectrum)
         plt.plot(t0, myspectrum[find_nearest(dtof, t0)],'x', markeredgewidth=3, c='orange')
         plt.plot(t0-edge_width, myspectrum[find_nearest(dtof, t0-edge_width)],'+', markeredgewidth=3, c='orange')
         plt.plot(t0+edge_width, myspectrum[find_nearest(dtof, t0+edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.plot(dtof, fitted_data)
+        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
+        plt.subplot(2,1,2), 
+        plt.plot(dtof, d_signal), plt.plot(dtof, fitted_data)
         plt.plot(t0, d_signal[find_nearest(dtof, t0)],'x', markeredgewidth=3, c='orange')
         plt.plot(t0-edge_width, d_signal[find_nearest(dtof, t0-edge_width)],'+', markeredgewidth=3, c='orange')
         plt.plot(t0+edge_width, d_signal[find_nearest(dtof, t0+edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.title('Bragg edge')
-        plt.xlabel('Wavelenght [Å]')
-        plt.ylabel('Transmission I/I$_{0}$')
-        #plt.savefig('step1_fitting.pdf')
+        plt.title('Bragg pattern derivative'), plt.xlabel('Wavelenght [Å]')
         plt.show()
         plt.close()
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
@@ -154,7 +146,6 @@ def AdvancedBraggEdgeFitting(myspectrum, myrange, myTOF, est_pos=0, est_sigma=1,
     #bool_print: flag to activate printing of figures
     #bool_average: flag to activate moving average across the spectrum (actualy SG filter)
     #bool_linear: flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential)
-    #bool_transmission: flag on if specturm is transmission, if it is off it assumes it is absorption and converts to Transmission [obsolete]
     
     ##OUTPUTS:
     #t0: fitted bragg edge position

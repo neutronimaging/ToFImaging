@@ -237,10 +237,10 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve( m[::-1], y, mode='valid')
 
-def moving_average_1D (mysignal, kernel_size = 3, custom_kernel_flag = False, custom_kernel = 0):
+def moving_average_1D (mysignal, kernel_size = 3, bool_custom_k = False, custom_kernel = 0):
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
-    if(custom_kernel_flag):
+    if(bool_custom_k):
         K = custom_kernel
     else:
         K = np.ones((kernel_size))
@@ -248,11 +248,11 @@ def moving_average_1D (mysignal, kernel_size = 3, custom_kernel_flag = False, cu
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
     
-def moving_average_2D (mysignal, kernel_size = 3, custom_kernel_flag = False, custom_kernel = 0):
+def moving_average_2D (mysignal, kernel_size = 3, bool_custom_k = False, custom_kernel = 0):
     import scipy.signal
     if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
         print('Data size is not either a 2D or ToF 2D')
-    if(custom_kernel_flag):
+    if(bool_custom_k):
         K = custom_kernel
     else:
         K = np.ones((kernel_size,kernel_size))
@@ -323,7 +323,7 @@ def fullspectrum_im (path_data, cut_last=0):
     T = I.sum(axis=2)
     return(T)    
     
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, k = 3, bool_custom_k = False, custom_k = 0):
     #load rawdata
     I = load_fits(path_sample,cut_last,bool_wavg)
     I0 = load_fits(path_ob,cut_last,bool_wavg)
@@ -337,6 +337,9 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
     if(bin_size):
         I = binning(I,bin_size)
         I0 = binning(I0,bin_size)
+    if(bool_mavg):
+        I = moving_average_2D(I, kernel_size = k, bool_custom_k = bool_custom_k, custom_kernel = custom_k)
+        I0 = moving_average_2D(I0, kernel_size = k, bool_custom_k = bool_custom_k, custom_kernel = custom_k)
     #normalize
     T = transmission_normalization(I,I0,dose_mask_path)
         
