@@ -3,7 +3,6 @@ from numpy import pi, r_, math, random
 import matplotlib.pyplot as plt
 from scipy import special
 from lmfit import Model
-import math
 
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
@@ -25,7 +24,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=
     bool_print = set to True to print output
 
     OUTPUTS:
-    #dictionary with the following fit in the dimension of the mask
+    dictionary with the following fits
     'edge_position' : edge position 
     'edge_height': edge height 
     'edge_width': edge width  
@@ -117,14 +116,15 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     bool_linear = flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential)
     
     OUTPUTS:
-    #t0 = fitted bragg edge position
-    #sigma = fitted Gaussian broadening
-    #alpha = fitted decay constant (moderator property)
-    #a1, a2, a5, a6 = parameters for spectrum besides the edge: a1 and a2 before, a5 and a6 after the edge
-    #final_result = fitting result after 7th iteration
-    #fitted_data = final fitted spectrum 
-    #pos_extrema = extrema of the bragg edges
-    #height = fitted height of the bragg edge
+    dictionary with the following fits
+    't0' = fitted bragg edge position
+    'sigma' = fitted Gaussian broadening
+    'alpha' = fitted decay constant (moderator property)
+    'a1, a2, a5, a6' = parameters for spectrum besides the edge: a1 and a2 before, a5 and a6 after the edge
+    'final_result' = fitting result after 7th iteration
+    'fitted_data' = final fitted spectrum 
+    'pos_extrema' = extrema of the bragg edges
+    'height' = fitted height of the bragg edge
     """     
 
     #----------------- FITTING FUNCTIONS---------------#
@@ -147,13 +147,13 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     #     return line_before(t,a5,a6)*B(t,t0,alpha,sigma)+line_after(t,a1,a2)*(1-B(t,t0,alpha,sigma))
 
     def term3(t,t0,sigma):
-        return math.erfc(-((t-t0)/(sigma * math.sqrt(2))))
+        return special.erfc(-((t-t0)/(sigma * math.sqrt(2))))
         
     def term4(t,t0,alpha,sigma):
         return np.exp(-((t-t0)/alpha) + ((sigma*sigma)/(2*alpha*alpha)))
 
     def term5(t,t0,alpha,sigma):
-        return math.erfc(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
+        return special.erfc(-((t-t0)/(sigma * math.sqrt(2))) + sigma/alpha)
 
     def line_after(t,a1,a2):
         return a1+a2*t
