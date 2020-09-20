@@ -6,9 +6,9 @@ import os, fnmatch
 from os import listdir
 from astropy.io import fits
 
-import TOF_routines
-from TOF_routines import tof2l
-from TOF_routines import find_nearest
+import reduction_tools
+from reduction_tools import tof2l
+from reduction_tools import find_nearest
 
 import time
    
@@ -69,7 +69,7 @@ def image_phase_fraction(LAC_tof,spectrum_lambda,phase1lac,phase2lac,phase_spect
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         import skimage.filters
-        mymask = TOF_routines.medianimage(LAC_tof)
+        mymask = reduction_tools.medianimage(LAC_tof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0

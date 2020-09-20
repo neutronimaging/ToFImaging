@@ -5,8 +5,8 @@ from scipy import special
 from lmfit import Model
 import math
 
-from TOF_routines import find_nearest
-from TOF_routines import savitzky_golay as SG_filter
+from reduction_tools import find_nearest
+from reduction_tools import savitzky_golay as SG_filter
 
 def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=0,est_h=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
