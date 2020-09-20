@@ -15,9 +15,9 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=
     signal = ndarray of the spectrum containing the Bragg edge(s)
     spectrum = spectrum, length of this ndarray must correspond to size of Tspectrum(lambda)
     spectrum_range = range corresponding to lambda where to perform the fitting
-    est_pos = estimated bragg edge position (in spectrum_l dimension)
-    est_wid = estimated bragg edge width (in spectrum_l dimension)
-    est_h = estimated bragg edge height (in spectrum_l dimension)
+    est_pos = estimated bragg edge position (in spectrum dimension)
+    est_wid = estimated bragg edge width (in spectrum dimension)
+    est_h = estimated bragg edge height (in spectrum dimension)
     bool_log = set to True to perform log norm and convert to attenuation
     bool_smooth = set to True to perform Savitzky-Golay filtering of the signal derivative
     smooth_w = window size of S-G filter

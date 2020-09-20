@@ -281,7 +281,7 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     if (np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0] | np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1]):
         print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
     if(debug_flag): #testing on a single pixel    
-        lambd = reduction_tools.tof2l_calibration(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
+        lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
         myrange = []
         myrange.append(find_nearest(lambd, spectrum_range[0])) 
         myrange.append(find_nearest(lambd, spectrum_range[1])) 
@@ -305,7 +305,7 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
                 if(debug_flag):
                     print(i,j)
                 signal = Ttof[i,j,:]
-                lambd = reduction_tools.tof2l_calibration(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
+                lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
                 myrange = []
                 myrange.append(find_nearest(lambd, spectrum_range[0])) 
                 myrange.append(find_nearest(lambd, spectrum_range[1])) 
