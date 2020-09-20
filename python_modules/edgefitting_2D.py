@@ -70,8 +70,12 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
     if(est_pos):
         est_pos = find_nearest(spectrum[myrange[0]:myrange[1]], est_pos) # 4.05
     if(debug_flag): #testing on a single pixel  
-        signal = Ttof[debug_idx[0],debug_idx[1],:] # This is for the first Bragg edge fitting
-        edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
+        signal = Ttof[debug_idx[0],debug_idx[1],:]
+        try:
+            edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
+        except:
+            print('Fitting failed')
+        return
 
     median_image = reduction_tools.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
@@ -84,8 +88,6 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
         print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
-                if(debug_flag):
-                    print(i,j)
                 signal = Ttof[i,j,:]
                 try:
                     edge_fit = edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=False)
@@ -175,8 +177,11 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
     myrange.append(find_nearest(spectrum, spectrum_range[1])) # 4.4
     if(debug_flag): #testing on a single pixel    
         sp = Ttof[debug_idx[0],debug_idx[1],:]
-        #run once the fitting to check if everything works
-        edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
+        try:
+            edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
+        except:
+            print('Fitting failed')
+        return
 
     median_image = reduction_tools.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
@@ -190,8 +195,6 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
         print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
-                if(debug_flag):
-                    print(i,j)
                 sp = Ttof[i,j,:]
                 try:
                     edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
@@ -286,9 +289,13 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
         myrange.append(find_nearest(lambd, spectrum_range[0])) 
         myrange.append(find_nearest(lambd, spectrum_range[1])) 
         
-        signal = Ttof[debug_idx[0],debug_idx[1],:] # This is for the first Bragg edge fitting
-        #run once the fitting to check if everything works
-        edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
+        signal = Ttof[debug_idx[0],debug_idx[1],:]
+        try:
+            edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
+        except:
+            print('Fitting failed')
+        return
+
 
     median_image = reduction_tools.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
@@ -302,8 +309,6 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
         print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
-                if(debug_flag):
-                    print(i,j)
                 signal = Ttof[i,j,:]
                 lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
                 myrange = []
