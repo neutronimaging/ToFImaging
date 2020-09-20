@@ -198,7 +198,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
         plt.figure()
         plt.plot(t, signal)
         plt.plot(t0_f, signal[est_pos],'x', markeredgewidth=3, c='orange')
-        plt.title('Bragg edge'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+        plt.title('Bragg edge pattern and initial guess'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
         #plt.savefig('step1_fitting.pdf')
     
     t_before= t[0:est_pos]
@@ -223,7 +223,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
             plt.plot(t,signal)
             plt.plot(t,interception_before+slope_before*t,'g')
             plt.plot(t,interception_after+slope_after*t,'r')
-            plt.title('linear fitting before and after the given edge position')
+            plt.title('Linear fitting before and after the given edge position'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
     else:
         exp_model_after = Model(exp_after)
         params = exp_model_after.make_params(a1=a1_f, a2=a2_f)
@@ -249,7 +249,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
             plt.plot(t,interception_after+slope_after*t,'--g', label='fitted line after')
             plt.plot(t,exp_after(t,a1_f,a2_f),'g', label='fitted exp before')
             plt.plot(t,exp_combined(t,a1_f,a2_f,a5_f,a6_f),'r', label='fitted exp after')
-            plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$'), plt.title('fitting before and after the given edge position')
+            plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$'), plt.title('Exponential fitting before and after the given edge position')
             plt.legend()
             plt.plot(t, BraggEdgeExponential(t,t0_f,est_alpha,est_sigma,a1_f,a2_f,a5_f,a6_f))
 
@@ -265,13 +265,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     
     # 1st round to fit a1 and a6 (intercept of before and slope of after)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
-    first_guess = gmodel.eval(params, t=t)
-    if (bool_print):
-        plt.figure()
-        plt.plot(t,signal,label='data')
-        plt.plot(t,first_guess,'--b',label='initial model')
-        plt.title('initial BE with given parameters'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
-        plt.legend()
+    # first_guess = gmodel.eval(params, t=t)
     
     params['alpha'].vary = False
     params['sigma'].vary = False
@@ -384,14 +378,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     #Get the extrema for edge height fitting
     fitted_data = result7.best_fit
     pos_extrema = []
-    
-    ## Attempt n.1 -------- Here I was searching the last 0 value and the first value with 1.0 in the step function, however is it not a robust solution
-    #     step_function = B(t,t0_f,alpha_f,sigma_f)
-    #     min_pos = find_last(step_function,0.0)
-    #     pos_extrema.append(min_pos)
-    #     max_pos = find_first(step_function,0.99)
-    #     pos_extrema.append(max_pos)
-    
+
     if (bool_linear):
         fit_before = line_before(t,a5_f,a6_f)
         fit_after = line_after(t,a1_f,a2_f)
@@ -399,15 +386,24 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
         fit_before = exp_combined(t,a1_f,a2_f,a5_f,a6_f)
         fit_after = exp_after(t,a1_f,a2_f)
 
-    #fit_edge = B(t,t0_f,alpha_f,sigma_f)
-    
-    if (bool_print):
-        plt.figure()
-        plt.plot(t,fit_before,'o-')
-        plt.plot(t,fit_after,'o-')
-        plt.plot(t,fitted_data,'.-')
-    
     index_t0 = find_nearest(t,t0_f)
+
+    # This plots the fitted edge and the sides
+    # if (bool_print): 
+    #     plt.figure()
+    #     plt.plot(t,fit_before,'o-')
+    #     plt.plot(t,fit_after,'o-')
+    #     plt.plot(t,fitted_data,'.-')
+    #     plt.title('Final Fit'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+
+    ## Attempt n.1 -------- Here I was searching the last 0 value and the first value with 1.0 in the step function, however is it not a robust solution
+    #     step_function = B(t,t0_f,alpha_f,sigma_f)
+    #     min_pos = find_last(step_function,0.0)
+    #     pos_extrema.append(min_pos)
+    #     max_pos = find_first(step_function,0.99)
+    #     pos_extrema.append(max_pos)
+
+    #fit_edge = B(t,t0_f,alpha_f,sigma_f)
 
     ## Attempt n.2 ------This is Florencia's approach and most used in the community: be careful that sometimes this gives an overestimation depending on the slope of the lines before and after
     #     pos_extrema.append(fit_before[index_t0])
@@ -415,7 +411,6 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     #     height = np.abs(fit_after[index_t0]-fit_before[index_t0])
 
     ## Attempt n.3 ------ This approach is based on the difference between the fit before and after the edge and the fitted data itself. so far, it gives the nicest results on the calibration sample, however the value used as threshold is not general and should probably be adjusted from case to case. So again it is not yet the final solution
-
     for i in range(0, len(fitted_data)):
         #print(i,(fitted_data[i]-fit_before[i]))
         if (np.abs(fitted_data[i]-fit_before[i])>1e-4):            
@@ -459,14 +454,12 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
         plt.plot(t, result5.best_fit, '--', color='gray')
         plt.plot(t, result6.best_fit, '--', color='gray')
         plt.plot(t, result7.best_fit, 'r', linewidth='1.5', label='final fit')
-        plt.legend()
-        plt.xlabel('Wavelenght [Å]')
-        plt.ylabel('Transmission I/I$_{0}$')
+        plt.legend(), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
 
         plt.plot(t0_f,result7.best_fit[index_t0],'ok')
         plt.plot(t[pos_extrema[0]],result7.best_fit[pos_extrema[0]],'ok')
         plt.plot(t[pos_extrema[1]],result7.best_fit[pos_extrema[1]],'ok')
-        plt.title('edge fitting and estimated edge position')
+        plt.title('Edge fitting with intermediate steps and estimated edge position')
         plt.show()
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
