@@ -399,7 +399,7 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     if(bool_log):
         Ttof = -np.log(Ttof)
 
-    if (np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0] | np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1]):
+    if ((np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1])):
         print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
     if(debug_flag): #testing on a single pixel    
         lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
@@ -408,11 +408,10 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
         myrange.append(find_nearest(lambd, spectrum_range[1]))
         signal = Ttof[debug_idx[0],debug_idx[1],:]
         try:
-            edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=lambd,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
+            edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
         except:
             print('Fitting failed')
         return
-
 
     median_image = reduction_tools.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))

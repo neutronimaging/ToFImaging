@@ -49,7 +49,8 @@ def weightedaverageimage(imgs,size=5):
     return img
     
 #Rebinning tools    
-def binning (mysignal, newsize):
+def binning_ndarray (mysignal, newsize):
+    #Remnant from Chiara's code: Rebins an ndarray into the newsize.
     binned_signal = np.zeros(newsize)
     bin_size = int(len(mysignal)/newsize)
     for i in range(0, newsize):
@@ -57,7 +58,8 @@ def binning (mysignal, newsize):
         binned_signal[i]=bin_value
     return (binned_signal)
     
-def binning_resolution (mysignal, spectrum, d_spectrum):
+def spectral_binning_resolution (mysignal, spectrum, d_spectrum):
+    # Rebins an (spectrum) or (x,spectrum) or (x,y,spectrum) matrix to match a new bin_width (e.g. instrumental resolution)
     spectrum_range = spectrum[-1]-spectrum[0]
     n_range = np.round(spectrum_range/d_spectrum)
     new_spectrum = np.arange(spectrum[0],spectrum[-1]+spectrum_range/n_range,spectrum_range/n_range)
@@ -84,6 +86,7 @@ def binning_resolution (mysignal, spectrum, d_spectrum):
     return (binned_signal, new_spectrum)
 
 def moving_average_1D (mysignal, kernel_size = 3, bool_custom_k = False, custom_kernel = 0):
+    # Moving average by kernel convolution to a ndarray
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
     if(bool_custom_k):
@@ -95,6 +98,8 @@ def moving_average_1D (mysignal, kernel_size = 3, bool_custom_k = False, custom_
     return outsignal
     
 def moving_average_2D (mysignal, kernel_size = 3, bool_custom_k = False, custom_kernel = 0):
+    # Moving average by kernel convolution to an image (2D) 
+    # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
     import scipy.signal
     if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
         print('Data size is not either a 2D or ToF 2D')
@@ -112,7 +117,7 @@ def moving_average_2D (mysignal, kernel_size = 3, bool_custom_k = False, custom_
         outsignal = scipy.signal.convolve2d(mysignal,K,'same')
     return outsignal   
 
-def rebin_image(image, new_shape, operation='sum'):
+def spatial_image_rebinning(image, new_shape, operation='sum'):
     """
     Bins an ndarray in all axes based on the target shape, by summing or
         averaging.
@@ -148,11 +153,11 @@ def rebin_image(image, new_shape, operation='sum'):
         image = op(-1*(i+1))
     return image    
 
-def rebin_image_tof(image, new_shape, operation='sum'):
+def spectral_image_rebinning(image, new_shape, operation='sum'):
     n_tof = np.shape(image)[2]
     image_rebin = np.zeros((new_shape[0],new_shape[1],n_tof))
     for i in range(0,n_tof):
-        image_rebin[:,:,i] = rebin_image(image[:,:,i],new_shape,operation)
+        image_rebin[:,:,i] = spatial_image_rebinning(image[:,:,i],new_shape,operation)
     return image_rebin
 
 def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
@@ -228,22 +233,19 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     return np.convolve( m[::-1], y, mode='valid')
 
 #Normalization tools
-def transmission_normalization (I,I0,dose_mask_path=0):
+def transmission_normalization (I,I0,mask_dose=0):
+    #Normalization to transmission, with dose correction if mask_dose is given. negative transmission and negative attenuation (T>1) are replaced with NaNs.
     from skimage import io
     if(np.shape(I)!=np.shape(I0)):
         print('The size of I and I0 does not match. Check input data')
     if(len(np.shape(I))!=2):
-        print('The input data is not an image')
+        print('The input data is not an image. Assuming is a TOF stack of images.')
     
     dose = 1
-    if(dose_mask_path):
-        dose_mask = io.imread(dose_mask_path)
-        if(np.shape(I)!=np.shape(dose_mask)):
-            print('The size of the dose mask does not match the signal. Check input data')
-        dose_mask[dose_mask!=1]=np.nan
-        dose = np.median(I0)/np.median(I)
+    if(mask_dose):
+        dose = np.median(np.multiply(I0,mask_dose),axis=(1,0))/np.median(np.multiply(I,mask_dose),axis=(1,0))
     
-    T = np.divide(I,I0)*dose
+    T = np.divide(I*dose,I0)
     T[T>1] = 1
     T[np.isinf(T)] = np.nan
     T[T<0] = np.nan
@@ -251,17 +253,20 @@ def transmission_normalization (I,I0,dose_mask_path=0):
 
 #Index seeking functions
 def find_nearest(array, value):
+    #finds the nearest index to the value in the array
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return (idx)
 
 def find_first(array, value):
+    #finds the first index where the array is higher than the value from the start
     for idx in range(0, len(array)):
         if array[idx]>=value:
             break
     return idx
 
 def find_last(array, value):
+    #finds the last index where the array is higher than the value from the start
     for idx in range(0, len(array)):
         if idx>1:
             if ((array[idx]-array[idx-1])>=value+0.005):
@@ -269,6 +274,7 @@ def find_last(array, value):
     return idx
 
 def rotatedata(x,y,a):
+    #rotates x,y by a(rad)
     cosa=np.cos(a)
     sina=np.sin(a)
     x = x*cosa-y*sina
@@ -292,6 +298,8 @@ def fullspectrum_im (path_data, cut_last=0):
 
 #Loading routines
 def load_fits (pathdata, cut_last=0, bool_wavg = False):
+    # Load stacks of TOF into 3D matrix (x,y,TOF). Requires subfolders in the pathdata with a subfolder for each repetition that is merged.
+    # It is often the case that a long acquisition is split into multiple shorter acquisition to be merged (e.g. 4 hours = 4x1 hour)
     from astropy.io import fits
     import os, fnmatch
     from os import listdir
@@ -330,6 +338,8 @@ def load_fits (pathdata, cut_last=0, bool_wavg = False):
     return data
 
 def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, k = 3, bool_custom_k = False, custom_k = 0):
+    # Full loading routine. Load sample and open beam and normalize to TOF transmission T=(x,y,TOF). The tof spectrum is loaded as well and converted to lambda, when asked.
+    
     #load rawdata
     I = load_fits(path_sample,cut_last,bool_wavg)
     I0 = load_fits(path_ob,cut_last,bool_wavg)
@@ -338,11 +348,11 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         spectrum = tof2l(spectrum, L, lambda_0, tof_0)
     #rebinning
     if(d_spectrum):
-        I = binning_resolution(I,spectrum,d_spectrum)
-        I0 = binning_resolution(I0,spectrum,d_spectrum)
+        I = spectral_binning_resolution(I,spectrum,d_spectrum)
+        I0 = spectral_binning_resolution(I0,spectrum,d_spectrum)
     if(bin_size):
-        I = binning(I,bin_size)
-        I0 = binning(I0,bin_size)
+        I = binning_ndarray(I,bin_size)
+        I0 = binning_ndarray(I0,bin_size)
     if(bool_mavg):
         I = moving_average_2D(I, kernel_size = k, bool_custom_k = bool_custom_k, custom_kernel = custom_k)
         I0 = moving_average_2D(I0, kernel_size = k, bool_custom_k = bool_custom_k, custom_kernel = custom_k)
