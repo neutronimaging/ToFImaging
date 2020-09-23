@@ -7,7 +7,7 @@ from lmfit import Model
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
-def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=0,est_h=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     
     INPUTS:
@@ -62,12 +62,25 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=
         est_h = signal[-2]-signal[2]
 
     params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
-    params['cen'].min = spectrum[0]
-    params['cen'].max = spectrum[-1]
-    params['amp'].min = 0
-    params['amp'].max = 1e2
-    params['wid'].min = 0
-    params['wid'].max = 1e2
+    if(pos_BC):
+        params['cen'].min = pos_BC[0]
+        params['cen'].max = pos_BC[1]
+    else:
+        params['cen'].min = spectrum[0]
+        params['cen'].max = spectrum[-1]
+    if(h_BC):
+        params['amp'].min = h_BC[0]
+        params['amp'].max = h_BC[1]
+    else:
+        params['amp'].min = 0
+        params['amp'].max = 1e2
+    if(wid_BC):
+        params['wid'].min = wid_BC[0]
+        params['wid'].max = wid_BC[1]
+    else:
+        params['wid'].min = 0
+        params['wid'].max = 1e2
+
     result = gmodel.fit(d_signal, params, x=d_spectrum, method=method, nan_policy='propagate')
     t0 = result.best_values.get('cen')
     edge_width = result.best_values.get('wid')

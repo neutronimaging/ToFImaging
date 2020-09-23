@@ -229,7 +229,7 @@ def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}    
 
-def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
+def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -242,6 +242,9 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
     est_pos = estimated bragg edge position (in spectrum dimension)
     est_wid = estimated bragg edge width (in spectrum dimension)
     est_h = estimated bragg edge height (in spectrum dimension)
+    pos_BC = boundary conditions for the bragg edge position fit
+    wid_BC = boundary conditions for the bragg edge width fit
+    h_BC = boundary conditions for the bragg edge height fit
     bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative
     smooth_w = window size of S-G filter
     smooth_n = order of S-G filter
@@ -290,7 +293,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
     if(debug_flag): #testing on a single pixel    
         sp = Ttof[debug_idx[0],debug_idx[1],:]
         try:
-            edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
+            edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
         except:
             print('Fitting failed')
         return
@@ -309,7 +312,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
             if (mymask[i,j]):
                 sp = Ttof[i,j,:]
                 try:
-                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
+                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['edge_height']
                     edge_width[i,j] = edge_fit['edge_width']
@@ -336,7 +339,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
+def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -351,6 +354,9 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     est_pos = estimated bragg edge position (in spectrum dimension)
     est_wid = estimated bragg edge width (in spectrum dimension)
     est_h = estimated bragg edge height (in spectrum dimension)
+    pos_BC = boundary conditions for the bragg edge position fit
+    wid_BC = boundary conditions for the bragg edge width fit
+    h_BC = boundary conditions for the bragg edge height fit
     bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative
     smooth_w = window size of S-G filter
     smooth_n = order of S-G filter
@@ -402,7 +408,7 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
         myrange.append(find_nearest(lambd, spectrum_range[1]))
         signal = Ttof[debug_idx[0],debug_idx[1],:]
         try:
-            edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=lambd,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
+            edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=lambd,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
         except:
             print('Fitting failed')
         return
@@ -426,7 +432,7 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
                 myrange.append(find_nearest(lambd, spectrum_range[0])) 
                 myrange.append(find_nearest(lambd, spectrum_range[1])) 
                 try:
-                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
+                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['edge_height']
                     edge_width[i,j] = edge_fit['edge_width']
