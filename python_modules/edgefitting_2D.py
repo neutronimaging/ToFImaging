@@ -164,7 +164,7 @@ def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
         mymask = skimage.filters.gaussian(mymask,sigma=2)
         mymask[mymask>0] = 1.0
         plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
-        plt.show(), plt.close()           
+        plt.show(), plt.close()               
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 

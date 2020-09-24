@@ -9,10 +9,11 @@ from astropy.io import fits
 import reduction_tools
 from reduction_tools import tof2l
 from reduction_tools import find_nearest
+import phasefitting_1D
 
 import time
    
-def image_phase_fraction(LAC_tof,spectrum_lambda,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,filemask=0, auto_mask = True, mask_thresh = [0.05, 0.95], debug_flag=0):        
+def phase_ratio_linearcomb_2D(Ttof,spectrum,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_phi=0.5,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     !!! IMPORTANT the data must be transmission or it won't work due to boundary conditions !!!
     
@@ -42,34 +43,17 @@ def image_phase_fraction(LAC_tof,spectrum_lambda,phase1lac,phase2lac,phase_spect
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """ 
-    """ Performs FOBI reduction from open beam and sample spectrum    
-    
-    INPUTS:
-    y = sample spectrum (I)
-    y0 = open beam spectrum (I0)
-    t = time-of-flight bins
-    tmax = maximum time of flight (this parameter is dependent on the chopper frequency: tmax = 1/f  with f = chopper frequency)
-    nrep = number of times the pattern is repeated (chopper)
-    c = Wiener constant
-    roll_value = shift the retrieved fobi spectra by this value 
-    (this is necessary because the output from Wiener decorrelation places the peak of 
-    the spectrum approximately in the middle of the array)
-    SG_w = Savitzky Golay filter window
-    SG_o = Savitzky Golay filter order
 
-    OUTPUTS:
-    #dictionary with the following fit in the dimension of the mask
-    #'y_fobi': edge position
-    #'x_fobi': edge height
-    #'t_fobi': edge width
-    """ 
-    if(filemask):
-        mymask = io.imread(filemask)
-        if( [np.shape(LAC_tof)[0], np.shape(LAC_tof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+    if(filemask.any()):
+        mymask = filemask
+        plt.figure()
+        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         import skimage.filters
-        mymask = reduction_tools.medianimage(LAC_tof)
+        mymask = reduction_tools.medianimage(Ttof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
@@ -83,19 +67,29 @@ def image_phase_fraction(LAC_tof,spectrum_lambda,phase1lac,phase2lac,phase_spect
         plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
         plt.show(), plt.close()        
     else:
-        mymask = np.ones([np.shape(LAC_tof)[0], np.shape(LAC_tof)[1]])
+        mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
+        
+    if(debug_flag): #testing on a single pixel    
+        T = Ttof[debug_idx[0],debug_idx[1],:]
+        phasefitting_1D.phase_ratio_linearcomb(T,spectrum,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,est_phi=est_phi,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
+        return
 
     phase_fraction = np.zeros(np.shape(mymask))
     for i in range(0, np.shape(mymask)[0]):
-            if(debug_flag):
-                print('processing row n. ', i, 'of', np.shape(mymask)[0])
-            for j in range(0, np.shape(mymask)[1]):
-                if (mymask[i,j]):
-                    lac = LAC_tof[i,j,:]
-                    try:
-                        phi_fit = AdvancedBraggEdgeFitting.phase_fraction_fitting(lac,spectrum_lambda,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,bool_plot=0)
-                        phase_fraction[i,j] = phi_fit['phi']
-                    except:
-                        print("Unexpected error at :", i, j)
-                        phase_fraction[i,j] = -2.0
+        print('---------------$$$$---------------')
+        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+        for j in range(0, np.shape(mymask)[1]):
+            if (mymask[i,j]):
+                T = Ttof[i,j,:]
+                try:
+                    phi_fit = phasefitting_1D.phase_ratio_linearcomb(T,spectrum,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,est_phi=est_phi,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=0)
+                    phase_fraction[i,j] = phi_fit['phi']
+                except:
+                    print("Unexpected error at :", i, j)
+                    phase_fraction[i,j] = -2.0
+
+    if(bool_print):
+        plt.imshow(phase_fraction), plt.title('Phase fraction (ph1 %)')
+    if(bool_save):
+        np.save('phase_fraction.npy', phase_fraction)
     return {'phase_fraction' : phase_fraction}
