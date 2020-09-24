@@ -17,4 +17,4 @@ Clone or download the codes to your local machine, then insert the following two
 import sys  
 sys.path.insert(0, "path-to-repository")
 
-This may require furhter installation of external modules.
+This may require further installation of external modules.
