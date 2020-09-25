@@ -13,7 +13,7 @@ from reduction_tools import find_nearest
 
 import time
    
-def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):            
+def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_idx=[]):            
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -72,12 +72,9 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=T
     myrange.append(find_nearest(spectrum, spectrum_range[1])) # 4.4
     if(est_pos):
         est_pos = find_nearest(spectrum[myrange[0]:myrange[1]], est_pos) # 4.05
-    if(debug_flag): #testing on a single pixel  
+    if(any(debug_idx)): #testing on a single pixel  
         signal = Ttof[debug_idx[0],debug_idx[1],:]
-        try:
-            edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
-        except:
-            print('Fitting failed')
+        edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
@@ -120,7 +117,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=T
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}        
 
-def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):            
+def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_idx=[]):            
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -179,7 +176,7 @@ def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     myrange.append(find_nearest(spectrum, spectrum_range[1])) # 4.4
     if(est_pos):
         est_pos = find_nearest(spectrum[myrange[0]:myrange[1]], est_pos) # 4.05
-    if(debug_flag): #testing on a single pixel  
+    if(any(debug_idx)): #testing on a single pixel  
         lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
         myrange = []
         myrange.append(find_nearest(lambd, spectrum_range[0])) 
@@ -235,7 +232,7 @@ def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}    
 
-def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
+def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -299,7 +296,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=T
     myrange = []
     myrange.append(find_nearest(spectrum, spectrum_range[0])) # 3.7
     myrange.append(find_nearest(spectrum, spectrum_range[1])) # 4.4
-    if(debug_flag): #testing on a single pixel    
+    if(any(debug_idx)): #testing on a single pixel    
         sp = Ttof[debug_idx[0],debug_idx[1],:]
         try:
             edgefitting_1D.GaussianBraggEdgeFitting(signal=sp,spectrum=spectrum,spectrum_range=myrange,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=debug_flag)
@@ -348,7 +345,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=T
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
+def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -413,7 +410,7 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
 
     if ((np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1])):
         print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
-    if(debug_flag): #testing on a single pixel    
+    if(any(debug_idx)): #testing on a single pixel    
         lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
         myrange = []
         myrange.append(find_nearest(lambd, spectrum_range[0])) 

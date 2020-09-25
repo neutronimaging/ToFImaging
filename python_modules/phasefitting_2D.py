@@ -13,7 +13,7 @@ import phasefitting_1D
 
 import time
    
-def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_phi=0.5,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):
+def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_phi=0.5,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[]):
     """ Performs phase ratio fitting on linear combination of two basis functions, works with linear attenuation coefficient (LAC) spectra
     
     INPUTS:
@@ -67,7 +67,7 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
     else:
         mymask = np.ones([np.shape(lac_tof)[0], np.shape(lac_tof)[1]])
         
-    if(debug_flag): #testing on a single pixel    
+    if(any(debug_idx)): #testing on a single pixel    
         lac = lac_tof[debug_idx[0],debug_idx[1],:]
         phasefitting_1D.phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_phi=est_phi,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
         return
@@ -92,7 +92,7 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         np.save('phase_ratio.npy', phase_ratio)
     return {'phase_ratio' : phase_ratio}
 
-def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_f1=0.3,est_f2=0.3,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):
+def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_f1=0.3,est_f2=0.3,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[]):
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     !!! IMPORTANT the data must be transmission or it won't work due to boundary conditions !!!
     
@@ -148,7 +148,7 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
     else:
         mymask = np.ones([np.shape(lac_tof)[0], np.shape(lac_tof)[1]])
         
-    if(debug_flag): #testing on a single pixel    
+    if(any(debug_idx)): #testing on a single pixel     
         lac = lac_tof[debug_idx[0],debug_idx[1],:]
         phasefitting_1D.phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_f1=est_f1,est_f2=est_f2,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
         return

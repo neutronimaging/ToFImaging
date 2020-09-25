@@ -8,7 +8,7 @@ import math
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
-def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_edges,est_phi=0.5,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0): 
+def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_phi=0.5,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0): 
     ##INPUTS:
     #lac: measured LAC spectrum to fit
     #spectrum: lambda spectrum of the lac
@@ -16,7 +16,7 @@ def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambd
     #phase2lac: LAC of the 2nd phase to fit
     #phase_spectrum: lambda spectrum of the theoretical phases LAC
     #lambda_range_norm: lambda range used to normalize data
-    #lambda_range_edges: lambda range where to perform the fitting
+    #lambda_range_fit: lambda range where to perform the fitting
     #est_phi: estimated phase fraction
     #bool_plot: flag to activate plotting
 
@@ -45,8 +45,8 @@ def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambd
     phase2lac = phase2lac*(np.nanmean(lac)/np.nanmean(phase2lac))
 
     # initial conditions
-    idx_l = find_nearest(spectrum,lambda_range_edges[0])
-    idx_h = find_nearest(spectrum,lambda_range_edges[1])
+    idx_l = find_nearest(spectrum,lambda_range_fit[0])
+    idx_h = find_nearest(spectrum,lambda_range_fit[1])
     lac_cut = lac[idx_l:idx_h]
     ph1 = phase1lac[idx_l:idx_h]
     ph2 = phase2lac[idx_l:idx_h]
@@ -85,7 +85,7 @@ def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambd
 
     return {'phi': phi}
 
-def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phase_spectrum,lambda_range_norm,lambda_range_edges,est_f1=0.3,est_f2=0.3,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0):     
+def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_f1=0.3,est_f2=0.3,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0):     
     ##INPUTS:
     #lac: measured LAC spectrum to fit
     #spectrum: lambda spectrum of the lac
@@ -93,7 +93,7 @@ def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phas
     #phase2lac: LAC of the 2nd phase to fit
     #phase_spectrum: lambda spectrum of the theoretical phases LAC
     #lambda_range_norm: lambda range used to normalize data
-    #lambda_range_edges: lambda range where to perform the fitting
+    #lambda_range_fit: lambda range where to perform the fitting
     #est_phi: estimated phase fraction
     #bool_plot: flag to activate plotting
 
@@ -125,8 +125,8 @@ def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phas
     phase3lac = phase3lac*(np.nanmean(lac)/np.nanmean(phase3lac))
 
     # initial conditions
-    idx_l = find_nearest(spectrum,lambda_range_edges[0])
-    idx_h = find_nearest(spectrum,lambda_range_edges[1])
+    idx_l = find_nearest(spectrum,lambda_range_fit[0])
+    idx_h = find_nearest(spectrum,lambda_range_fit[1])
     lac_cut = lac[idx_l:idx_h]
     ph1 = phase1lac[idx_l:idx_h]
     ph2 = phase2lac[idx_l:idx_h]
