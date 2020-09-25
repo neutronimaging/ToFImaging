@@ -11,6 +11,7 @@ from reduction_tools import tof2l
 from reduction_tools import find_nearest
 import phasefitting_1D
 
+from tqdm import tqdm
 import time
    
 def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_phi=0.5,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[]):
@@ -73,9 +74,9 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         return
 
     phase_ratio = np.zeros(np.shape(mymask))
-    for i in range(0, np.shape(mymask)[0]):
-        print('---------------$$$$---------------')
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+    for i in tqdm(0, np.shape(mymask)[0]):
+        # print('---------------$$$$---------------')
+        # print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 lac = lac_tof[i,j,:]
@@ -154,9 +155,9 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
         return
 
     phase_ratio = np.zeros(np.shape(mymask))
-    for i in range(0, np.shape(mymask)[0]):
-        print('---------------$$$$---------------')
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+    for i in tqdm(0, np.shape(mymask)[0]):
+        # print('---------------$$$$---------------')
+        # print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 lac = lac_tof[i,j,:]

@@ -11,6 +11,7 @@ import reduction_tools
 from reduction_tools import tof2l
 from reduction_tools import find_nearest
 
+from tqdm import tqdm
 import time
    
 def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_idx=[]):            
@@ -83,9 +84,9 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=T
     edge_height = np.zeros(np.shape(mymask))
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
-    for i in range(0, np.shape(mymask)[0]):
-        print('---------------$$$$---------------')
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+    for i in tqdm(range(0, np.shape(mymask)[0])):
+        # print('---------------$$$$---------------')
+        # print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 signal = Ttof[i,j,:]
@@ -194,9 +195,9 @@ def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     edge_height = np.zeros(np.shape(mymask))
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
-    for i in range(0, np.shape(mymask)[0]):
-        print('---------------$$$$---------------')
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+    for i in tqdm(range(0, np.shape(mymask)[0])):
+        # print('---------------$$$$---------------')
+        # print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 signal = Ttof[i,j,:]
@@ -311,9 +312,9 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=T
     edge_slope = np.zeros(np.shape(mymask))
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
-    for i in range(0, np.shape(mymask)[0]):
-        print('---------------$$$$---------------')
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+    for i in tqdm(range(0, np.shape(mymask)[0])):
+        # print('---------------$$$$---------------')
+        # print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 sp = Ttof[i,j,:]
@@ -429,9 +430,9 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     edge_slope = np.zeros(np.shape(mymask))
     #loop for all pixel position, where the mask is equal to one
     start_time = time.time()
-    for i in range(0, np.shape(mymask)[0]):
-        print('---------------$$$$---------------')
-        print('Processing row n. ', i, 'of', np.shape(mymask)[0])
+    for i in tqdm(range(0, np.shape(mymask)[0])):
+        # print('---------------$$$$---------------')
+        # print('Processing row n. ', i, 'of', np.shape(mymask)[0])
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 signal = Ttof[i,j,:]
