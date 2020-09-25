@@ -13,7 +13,7 @@ from reduction_tools import find_nearest
 
 import time
    
-def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):            
+def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):            
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -42,8 +42,11 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """ 
-    if(filemask):
-        mymask = io.imread(filemask)
+    if(any(mask)):
+        mymask = mask
+        plt.figure()
+        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
@@ -117,7 +120,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}        
 
-def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):            
+def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=True,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):            
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -146,8 +149,11 @@ def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """ 
-    if(filemask):
-        mymask = io.imread(filemask)
+    if(any(mask)):
+        mymask = mask
+        plt.figure()
+        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
@@ -229,7 +235,7 @@ def AdvancedBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}    
 
-def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
+def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -262,8 +268,11 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """ 
-    if(filemask):
-        mymask = io.imread(filemask)
+    if(any(mask)):
+        mymask = mask
+        plt.figure()
+        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
@@ -339,7 +348,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,filemask=0,auto_mas
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,filemask=0,auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
+def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,spectrum_range,mask=[],auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[160,200]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     
     INPUTS:
@@ -374,8 +383,11 @@ def GaussianBraggEdgeFitting_2D_Calib_matrix(Ttof,spectrum,calibration_matrix,sp
     'median_image': median Transmission image in the selected lambda range
     """ 
 
-    if(filemask):
-        mymask = io.imread(filemask)
+    if(any(mask)):
+        mymask = mask
+        plt.figure()
+        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
