@@ -85,11 +85,11 @@ def spectral_binning_resolution (mysignal, spectrum, d_spectrum):
     
     return (binned_signal, new_spectrum)
 
-def moving_average_1D (mysignal, kernel_size = 3, bool_custom_k = False, custom_kernel = 0):
+def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = []):
     # Moving average by kernel convolution to a ndarray
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
-    if(bool_custom_k):
+    if(any(custom_kernel)):
         K = custom_kernel
     else:
         K = np.ones((kernel_size))
@@ -97,13 +97,13 @@ def moving_average_1D (mysignal, kernel_size = 3, bool_custom_k = False, custom_
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
     
-def moving_average_2D (mysignal, kernel_size = 3, bool_custom_k = False, custom_kernel = 0):
+def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = []):
     # Moving average by kernel convolution to an image (2D) 
     # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
     import scipy.signal
     if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
         print('Data size is not either a 2D or ToF 2D')
-    if(bool_custom_k):
+    if(any(custom_kernel)):
         K = custom_kernel
     else:
         K = np.ones((kernel_size,kernel_size))
@@ -233,7 +233,7 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     return np.convolve( m[::-1], y, mode='valid')
 
 #Normalization tools
-def transmission_normalization (I,I0,mask_dose=0):
+def transmission_normalization (I,I0,mask_dose=[]):
     #Normalization to transmission, with dose correction if mask_dose is given. negative transmission and negative attenuation (T>1) are replaced with NaNs.
     from skimage import io
     if(np.shape(I)!=np.shape(I0)):
@@ -242,7 +242,7 @@ def transmission_normalization (I,I0,mask_dose=0):
         print('The input data is not an image. Assuming is a TOF stack of images.')
     
     dose = 1
-    if(mask_dose):
+    if(any(mask_dose)):
         dose = np.median(np.multiply(I0,mask_dose),axis=(1,0))/np.median(np.multiply(I,mask_dose),axis=(1,0))
     
     T = np.divide(I*dose,I0)
@@ -354,8 +354,8 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         I = binning_ndarray(I,bin_size)
         I0 = binning_ndarray(I0,bin_size)
     if(bool_mavg):
-        I = moving_average_2D(I, kernel_size = k, bool_custom_k = bool_custom_k, custom_kernel = custom_k)
-        I0 = moving_average_2D(I0, kernel_size = k, bool_custom_k = bool_custom_k, custom_kernel = custom_k)
+        I = moving_average_2D(I, kernel_size = k, custom_kernel = custom_k)
+        I0 = moving_average_2D(I0, kernel_size = k, custom_kernel = custom_k)
     #normalize
     T = transmission_normalization(I,I0,dose_mask_path)
         
