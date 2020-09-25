@@ -1,5 +1,5 @@
 import numpy as np
-import TOF_routines
+import reduction_tools
 
 def chopper_time_delays_generator(time, nslits=8, nrep=2, mode='pseudorandom', rng = 0.25):
     """
@@ -139,27 +139,6 @@ def wiener_deconvolution(f, g, c=1e-1):
     H = np.fft.ifft(arg)
     return H
 
-def merge_reconstruction(x0,idx_l,nrep):
-    """
-    Merge repeated pattern signals into a single one
-    
-    INPUTS:
-    x0 = repeated signal
-    idx_l = index where the repeated signal starts
-    nrep = number of pattern repetitions
-
-    OUTPUT:
-    x0_rec = merged signal
-    """    
-    nt = int(int(np.shape(x0)[0])/nrep)
-    x0 = np.roll(x0,-idx_l)
-    x0_rec = np.zeros(nt)
-    for i in range(0,nrep,1):
-        x0_rec = x0_rec + x0[i*nt:(i+1)*nt]
-    x0_rec = x0_rec/nrep
-
-    return x0_rec
-
 def interp_noreadoutgaps(y,t,tmax,nrep=0):
     """ Merge multislit chopper data interpolating readout gaps (in this case only at each chopper full rotation) then repeat the signal for the chopper pattern repetitions
     INPUTS:
@@ -169,9 +148,8 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0):
     nrep = number of times the pattern is repeated (chopper)
     
     OUTPUTS:
-    dictionary with the following fit in the dimension of the mask
-    'y_extended': edge position
-    't_merged': edge height
+    y_extended: interpolated signal
+    t_merged: tof spectrum in the interpolated signal dimension
     """ 
     nrep = np.int(nrep)
 
@@ -211,14 +189,15 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,chopper_id,c=1e-1,bool_roll=False,bool_
     nrep = number of times the pattern is repeated (chopper)
     c = Wiener constant
     bool_roll = if this is activated the spectra are offset to have the minimum of the I0 spectrum as first time bin
+    use for single spectra, but not for 2D spectra as it my yield an offset in the results
     SG_w = Savitzky Golay filter window
     SG_o = Savitzky Golay filter order
 
     OUTPUTS:
-    #dictionary with the following fit in the dimension of the mask
-    #'y_fobi': edge position
-    #'x_fobi': edge height
-    #'t_fobi': edge width
+    y_fobi: FOBI reduced I
+    y0_fobi: FOBI reduced I0
+    T_fobi: FOBI reduced I/I0
+    t_fobi: FOBI reduced TOF bins
     """ 
     [y,tn] = interp_noreadoutgaps(y,t,tmax,nrep)
     [y0,tn] = interp_noreadoutgaps(y0,t,tmax,nrep)
@@ -228,40 +207,40 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,chopper_id,c=1e-1,bool_roll=False,bool_
         D = time_delays_4x10(tn)
 
     # FIXED POLDI angles: now it's working as deconvolution!
-    # x0rec = TOF_routines.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
-    # yrec = TOF_routines.savitzky_golay(wiener_decorrelation(y,D,c),SG_w,SG_o)
+    # x0rec = reduction_tools.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
+    # yrec = reduction_tools.savitzky_golay(wiener_decorrelation(y,D,c),SG_w,SG_o)
     # Trec = np.divide(yrec,x0rec)
-    # #Trec = TOF_routines.savitzky_golay(wiener_decorrelation(np.divide(y,y0),D,c),SG_w,SG_o)
+    # #Trec = reduction_tools.savitzky_golay(wiener_decorrelation(np.divide(y,y0),D,c),SG_w,SG_o)
 
-    x0rec = wiener_deconvolution(y0,D,c)
+    y0rec = wiener_deconvolution(y0,D,c)
     yrec = wiener_deconvolution(y,D,c)
     if(bool_smooth):
-        x0rec = TOF_routines.savitzky_golay(x0rec,SG_w,SG_o)
-        yrec = TOF_routines.savitzky_golay(yrec,SG_w,SG_o)
-    Trec = np.divide(yrec,x0rec)
-    # Trec = TOF_routines.savitzky_golay(wiener_deconvolution(np.divide(y,y0),D,c),SG_w,SG_o)
+        y0rec = reduction_tools.savitzky_golay(y0rec,SG_w,SG_o)
+        yrec = reduction_tools.savitzky_golay(yrec,SG_w,SG_o)
+    Trec = np.divide(yrec,y0rec)
+    # Trec = reduction_tools.savitzky_golay(wiener_deconvolution(np.divide(y,y0),D,c),SG_w,SG_o)
 
     if(bool_roll==True):
-        min_id = np.argmin(x0rec[0:np.shape(x0rec)[0]/nrep])
-        x0rec = np.roll(x0rec,-min_id)
+        min_id = np.argmin(y0rec[0:np.shape(y0rec)[0]/nrep])
+        y0rec = np.roll(y0rec,-min_id)
         yrec = np.roll(yrec,-min_id)
         Trec = np.roll(Trec,-min_id)
 
     replen = np.int(np.floor(np.shape(y)[0]/nrep))
-    x0_over = np.zeros((replen,nrep))
+    y0_over = np.zeros((replen,nrep))
     y_over = np.zeros((replen,nrep))
     T_over = np.zeros((replen,nrep))
     for i in range(0,nrep):
-        x0_over[:,i] = x0rec[replen*i:replen*(i+1)]
+        y0_over[:,i] = y0rec[replen*i:replen*(i+1)]
         y_over[:,i] = yrec[replen*i:replen*(i+1)]
         T_over[:,i] = Trec[replen*i:replen*(i+1)]
 
-    x_fobi = np.nanmean(x0_over,axis=1)
+    y0_fobi = np.nanmean(y0_over,axis=1)
     y_fobi = np.nanmean(y_over,axis=1)
     T_fobi = np.nanmean(T_over,axis=1)
     t_fobi = tn[0:replen]
 
-    return x_fobi,y_fobi,T_fobi,t_fobi
+    return y0_fobi,y_fobi,T_fobi,t_fobi
 
 def fobi_2d(I,I0,t,tmax,nrep,chopper_id,c=1e-1,roll_value=201,bool_smooth=True,SG_w=5,SG_o=1):
     """ Performs FOBI reduction from open beam and sample spectrum to a stack of images  
@@ -275,33 +254,34 @@ def fobi_2d(I,I0,t,tmax,nrep,chopper_id,c=1e-1,roll_value=201,bool_smooth=True,S
     c = Wiener constant
     roll_value = shift the retrieved fobi spectra by this value 
     (this is necessary because the output from Wiener decorrelation places the peak of 
-    the spectrum approximately in the middle of the array)
+    the spectrum approximately in the middle of the array) This depends on time of flight bins and type of choppper
+    bool_smooth = Set to true to apply S-G filter
     SG_w = Savitzky Golay filter window
     SG_o = Savitzky Golay filter order
 
     OUTPUTS:
-    #dictionary with the following fit in the dimension of the mask
-    #'y_fobi': edge position
-    #'x_fobi': edge height
-    #'t_fobi': edge width
+    y_fobi: FOBI reduced I
+    y0_fobi: FOBI reduced I0
+    T_fobi: FOBI reduced I/I0
+    t_fobi: FOBI reduced TOF bins
     """ 
     #get reference
-    Iref = np.nanmean(np.nanmean(I,axis=0),axis=0)
-    I0ref = np.nanmean(np.nanmean(I0,axis=0),axis=0)
-    [xref,yref,Tref,tref] = full_fobi_reduction(Iref,I0ref,t=t,tmax=tmax,nrep=nrep,c=c,chopper_id=chopper_id,bool_smooth=bool_smooth,SG_w=SG_w,SG_o=SG_o)
-    id_ref = np.argmin(xref)
+    yref = np.nanmean(np.nanmean(I,axis=0),axis=0)
+    y0ref = np.nanmean(np.nanmean(I0,axis=0),axis=0)
+    [y0ref,yref,Tref,tref] = full_fobi_reduction(yref,y0ref,t=t,tmax=tmax,nrep=nrep,c=c,chopper_id=chopper_id,bool_smooth=bool_smooth,SG_w=SG_w,SG_o=SG_o)
+    id_ref = np.argmin(y0ref)
 
     id_i = np.shape(I)[0]
     id_j = np.shape(I)[1]
-    id_t = np.shape(xref)[0]
+    id_t = np.shape(y0ref)[0]
     T_fobi = np.zeros((id_i,id_j,id_t))
     I0_fobi = np.zeros((id_i,id_j,id_t))
     I_fobi = np.zeros((id_i,id_j,id_t))
     for i in range(0,id_i):
         for j in range(0,id_j):
-            [x_rec,y_rec,T_rec,t_fobi] = full_fobi_reduction(I[i,j,:],I0[i,j,:],t=t,tmax=tmax,nrep=nrep,c=c,chopper_id=chopper_id,bool_smooth=bool_smooth,SG_w=SG_w,SG_o=SG_o)
+            [y0_rec,y_rec,T_rec,t_fobi] = full_fobi_reduction(I[i,j,:],I0[i,j,:],t=t,tmax=tmax,nrep=nrep,c=c,chopper_id=chopper_id,bool_smooth=bool_smooth,SG_w=SG_w,SG_o=SG_o)
             T_fobi[i,j,:] = np.roll(T_rec,-np.int(roll_value))
-            I0_fobi[i,j,:] = np.roll(x_rec,-np.int(roll_value))
+            I0_fobi[i,j,:] = np.roll(y0_rec,-np.int(roll_value))
             I_fobi[i,j,:] = np.roll(y_rec,-np.int(roll_value))
 
-    return T_fobi,I0_fobi,I_fobi
+    return T_fobi,I0_fobi,I_fobi,t_fobi
