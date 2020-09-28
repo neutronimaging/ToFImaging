@@ -85,11 +85,11 @@ def spectral_binning_resolution (mysignal, spectrum, d_spectrum):
     
     return (binned_signal, new_spectrum)
 
-def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = []):
+def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([])):
     # Moving average by kernel convolution to a ndarray
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
-    if(any(custom_kernel)):
+    if(custom_kernel.any()):
         K = custom_kernel
     else:
         K = np.ones((kernel_size))
@@ -97,13 +97,13 @@ def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = []):
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
     
-def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = []):
+def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([])):
     # Moving average by kernel convolution to an image (2D) 
     # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
     import scipy.signal
     if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
         print('Data size is not either a 2D or ToF 2D')
-    if(any(custom_kernel)):
+    if(custom_kernel.any()):
         K = custom_kernel
     else:
         K = np.ones((kernel_size,kernel_size))
@@ -233,7 +233,7 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     return np.convolve( m[::-1], y, mode='valid')
 
 #Normalization tools
-def transmission_normalization (I,I0,mask_dose=[]):
+def transmission_normalization (I,I0,mask_dose=np.ndarray([])):
     #Normalization to transmission, with dose correction if mask_dose is given. negative transmission and negative attenuation (T>1) are replaced with NaNs.
     from skimage import io
     if(np.shape(I)!=np.shape(I0)):
@@ -242,7 +242,7 @@ def transmission_normalization (I,I0,mask_dose=[]):
         print('The input data is not an image. Assuming is a TOF stack of images.')
     
     dose = 1
-    if(any(mask_dose)):
+    if(mask_dose.any()):
         dose = np.median(np.multiply(I0,mask_dose),axis=(1,0))/np.median(np.multiply(I,mask_dose),axis=(1,0))
     
     T = np.divide(I*dose,I0)
