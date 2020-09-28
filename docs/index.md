@@ -6,7 +6,7 @@
 	* [Reduction Tools](UserManual-ReductionTools.md)
 	* [Single Bragg Edge Fitting](UserManual-SingleBEfit.md)
 	* [Phase Fitting](UserManual-PhaseFitting.md)
-	* [Rietveld Bragg Pattern Fitting Fitting](UserManual-RietveldFitting.md)
+	* [Rietveld Bragg Pattern Fitting](UserManual-RietveldFitting.md)
 
 # Related publications
 If you use the results in a publication. The following publication should be cited: <br/>
