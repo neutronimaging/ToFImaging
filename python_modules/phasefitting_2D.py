@@ -88,7 +88,9 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
                     phase_ratio[i,j] = -2.0
 
     if(bool_print):
+        plt.figure()
         plt.imshow(phase_ratio), plt.title('Phase ratio (ph1 %)')
+        plt.show(), plt.close()        
     if(bool_save):
         np.save('phase_ratio.npy', phase_ratio)
     return {'phase_ratio' : phase_ratio}
@@ -154,7 +156,9 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
         phasefitting_1D.phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_f1=est_f1,est_f2=est_f2,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
         return
 
-    phase_ratio = np.zeros(np.shape(mymask))
+    phase1_ratio = np.zeros(np.shape(mymask))
+    phase2_ratio = np.zeros(np.shape(mymask))
+    phase3_ratio = np.zeros(np.shape(mymask))
     for i in tqdm(range(0, np.shape(mymask)[0])):
         # print('---------------$$$$---------------')
         # print('Processing row n. ', i, 'of', np.shape(mymask)[0])
@@ -163,13 +167,23 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
                 lac = lac_tof[i,j,:]
                 try:
                     phi_fit = phasefitting_1D.phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_f1=est_f1,est_f2=est_f2,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=0)
-                    phase_ratio[i,j] = phi_fit['phi']
+                    phase1_ratio[i,j] = phi_fit['phi1']
+                    phase2_ratio[i,j] = phi_fit['phi2']
+                    phase3_ratio[i,j] = phi_fit['phi3']
                 except:
                     print("Unexpected error at :", i, j)
-                    phase_ratio[i,j] = -2.0
+                    phase1_ratio[i,j] = -2.0
+                    phase2_ratio[i,j] = -2.0
+                    phase3_ratio[i,j] = -2.0
 
     if(bool_print):
-        plt.imshow(phase_ratio), plt.title('Phase fraction (ph1 %)')
+        plt.figure()
+        plt.subplot(1,3,1), plt.imshow(phase1_ratio), plt.title('Phase fraction (ph1 %)')
+        plt.subplot(1,3,2), plt.imshow(phase2_ratio), plt.title('Phase fraction (ph2 %)')
+        plt.subplot(1,3,3), plt.imshow(phase3_ratio), plt.title('Phase fraction (ph3 %)')
+        plt.show(), plt.close()        
     if(bool_save):
-        np.save('phase_ratio.npy', phase_ratio)
-    return {'phase_ratio' : phase_ratio}    
+        np.save('phase1_ratio.npy', phase1_ratio)
+        np.save('phase2_ratio.npy', phase2_ratio)
+        np.save('phase3_ratio.npy', phase3_ratio)
+    return {'phase1_ratio' : phase1_ratio, 'phase2_ratio' : phase2_ratio, 'phase3_ratio' : phase3_ratio}    

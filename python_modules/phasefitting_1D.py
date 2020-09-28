@@ -85,7 +85,7 @@ def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambd
 
     return {'phi': phi}
 
-def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_f1=0.3,est_f2=0.3,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0):     
+def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_f1=0.333,est_f2=0.333,est_f3=0.334,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0):     
     ##INPUTS:
     #lac: measured LAC spectrum to fit
     #spectrum: lambda spectrum of the lac
@@ -140,11 +140,12 @@ def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phas
     # method='lmsquare' # this should implement the Levemberq-Marquardt but it says Nelder-Mead method (which should be Amoeba)
     # method ='least_squares' # default and it implements the Levenberg-Marquardt
 
-    def three_phases(ph1,ph2,ph3,f1,f2):
-        return (1-f1-f2)*ph1+f1*ph2+f2*ph3
+    def three_phases(ph1,ph2,ph3,f1,f2,f3):
+        return f1*ph1+f2*ph2+f3*ph3
+        # return (1-f1-f2)*ph1+f1*ph2+f2*ph3
 
     gmodel = Model(three_phases,independent_vars=['ph1', 'ph2', 'ph3'])
-    params = gmodel.make_params(f1 = est_f1, f2 = est_f2)    
+    params = gmodel.make_params(f1 = est_f1, f2 = est_f2, f3 = est_f3)    
     #params['ph1'].vary = False
     #params['ph2'].vary = False
     params['f1'].vary = True
@@ -153,20 +154,26 @@ def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phas
     params['f2'].vary = True
     params['f2'].min = 0.0
     params['f2'].max = 1.0
+    params['f3'].vary = True
+    params['f3'].min = 0.0
+    params['f3'].max = 1.0
     result = gmodel.fit(lac_cut, params, ph1 = ph1, ph2 = ph2, ph3 = ph3, method=method, nan_policy='propagate')
     phi1=result.best_values.get('f1')    
     phi2=result.best_values.get('f2')    
+    phi3=result.best_values.get('f3')    
 
     if(bool_print):
-        print('phase fraction (ph1 %) = ',100*ph1,'%')
-        print('phase fraction (ph2 %) = ',100*ph2,'%')
+        print('Phase fraction 1 (ph1 %) = ',100*phi1,'%')
+        print('Phase fraction 2 (ph2 %) = ',100*phi2,'%')
+        print('Phase fraction 3 (ph3 %) = ',100*phi3,'%')
         plt.figure()
         plt.plot(sp0, lac0, label ='LAC')
         plt.plot(spectrum, lac, label ='LAC (normalization)')
         plt.plot(spectrum, phase1lac, '--', label ='Phase 1')
         plt.plot(spectrum, phase2lac, '--', label ='Phase 2')
-        plt.plot(l_cut, three_phases(ph1,ph2,ph3,phi1,phi2), label ='Fitted ratio')
+        plt.plot(spectrum, phase3lac, '--', label ='Phase 3')
+        plt.plot(l_cut, three_phases(ph1,ph2,ph3,phi1,phi2,phi3), label ='Fitted ratio')
         plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
         plt.legend(),        plt.show(),        plt.close()
 
-    return {'phi1': phi1,'phi2': phi2}
+    return {'phi1': phi1,'phi2': phi2,'phi3': phi3}
