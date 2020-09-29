@@ -7,7 +7,7 @@ from lmfit import Model
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
-def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     
     INPUTS:
@@ -113,7 +113,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=
         plt.close()
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
 
-def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigma=1,est_alpha=1,bool_print=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False): 
+def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_print=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False): 
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     !!Currently not tested with attenuation data, must be transmission!
 
