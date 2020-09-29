@@ -47,7 +47,7 @@ def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambd
     phase2lac = phase2lac[idx_low:idx_high]
 
     phase1lac = np.interp(spectrum,lambda_table,phase1lac)
-    phase2lac =  np.interp(spectrum,lambda_table,phase2lac)
+    phase2lac = np.interp(spectrum,lambda_table,phase2lac)
     phase1lac = phase1lac*(np.nanmean(lac)/np.nanmean(phase1lac))
     phase2lac = phase2lac*(np.nanmean(lac)/np.nanmean(phase2lac))
 
