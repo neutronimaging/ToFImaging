@@ -6,6 +6,11 @@ This assumes the measured linear attenuation coefficient μ, is a linear combina
 
 Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases case (i=1,2,3).
 
+IMPORTANT NOTES:
+    - In the following functions spectrum, lambda_range_norm, lambda_range_edges must all be in the same domain (by default is lambda (wavelenght) but could be bin index or tof).
+    - Currently texture is not implemented. For a refined method accuracy, this should be modeled in the reference phase spectra.
+
+FUNCTION LIST:
     - phasefitting_1D: functions for phase fitting of 1D-arrays
         - phase_ratio_linearcomb: fit two phases
             - INPUTS:
