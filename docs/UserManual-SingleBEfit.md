@@ -51,7 +51,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'height' | fitted height of the bragg edge |
 
 ### GaussianBraggEdgeFitting
-Fit three phases
+Gaussian Bragg Edge Fitting
 
 __INPUTS__:
 |Parameter| Description|
@@ -85,7 +85,7 @@ __OUTPUTS__: dictionary with the following fits
 Functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
 
 ### AdvancedBraggEdgeFitting_2D 
-Fit two phases for all pixel in an image
+Advanced Bragg Edge Fitting for all pixels in an image
 
 __INPUTS__:
 |Parameter| Description|
@@ -117,7 +117,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'median_image'| median Transmission image in the selected lambda range |
 
 ### GaussianBraggEdgeFitting_2D: 
-Fit three phases
+Gaussian Bragg Edge Fitting for all pixels in an image
 
 __INPUTS__:
 |Parameter| Description|
