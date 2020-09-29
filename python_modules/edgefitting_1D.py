@@ -374,9 +374,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
-def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=True,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
-    
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
     spectrum = spectrum, length of this ndarray must correspond to size of Tspectrum(lambda)
@@ -384,6 +383,9 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     est_pos = estimated bragg edge position (in spectrum dimension)
     est_wid = estimated bragg edge width (in spectrum dimension)
     est_h = estimated bragg edge height (in spectrum dimension)
+    pos_BC = boundary conditions for the bragg edge position fit
+    wid_BC = boundary conditions for the bragg edge width fit
+    h_BC = boundary conditions for the bragg edge height fit
     bool_log = set to True to perform log norm and convert to attenuation
     bool_smooth = set to True to perform Savitzky-Golay filtering of the signal derivative
     smooth_w = window size of S-G filter

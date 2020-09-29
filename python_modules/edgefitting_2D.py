@@ -40,7 +40,6 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
     'edge_position' : edge position 
     'edge_height': edge height 
     'edge_width': edge width  
-    'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """ 
 
