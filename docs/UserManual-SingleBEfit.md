@@ -17,7 +17,7 @@ Currently implemented are:
 
 # FUNCTION LIST:
 
-    - edgefitting_1D: functions for edge fitting of 1D-arrays
+    - edgefitting_1D.py: functions for edge fitting of 1D-arrays
         - AdvancedBraggEdgeFitting: Advanced Bragg Edge Fitting
             - INPUTS:
                 - signal = 1darray of the signal containing the Bragg edge (1darray) [REQUIRED]
@@ -67,7 +67,7 @@ Currently implemented are:
                 - 'edge_slope': edge slope 
                 - 'median_image': median Transmission image in the selected lambda range
 
-    - edgefitting_2D: functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
+    - edgefitting_2D.py: functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
         - AdvancedBraggEdgeFitting_2D: fit two phases
             - INPUTS:
                 - Ttof = 3darray of the image TOF stack containing the Bragg edge (x,y,lambda) [REQUIRED]
