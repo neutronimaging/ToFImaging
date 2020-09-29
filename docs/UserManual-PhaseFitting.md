@@ -74,11 +74,11 @@ Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases
                 - debug_idx = pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]
 
             - OUTPUTS: dictionary with the following fit in the dimension of the mask
-                - 'phi' : phase 1 weight
+                - 'phase_ratio' : phase 1 weight
 
         - phase_ratio_linearcomb_three_2D: fit three phases
             - INPUTS:
-                - lac = 1d array the attenuation -log(I/I0) (1darray) [REQUIRED]
+                - lac_tof = 3darray the attenuation -log(I/I0) (x,y,lambda) [REQUIRED]
                 - spectrum = spectrum range corresponding to lac (1darray) [REQUIRED]
                 - phase1lac = lac of the phase 1 (1darray) [REQUIRED]
                 - phase2lac = lac of the phase 2 (1darray) [REQUIRED]
@@ -86,16 +86,22 @@ Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases
                 - spectrum_phase = spectrum range corresponding to phase1lac,phase2lac and phase3lac (1darray) [REQUIRED]
                 - lambda_range_norm = lambda range where to normalize spectra ([lambda1, lambda2]) [REQUIRED]
                 - lambda_range_edges = lambda range where to do the fitting ([lambda1, lambda2]) [REQUIRED]
+                - calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]). Will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y) [Default = np.ndarray([0])]
+                - mask = mask of where to perform the fit (x,y) [Default = np.ndarray([0])]
+                - auto_mask = if True and mask is not given will automatically mask the region based on the mask_thresh thresholds (bool) [Default = True]
+                - mask_thresh = low and high threshold for the automatic mask ([thresh_low, thresh_high]) [Default = np.ndarray([0])]
                 - est_f1 = estimate phase 1 weight [Default = 0.333]
                 - est_f2 = estimate phase 2 weight [Default = 0.333]
                 - est_f3 = estimate phase 3 weight [Default = 0.334]
                 - method = fitting method [Default = 'least_squares']
-                - bool_SG = set to True to perform Savitzky-Golay filtering [Default = False]
+                - bool_SG = set to True to perform Savitzky-Golay filtering (bool) [Default = False]
                 - SG_w = window size of S-G filter [Default = 5]
                 - SG_n = order of S-G filter [Default = 1]
+                - bool_save = set to True to save output (bool) [Default = False]
                 - bool_print = set to True to print output [Default = False]
+                - debug_idx = pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]
 
             - OUTPUTS: dictionary with the following fit in the dimension of the mask
-                - 'phi1' : phase 1 weight
-                - 'phi2' : phase 2 weight
-                - 'phi3' : phase 3 weight
+                - 'phase1_ratio' : phase 1 weight
+                - 'phase2_ratio' : phase 2 weight
+                - 'phase3_ratio' : phase 3 weight

@@ -36,8 +36,10 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
         
     if(spectrum_range):
-        signal = signal[spectrum_range[0]:spectrum_range[1]]
-        spectrum = spectrum[spectrum_range[0]:spectrum_range[1]]
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])        
+        signal = signal[idx_low:idx_high]
+        spectrum = spectrum[idx_low:idx_high]
         
     if(bool_smooth):
         signal = SG_filter(signal,smooth_w,smooth_n)    
@@ -197,8 +199,10 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     t=spectrum #renamed to t for convenience but could be lambda or bin index
     #get the part of the spectrum that I want to fit
     if(spectrum_range):
-        signal=signal[spectrum_range[0]:spectrum_range[1]]
-        t=t[spectrum_range[0]:spectrum_range[1]]
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])        
+        signal = signal[idx_low:idx_high]
+        spectrum = spectrum[idx_low:idx_high]
     
     if(bool_smooth):
         signal = SG_filter(signal,smooth_w,smooth_n)
