@@ -9,10 +9,12 @@ Currently implemented are:
 - Gaussian Bragg Edge Fitting: This methods takes the attenuation or transmission derivative and fits the edge to a Gaussian, returning centroid, height, and width of the Gaussian fit. The height is converted to the bragg edge slope and the bragg edge height is calculated as the integral of the gaussian fit.
 
 IMPORTANT NOTES:
+
     - In the following functions spectrum and spectrum_range must all be in the same domain (by default is lambda (wavelenght) but could be bin index or tof).
     - Currently texture is not implemented. For a refined method accuracy, this should be modeled in the reference phase spectra.
 
 FUNCTION LIST:
+
     - edgefitting_1D: functions for edge fitting of 1D-arrays
         - AdvancedBraggEdgeFitting: Advanced Bragg Edge Fitting
             - INPUTS:
