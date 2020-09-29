@@ -10,8 +10,9 @@ Currently implemented are:
 
 IMPORTANT NOTES:
 
-    - In the following functions spectrum and spectrum_range must all be in the same domain (by default is lambda (wavelenght) but could be bin index or tof).
-    - Currently texture is not implemented. For a refined method accuracy, this should be modeled in the reference phase spectra.
+    - In the following functions spectrum and spectrum_range, and eventually initial guesses and boundary conditions must all be in the same domain (by default is lambda (wavelenght) but could be bin index or tof).
+    - For increased efficiency of the image fitting it is highly reccomended to run first the fitting in debugging mode by setting the debug_idx on a desired pixel location, and use the obtained values as initial guesses.
+    - Boundary conditions may be useful in the cases of double edges / texture to impose the fitting of a specific bragg edge.
 
 FUNCTION LIST:
 
@@ -21,10 +22,10 @@ FUNCTION LIST:
                 - signal = 1darray of the signal containing the Bragg edge (1darray) [REQUIRED]
                 - spectrum = spectrum range corresponding to signal (1darray) [REQUIRED]
                 - spectrum_range = range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]
-                - est_pos = estimated bragg edge position (in spectrum_range dimension) (lambda) [Default = 0]
-                - est_sigma = expected Gaussian broadening () [Default = 1]
+                - est_pos = estimated bragg edge position (in spectrum_range dimension) [Default = 0]
+                - est_sigma = expected Gaussian broadening [Default = 1]
                 - est_alpha = expected decay constant, a moderator property [Default = 1]
-                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative (bool) [Default = False]
+                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]
                 - smooth_w = window size of S-G filter [Default = 5]
                 - smooth_n = order of S-G filter [Default = 1]
                 - bool_linear = flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]
@@ -45,14 +46,14 @@ FUNCTION LIST:
                 - signal = 1darray of the spectrum containing the Bragg edge (1darray) [REQUIRED]
                 - spectrum = spectrum range corresponding to signal (1darray) [REQUIRED]
                 - spectrum_range = range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]
-                - est_pos = estimated bragg edge position (in spectrum_range dimension) [Default = 0]
-                - est_wid = estimated bragg edge width (in spectrum dimension)  [Default = 0]
-                - est_h = estimated bragg edge height (in spectrum dimension) [Default = 0]
+                - est_pos = estimated bragg edge position [Default = 0]
+                - est_wid = estimated bragg edge width [Default = 0]
+                - est_h = estimated bragg edge height [Default = 0]
                 - pos_BC = boundary conditions for the bragg edge position fit ([lambda1, lambda2]) [Default = 0]
                 - wid_BC = boundary conditions for the bragg edge width fit ([lambda1, lambda2]) [Default = 0]
                 - h_BC = boundary conditions for the bragg edge height fit ([lambda1, lambda2]) [Default = 0]
                 - bool_log = set to True to perform log norm and convert to attenuation [Default = True]
-                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative (bool) [Default = False]
+                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]
                 - smooth_w = window size of S-G filter [Default = 5]
                 - smooth_n = order of S-G filter [Default = 1]
                 - bool_linear = flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]
@@ -69,20 +70,20 @@ FUNCTION LIST:
         - AdvancedBraggEdgeFitting_2D: fit two phases
             - INPUTS:
                 - Ttof = 3darray of the image TOF stack containing the Bragg edge (x,y,lambda) [REQUIRED]
-                - spectrum = spectrum range corresponding to Ttof third dimension (ndarray) [REQUIRED]
+                - spectrum = spectrum range corresponding to Ttof third dimension (1darray) [REQUIRED]
                 - spectrum_range = range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]
                 - calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]). Will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y) [Default = np.ndarray([0])]
                 - mask = mask of where to perform the fit (x,y) [Default = np.ndarray([0])]
-                - auto_mask = if True and mask is not given will automatically mask the region based on the mask_thresh thresholds (bool) [Default = True]
+                - auto_mask = if True and mask is not given will automatically mask the region based on the mask_thresh thresholds [Default = True]
                 - mask_thresh = low and high threshold for the automatic mask ([thresh_low, thresh_high]) [Default = np.ndarray([0])]
-                - est_pos = estimated bragg edge position (in spectrum_range dimension) (lambda) [Default = 0]
-                - est_sigma = expected Gaussian broadening () [Default = 1]
+                - est_pos = estimated bragg edge position (in spectrum_range dimension) [Default = 0]
+                - est_sigma = expected Gaussian broadening [Default = 1]
                 - est_alpha = expected decay constant, a moderator property [Default = 1]
-                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative (bool) [Default = False]
+                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]
                 - smooth_w = window size of S-G filter [Default = 5]
                 - smooth_n = order of S-G filter [Default = 1]
                 - bool_linear = flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]
-                - bool_save = set to True to save output (bool) [Default = False]
+                - bool_save = set to True to save output [Default = False]
                 - bool_print = set to True to print output [Default = False]
                 - debug_idx = pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]
 
@@ -99,16 +100,16 @@ FUNCTION LIST:
                 - spectrum_range = range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]
                 - calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]). Will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y) [Default = np.ndarray([0])]
                 - mask = mask of where to perform the fit (x,y) [Default = np.ndarray([0])]
-                - auto_mask = if True and mask is not given will automatically mask the region based on the mask_thresh thresholds (bool) [Default = True]
+                - auto_mask = if True and mask is not given will automatically mask the region based on the mask_thresh thresholds [Default = True]
                 - mask_thresh = low and high threshold for the automatic mask ([thresh_low, thresh_high]) [Default = np.ndarray([0])]
-                - est_pos = estimated bragg edge position (in spectrum_range dimension) [Default = 0]
-                - est_wid = estimated bragg edge width (in spectrum dimension)  [Default = 0]
-                - est_h = estimated bragg edge height (in spectrum dimension) [Default = 0]
+                - est_pos = estimated bragg edge position [Default = 0]
+                - est_wid = estimated bragg edge width [Default = 0]
+                - est_h = estimated bragg edge height [Default = 0]
                 - pos_BC = boundary conditions for the bragg edge position fit ([lambda1, lambda2]) [Default = 0]
                 - wid_BC = boundary conditions for the bragg edge width fit ([lambda1, lambda2]) [Default = 0]
                 - h_BC = boundary conditions for the bragg edge height fit ([lambda1, lambda2]) [Default = 0]
                 - bool_log = set to True to perform log norm and convert to attenuation [Default = True]
-                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative (bool) [Default = False]
+                - bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]
                 - smooth_w = window size of S-G filter [Default = 5]
                 - smooth_n = order of S-G filter [Default = 1]
                 - bool_save = set to True to save output [Default = False]
