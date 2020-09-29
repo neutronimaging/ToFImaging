@@ -14,7 +14,7 @@ Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases
 
 # FUNCTION LIST:
 
-    - phasefitting_1D: functions for phase fitting of 1D-arrays
+    - phasefitting_1D.py: functions for phase fitting of 1D-arrays
         - phase_ratio_linearcomb: fit two phases
             - INPUTS:
                 - lac = 1d array the attenuation -log(I/I0) (1darray) [REQUIRED]
@@ -58,7 +58,7 @@ Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases
                 - 'phi2' : phase 2 weight
                 - 'phi3' : phase 3 weight
 
-    - phasefitting_2D: functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
+    - phasefitting_2D.py: functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
         - phase_ratio_linearcomb_2D: fit two phases
             - INPUTS:
                 - lac_tof = 3darray the attenuation -log(I/I0) (x,y,lambda) [REQUIRED]
