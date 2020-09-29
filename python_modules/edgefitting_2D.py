@@ -81,7 +81,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
         else:
             lambd = spectrum
 
-        edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
+        edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
@@ -103,7 +103,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
                     lambd = spectrum
 
                 try:
-                    edge_fit = edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=spectrum,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=False)
+                    edge_fit = edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=False)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['height']
                     if (len(edge_fit['pos_extrema'])==2):
@@ -132,13 +132,12 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
 
 def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=True,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
-    
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
     spectrum = spectrum, length of this ndarray must correspond to size of Ttof(lambda)
+    spectrum_range = range corresponding to lambda where to perform the fitting
     calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]);
                          will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y)
-    spectrum_range = range corresponding to lambda where to perform the fitting
     mask = mask of where to perform the fit (x,y)
     auto_mask = if True will automatically mask the region based on the mask_thresh thresholds
     mask_thresh = low and high threshold for the automatic mask

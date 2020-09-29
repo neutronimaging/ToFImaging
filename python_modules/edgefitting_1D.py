@@ -117,7 +117,6 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
 
 def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_print=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False): 
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
-    !!Currently not tested with attenuation data, must be transmission!
 
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
