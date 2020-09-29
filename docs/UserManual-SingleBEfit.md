@@ -1,4 +1,5 @@
 [Return to table of contents](index.md)<br/>
+# Single Bragg edge fitting
 This package contains python functions for the fitting of a single Bragg edge pattern.
 Currently implemented are:
 
@@ -8,13 +9,13 @@ Currently implemented are:
 
 - Gaussian Bragg Edge Fitting: This methods takes the attenuation or transmission derivative and fits the edge to a Gaussian, returning centroid, height, and width of the Gaussian fit. The height is converted to the bragg edge slope and the bragg edge height is calculated as the integral of the gaussian fit.
 
-IMPORTANT NOTES:
+# IMPORTANT NOTES:
 
     - In the following functions spectrum and spectrum_range, and eventually initial guesses and boundary conditions must all be in the same domain (by default is lambda (wavelenght) but could be bin index or tof).
     - For increased efficiency of the image fitting it is highly reccomended to run first the fitting in debugging mode by setting the debug_idx on a desired pixel location, and use the obtained values as initial guesses.
     - Boundary conditions may be useful in the cases of double edges / texture to impose the fitting of a specific bragg edge.
 
-FUNCTION LIST:
+# FUNCTION LIST:
 
     - edgefitting_1D: functions for edge fitting of 1D-arrays
         - AdvancedBraggEdgeFitting: Advanced Bragg Edge Fitting
