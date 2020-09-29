@@ -15,7 +15,7 @@ Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases
 # FUNCTION LIST:
 
 ## phasefitting_1D.py: 
-Functions for phase fitting of 1D-arrays
+Functions for phase fitting of 1D-arrays.
 <img width="150" alt="Edge sample" src="Figures/phasefitting_1D-phase_ratio_linearcomb_example.png"><br />
 
 ### phase_ratio_linearcomb: 
