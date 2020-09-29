@@ -115,7 +115,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 ### phase_ratio_linearcomb_three_2D: 
 Fit three phases. Example:
 
-<img width="250" alt="Edge sample" src="Figures/phasefitting_2D-phase_ratio_linearcomb_three_2D_example.png"><br />
+<img width="500" alt="Edge sample" src="Figures/phasefitting_2D-phase_ratio_linearcomb_three_2D_example.png"><br />
 
 __INPUTS__:
 |Parameter| Description|
