@@ -180,6 +180,9 @@ def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phas
     phi1=result.best_values.get('f1')    
     phi2=result.best_values.get('f2')    
     phi3=result.best_values.get('f3')    
+    phi1_n = phi1/(phi1+phi2+phi3)
+    phi2_n = phi2/(phi1+phi2+phi3)
+    phi3_n = phi3/(phi1+phi2+phi3)
 
     if(bool_print):
         print('Phase fraction 1 (ph1 %) = ',100*phi1,'%')
@@ -195,4 +198,4 @@ def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phas
         plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
         plt.legend(),        plt.show(),        plt.close()
 
-    return {'phi1': phi1,'phi2': phi2,'phi3': phi3}
+    return {'phi1': phi1_n,'phi2': phi2_n,'phi3': phi3_n}
