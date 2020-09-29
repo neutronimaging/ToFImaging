@@ -9,38 +9,38 @@ Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases
     - phasefitting_1D: functions for phase fitting of 1D-arrays
         - phase_ratio_linearcomb:
             - INPUTS:
-                - lac = 1d array the attenuation -log(I/I0) TOF images (lambda) [REQUIRED]
-                - spectrum = spectrum, length of this ndarray must correspond to size of lac_tof (lambda) [REQUIRED]
-                - phase1lac = lac of the phase 1 (lambda) [REQUIRED]
-                - phase2lac = lac of the phase 2 (lambda) [REQUIRED]
-                - spectrum_phase = spectrum corresponding to phase 1 and 2 (lambda) [REQUIRED]
+                - lac = 1d array the attenuation -log(I/I0) (1darray) [REQUIRED]
+                - spectrum = spectrum range corresponding to lac (1darray) [REQUIRED]
+                - phase1lac = lac of the phase 1 (1darray) [REQUIRED]
+                - phase2lac = lac of the phase 2 (1darray) [REQUIRED]
+                - spectrum_phase = spectrum range corresponding to phase1lac and phase2lac (1darray) [REQUIRED]
                 - lambda_range_norm = lambda range where to normalize spectra ([lambda1, lambda2]) [REQUIRED]
                 - lambda_range_edges = lambda range where to do the fitting ([lambda1, lambda2]) [REQUIRED]
                 - est_phi = estimate phase 1 weight [Default = 0.5]
                 - method = fitting method [Default = 'least_squares']
-                - bool_SG = set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]
+                - bool_SG = set to True to perform Savitzky-Golay filtering [Default = False]
                 - SG_w = window size of S-G filter [Default = 5]
                 - SG_n = order of S-G filter [Default = 1]
                 - bool_print = set to True to print output [Default = False]
 
             - OUTPUTS: dictionary with the following fit in the dimension of the mask
-                - 'phi' : phase1 weight
+                - 'phi' : phase 1 weight
 
         - phase_ratio_linearcomb_three:
             - INPUTS:
-                - lac = 1d array the attenuation -log(I/I0) TOF images (lambda) [REQUIRED]
-                - spectrum = spectrum, length of this ndarray must correspond to size of lac_tof (lambda) [REQUIRED]
-                - phase1lac = lac of the phase 1 (lambda) [REQUIRED]
-                - phase2lac = lac of the phase 2 (lambda) [REQUIRED]
-                - phase3lac = lac of the phase 3 (lambda) [REQUIRED]
-                - spectrum_phase = spectrum corresponding to phase 1 and 2 ([lambda1, lambda2]) [REQUIRED]
+                - lac = 1d array the attenuation -log(I/I0) (1darray) [REQUIRED]
+                - spectrum = spectrum range corresponding to lac (1darray) [REQUIRED]
+                - phase1lac = lac of the phase 1 (1darray) [REQUIRED]
+                - phase2lac = lac of the phase 2 (1darray) [REQUIRED]
+                - phase3lac = lac of the phase 3 (1darray) [REQUIRED]
+                - spectrum_phase = spectrum range corresponding to phase1lac,phase2lac and phase3lac (1darray) [REQUIRED]
                 - lambda_range_norm = lambda range where to normalize spectra ([lambda1, lambda2]) [REQUIRED]
                 - lambda_range_edges = lambda range where to do the fitting ([lambda1, lambda2]) [REQUIRED]
                 - est_f1 = estimate phase 1 weight [Default = 0.333]
                 - est_f2 = estimate phase 2 weight [Default = 0.333]
                 - est_f3 = estimate phase 3 weight [Default = 0.334]
                 - method = fitting method [Default = 'least_squares']
-                - bool_SG = set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]
+                - bool_SG = set to True to perform Savitzky-Golay filtering [Default = False]
                 - SG_w = window size of S-G filter [Default = 5]
                 - SG_n = order of S-G filter [Default = 1]
                 - bool_print = set to True to print output [Default = False]

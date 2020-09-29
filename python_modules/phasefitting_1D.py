@@ -8,7 +8,7 @@ import math
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
-def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_phi=0.5,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0): 
+def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_phi=0.5,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=False): 
     """ Performs phase ratio fitting on linear combination of two basis functions, works with linear attenuation coefficient (LAC) spectra
     INPUTS:
     lac = 1d array the attenuation -log(I/I0) TOF images (x,y,lambda) 
@@ -92,7 +92,7 @@ def phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,phase_spectrum,lambd
 
     return {'phi': phi}
 
-def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_f1=0.333,est_f2=0.333,est_f3=0.334,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=0):     
+def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phase_spectrum,lambda_range_norm,lambda_range_fit,est_f1=0.333,est_f2=0.333,est_f3=0.334,method ='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_print=False):     
     """ Performs phase ratio fitting on linear combination of two basis functions, works with linear attenuation coefficient (LAC) spectra
     INPUTS:
     lac = 1d array the attenuation -log(I/I0) TOF images (x,y,lambda) 
