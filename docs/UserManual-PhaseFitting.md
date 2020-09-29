@@ -19,6 +19,7 @@ Functions for phase fitting of 1D-arrays
 
 ### phase_ratio_linearcomb: 
 Fit two phases
+
 __INPUTS__:
 |Parameter| Description|
 |----------|------------|
@@ -43,6 +44,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 
 ### phase_ratio_linearcomb_three: 
 Fit three phases
+
 __INPUTS__:
 |Parameter| Description|
 |----------|------------|
@@ -72,8 +74,10 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 
 ## phasefitting_2D.py: 
 Functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
+
 ### phase_ratio_linearcomb_2D: 
 Fit two phases
+
 __INPUTS__:
 |Parameter| Description|
 |----------|------------|
@@ -100,10 +104,11 @@ __INPUTS__:
 __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 |Parameter| Description|
 |----------|------------|
-| 'phase_ratio' : phase 1 weight|
+| 'phase_ratio' | phase 1 weight|
 
 ### phase_ratio_linearcomb_three_2D: 
 Fit three phases
+
 __INPUTS__:
 |Parameter| Description|
 |----------|------------|
