@@ -1,15 +1,20 @@
 [Return to table of contents](index.md)<br/>
 This package contains python functions for the fitting of a single Bragg edge pattern.
 Currently implemented are:
-    - Advanced Bragg Edge Fitting: 7 parameters fit as in Ramadhan et al. [2019] {a_0,b_0,a_{hkl},b_{hkl},λ_{hkl},σ,τ}
-    ![img](https://latex.codecogs.com/svg.latex?T(\lambda)=\exp{[-a_0+b_0\lambda]}\times(\exp{[-(a_{hkl}+b_{hkl}\lambda)]+\{1-\exp{[-(a_{hkl}+b_{hkl}\lambda)]\})\times\frac{1}{2}[\mathrm{erfc}(-\frac{\lambda-\lambda_{hkl}}{2^{1/2}\sigma})-\exp{(-\frac{\lambda-\lambda_{hkl}}{\tau}+\frac{\sigma^2}{2\tau^2})}\times\mathrm{erfc}(-\frac{\lambda-\lambda_{hkl}}{2^{1/2}\sigma}+\frac{\sigma}{\tau})])
-    - Gaussian Bragg Edge Fitting: This methods takes the attenuation or transmission derivative and fits the edge to a Gaussian, returning centroid, height, and width of the Gaussian fit. The height is converted to the bragg edge slope and the bragg edge height is calculated as the integral of the gaussian fit.
+
+- Advanced Bragg Edge Fitting: 7 parameters fit as in Ramadhan et al. [2019] {a_0,b_0,a_{hkl},b_{hkl},λ_{hkl},σ,τ}
+
+![img](https://latex.codecogs.com/svg.latex?T(\lambda)=\exp{[-a_0+b_0\lambda]}\times(\exp{[-(a_{hkl}+b_{hkl}\lambda)]+\{1-\exp{[-(a_{hkl}+b_{hkl}\lambda)]\})\times\frac{1}{2}[\mathrm{erfc}(-\frac{\lambda-\lambda_{hkl}}{2^{1/2}\sigma})-\exp{(-\frac{\lambda-\lambda_{hkl}}{\tau}+\frac{\sigma^2}{2\tau^2})}\times\mathrm{erfc}(-\frac{\lambda-\lambda_{hkl}}{2^{1/2}\sigma}+\frac{\sigma}{\tau})])
+
+- Gaussian Bragg Edge Fitting: This methods takes the attenuation or transmission derivative and fits the edge to a Gaussian, returning centroid, height, and width of the Gaussian fit. The height is converted to the bragg edge slope and the bragg edge height is calculated as the integral of the gaussian fit.
+
+Functions list:
 
     - edgefitting_1D: functions for edge fitting of 1D-arrays
-        - AdvancedBraggEdgeFitting: fit two phases
+        - AdvancedBraggEdgeFitting: Advanced Bragg Edge Fitting
             - INPUTS:
-                - signal = ndarray of the spectrum containing the Bragg edge(s)
-                - spectrum = spectrum, length of this ndarray must correspond to size of Tspectrum (lambda)
+                - signal = ndarray of the signal containing the Bragg edge (ndarray)
+                - spectrum = spectrum range corresponding to signal (ndarray)
                 - spectrum_range = range corresponding to lambda where to perform the fitting
                 - est_pos = estimated bragg edge position (in spectrum_range dimension)
                 - est_sigma = expected Gaussian broadening
