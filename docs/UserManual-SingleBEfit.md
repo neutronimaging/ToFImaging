@@ -27,7 +27,11 @@ Functions for edge fitting of 1D-arrays
 ### AdvancedBraggEdgeFitting
 Advanced Bragg Edge Fitting. Printout example:
 
+<<<<<<< .mine
 <img width="300" alt="Edge sample" src="Figures/edgefitting_1D-AdvancedEdgeFitting_example.png"><br />
+=======
+<img width="400" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
+>>>>>>> .theirs
 
 __INPUTS__:
 |Parameter| Description|
@@ -59,7 +63,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 ### GaussianBraggEdgeFitting
 Gaussian Bragg Edge Fitting. Printout example:
 
-<img width="300" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
+<img width="400" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
 
 __INPUTS__:
 |Parameter| Description|
