@@ -85,7 +85,7 @@ def spectral_binning_resolution (mysignal, spectrum, d_spectrum):
     
     return (binned_signal, new_spectrum)
 
-def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([])):
+def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0])):
     # Moving average by kernel convolution to a ndarray
     if(len(np.shape(mysignal))!=1):
         print('Data size is not 1D')
@@ -97,7 +97,7 @@ def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([])
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
     
-def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([])):
+def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0])):
     # Moving average by kernel convolution to an image (2D) 
     # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
     import scipy.signal
@@ -233,7 +233,7 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     return np.convolve( m[::-1], y, mode='valid')
 
 #Normalization tools
-def transmission_normalization (I,I0,mask_dose=np.ndarray([])):
+def transmission_normalization (I,I0,mask_dose=np.ndarray([0])):
     #Normalization to transmission, with dose correction if mask_dose is given. negative transmission and negative attenuation (T>1) are replaced with NaNs.
     from skimage import io
     if(np.shape(I)!=np.shape(I0)):
@@ -337,7 +337,7 @@ def load_fits (pathdata, cut_last=0, bool_wavg = False):
             data[:,:,i] = medianimage(data_t)    
     return data
 
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, k = 3, bool_custom_k = False, custom_k = 0):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, k = 3, custom_k = np.ndarray([0])):
     # Full loading routine. Load sample and open beam and normalize to TOF transmission T=(x,y,TOF). The tof spectrum is loaded as well and converted to lambda, when asked.
     
     #load rawdata
@@ -357,6 +357,6 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         I = moving_average_2D(I, kernel_size = k, custom_kernel = custom_k)
         I0 = moving_average_2D(I0, kernel_size = k, custom_kernel = custom_k)
     #normalize
-    T = transmission_normalization(I,I0,dose_mask_path)
+    T = transmission_normalization(I,I0,dose_mask)
         
     return{'T':T, 'spectrum':spectrum}

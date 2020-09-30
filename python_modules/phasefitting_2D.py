@@ -14,9 +14,8 @@ import phasefitting_1D
 from tqdm import tqdm
 import time
    
-def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_phi=0.5,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[]):
+def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_phi=0.5,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_idx=[]):
     """ Performs phase ratio fitting on linear combination of two basis functions, works with linear attenuation coefficient (LAC) spectra
-    
     INPUTS:
     lac_tof = 3d matrix with the stack of attenuation -log(I/I0) TOF images (x,y,lambda) 
     spectrum = spectrum, length of this ndarray must correspond to size of lac_tof(lambda)
@@ -25,6 +24,8 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
     spectrum_phase = spectrum corresponding to phase 1 and 2
     lambda_range_norm = lambda range where to normalize spectra
     lambda_range_edges = lambda range where to do the fitting
+    calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]);
+                         will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y)
     mask = mask of where to perform the fit (x,y)
     auto_mask = if True will automatically mask the region based on the mask_thresh thresholds
     mask_thresh = low and high threshold for the automatic mask
@@ -35,11 +36,10 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
     SG_n = order of S-G filter
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_flag = set to True to test on single pixel (will actually also perform the whole image fitting if not stopped)
     debug_idx = pixel coordinates where to test the single pixel fitting
 
     OUTPUTS:
-    #dictionary with the following fit in the dimension of the mask
+    dictionary with the following fit in the dimension of the mask
     'phase_ratio' : phase ratio
     """ 
 
@@ -67,10 +67,20 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         plt.show(), plt.close()        
     else:
         mymask = np.ones([np.shape(lac_tof)[0], np.shape(lac_tof)[1]])
-        
+    
+    if(calibration_matrix.any()):
+        if ((np.shape(lac_tof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(lac_tof)[1]!=np.shape(calibration_matrix)[1])):
+            print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
+    
     if(any(debug_idx)): #testing on a single pixel    
         lac = lac_tof[debug_idx[0],debug_idx[1],:]
-        phasefitting_1D.phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_phi=est_phi,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
+
+        if(calibration_matrix.any()):
+            lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
+        else:
+            lambd = spectrum
+
+        phasefitting_1D.phase_ratio_linearcomb(lac,lambd,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_phi=est_phi,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
         return
 
     phase_ratio = np.zeros(np.shape(mymask))
@@ -80,8 +90,14 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 lac = lac_tof[i,j,:]
+
+                if(calibration_matrix.any()):
+                    lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
+                else:
+                    lambd = spectrum
+
                 try:
-                    phi_fit = phasefitting_1D.phase_ratio_linearcomb(lac,spectrum,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_phi=est_phi,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=0)
+                    phi_fit = phasefitting_1D.phase_ratio_linearcomb(lac,lambd,phase1lac,phase2lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_phi=est_phi,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=0)
                     phase_ratio[i,j] = phi_fit['phi']
                 except:
                     print("Unexpected error at :", i, j)
@@ -95,35 +111,37 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         np.save('phase_ratio.npy', phase_ratio)
     return {'phase_ratio' : phase_ratio}
 
-def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_f1=0.3,est_f2=0.3,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_flag=False,debug_idx=[]):
-    """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
-    !!! IMPORTANT the data must be transmission or it won't work due to boundary conditions !!!
-    
+def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_f1=0.333,est_f2=0.333,est_f3=0.334,method='least_squares',bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_idx=[]):
+    """ Performs phase ratio fitting on linear combination of two basis functions, works with linear attenuation coefficient (LAC) spectra
     INPUTS:
-    lac_tof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
-    spectrum_l = spectrum, length of this ndarray must correspond to size of lac_tof(lambda)
-    lambda_range = range corresponding to lambda where to perform the fitting
-    filemask = mask of where to perform the fit (x,y)
+    lac_tof = 3d matrix with the stack of attenuation -log(I/I0) TOF images (x,y,lambda) 
+    spectrum = spectrum, length of this ndarray must correspond to size of lac_tof(lambda)
+    phase1lac = lac of the phase 1
+    phase2lac = lac of the phase 2
+    spectrum_phase = spectrum corresponding to phase 1 and 2
+    lambda_range_norm = lambda range where to normalize spectra
+    lambda_range_edges = lambda range where to do the fitting
+    calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]);
+                         will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y)
+    mask = mask of where to perform the fit (x,y)
     auto_mask = if True will automatically mask the region based on the mask_thresh thresholds
     mask_thresh = low and high threshold for the automatic mask
-    est_pos = estimated bragg edge position (in spectrum_l dimension)
-    est_wid = estimated bragg edge width (in spectrum_l dimension)
-    est_h = estimated bragg edge height (in spectrum_l dimension)
-    bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative
-    smooth_w = window size of S-G filter
-    smooth_n = order of S-G filter
+    est_f1 = estimate phase 1 weight
+    est_f2 = estimate phase 2 weight
+    est_f3 = estimate phase 3 weight
+    method = fitting method
+    bool_SG = set to True to perform Savitzky-Golay filtering of the transmission derivative
+    SG_w = window size of S-G filter
+    SG_n = order of S-G filter
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_flag = set to True to test on single pixel (will actually also perform the whole image fitting if not stopped)
     debug_idx = pixel coordinates where to test the single pixel fitting
 
     OUTPUTS:
-    #dictionary with the following fit in the dimension of the mask
-    'edge_position' : edge position 
-    'edge_height': edge height 
-    'edge_width': edge width  
-    'edge_slope': edge slope 
-    'median_image': median Transmission image in the selected lambda range
+    dictionary with the following fit in the dimension of the mask
+    'phase1_ratio' : phase1 weight
+    'phase2_ratio' : phase2 weight
+    'phase3_ratio' : phase3 weight
     """ 
 
     if(mask.any()):
@@ -150,10 +168,20 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
         plt.show(), plt.close()        
     else:
         mymask = np.ones([np.shape(lac_tof)[0], np.shape(lac_tof)[1]])
-        
+    
+    if(calibration_matrix.any()):        
+        if ((np.shape(lac_tof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(lac_tof)[1]!=np.shape(calibration_matrix)[1])):
+            print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
+
     if(any(debug_idx)): #testing on a single pixel     
         lac = lac_tof[debug_idx[0],debug_idx[1],:]
-        phasefitting_1D.phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_f1=est_f1,est_f2=est_f2,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
+
+        if(calibration_matrix.any()):     
+            lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
+        else:
+            lambd = spectrum
+
+        phasefitting_1D.phase_ratio_linearcomb_three(lac,lambd,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_f1=est_f1,est_f2=est_f2,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=1)
         return
 
     phase1_ratio = np.zeros(np.shape(mymask))
@@ -165,8 +193,14 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
         for j in range(0, np.shape(mymask)[1]):
             if (mymask[i,j]):
                 lac = lac_tof[i,j,:]
+
+                if(calibration_matrix.any()):     
+                    lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
+                else:
+                    lambd = spectrum
+
                 try:
-                    phi_fit = phasefitting_1D.phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_f1=est_f1,est_f2=est_f2,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=0)
+                    phi_fit = phasefitting_1D.phase_ratio_linearcomb_three(lac,lambd,phase1lac,phase2lac,phase3lac,spectrum_phase,lambda_range_norm,lambda_range_edges,est_f1=est_f1,est_f2=est_f2,method=method,bool_SG=bool_SG,SG_w=SG_w,SG_n=SG_n,bool_print=0)
                     phase1_ratio[i,j] = phi_fit['phi1']
                     phase2_ratio[i,j] = phi_fit['phi2']
                     phase3_ratio[i,j] = phi_fit['phi3']

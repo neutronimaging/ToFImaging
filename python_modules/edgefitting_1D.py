@@ -7,115 +7,8 @@ from lmfit import Model
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
-def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,bool_print=False): 
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
-    
-    INPUTS:
-    signal = ndarray of the spectrum containing the Bragg edge(s)
-    spectrum = spectrum, length of this ndarray must correspond to size of Tspectrum(lambda)
-    spectrum_range = range corresponding to lambda where to perform the fitting
-    est_pos = estimated bragg edge position (in spectrum dimension)
-    est_wid = estimated bragg edge width (in spectrum dimension)
-    est_h = estimated bragg edge height (in spectrum dimension)
-    bool_log = set to True to perform log norm and convert to attenuation
-    bool_smooth = set to True to perform Savitzky-Golay filtering of the signal derivative
-    smooth_w = window size of S-G filter
-    smooth_n = order of S-G filter
-    bool_print = set to True to print output
-
-    OUTPUTS:
-    dictionary with the following fits
-    'edge_position' : edge position 
-    'edge_height': edge height 
-    'edge_width': edge width  
-    'edge_slope': edge slope 
-    'median_image': median Transmission image in the selected lambda range
-    """     
-    def gaussian(x, amp, cen, wid):
-        """1-d gaussian: gaussian(x, amp, cen, wid)"""
-        return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
-        
-    if(spectrum_range):
-        signal = signal[spectrum_range[0]:spectrum_range[1]]
-        spectrum = spectrum[spectrum_range[0]:spectrum_range[1]]
-        
-    if(bool_smooth):
-        signal = SG_filter(signal,smooth_w,smooth_n)    
-        
-    d_signal = np.diff(signal)
-    if(bool_log):
-        d_signal = -d_signal
-
-    d_spectrum = spectrum[0:-1]
-        
-    if (bool_smooth):
-        d_signal = SG_filter(d_signal,smooth_w,smooth_n)    
-
-    ## 2nd Appoach
-    method ='least_squares' # default and it implements the Levenberg-Marquardt
-    gmodel = Model(gaussian)
-    if(est_pos==0):
-        est_pos = d_spectrum[np.int(len(d_spectrum)/2)]
-    if(est_wid==0):
-        est_wid = 0.01
-    if(est_h==0):
-        est_h = signal[-2]-signal[2]
-
-    params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
-    if(pos_BC):
-        params['cen'].min = pos_BC[0]
-        params['cen'].max = pos_BC[1]
-    else:
-        params['cen'].min = spectrum[0]
-        params['cen'].max = spectrum[-1]
-    if(h_BC):
-        params['amp'].min = h_BC[0]
-        params['amp'].max = h_BC[1]
-    else:
-        params['amp'].min = 0
-        params['amp'].max = 1e2
-    if(wid_BC):
-        params['wid'].min = wid_BC[0]
-        params['wid'].max = wid_BC[1]
-    else:
-        params['wid'].min = 0
-        params['wid'].max = 1e2
-
-    result = gmodel.fit(d_signal, params, x=d_spectrum, method=method, nan_policy='propagate')
-    t0 = result.best_values.get('cen')
-    edge_width = result.best_values.get('wid')
-    fitted_data = result.best_fit       
-    
-    id_low = find_nearest(d_spectrum, t0-edge_width) # 3.7
-    id_high = find_nearest(d_spectrum, t0+edge_width) # 3.7
-    edge_height = np.sum(fitted_data[id_low:id_high])
-    edge_slope = result.best_values.get('amp')
-    
-    if (bool_print):
-        print('t0 = ',t0)
-        print('height = ',edge_height)
-        print('width = ',edge_width)
-        print('id_low = ',id_low,'id_high = ',id_high)
-        plt.figure()
-        plt.subplot(2,1,1), 
-        plt.plot(spectrum, signal)
-        plt.plot(t0, signal[find_nearest(d_spectrum, t0)],'x', markeredgewidth=3, c='orange')
-        plt.plot(t0-edge_width, signal[find_nearest(d_spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.plot(t0+edge_width, signal[find_nearest(d_spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
-        plt.subplot(2,1,2), 
-        plt.plot(d_spectrum, d_signal), plt.plot(d_spectrum, fitted_data)
-        plt.plot(t0, d_signal[find_nearest(d_spectrum, t0)],'x', markeredgewidth=3, c='orange')
-        plt.plot(t0-edge_width, d_signal[find_nearest(d_spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.plot(t0+edge_width, d_signal[find_nearest(d_spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.title('Bragg pattern derivative'), plt.xlabel('Wavelenght [Å]')
-        plt.show()
-        plt.close()
-    return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
-
-def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigma=1,est_alpha=1,bool_print=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False): 
-    """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
-    !!Currently not tested with attenuation data, must be transmission!
 
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
@@ -124,9 +17,11 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     est_pos = estimated bragg edge position (in spectrum_range dimension)
     est_sigma = expected Gaussian broadening
     est_alpha = expected decay constant (moderator property)
-    bool_print = flag to activate printing of figures
-    bool_average = flag to activate moving average across the spectrum (actualy SG filter)
+    bool_smooth = set to True to perform Savitzky-Golay filtering of the transmission derivative
+    smooth_w = window size of S-G filter
+    smooth_n = order of S-G filter
     bool_linear = flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential)
+    bool_print = flag to activate printing of figures
     
     OUTPUTS:
     dictionary with the following fits
@@ -197,14 +92,18 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     t=spectrum #renamed to t for convenience but could be lambda or bin index
     #get the part of the spectrum that I want to fit
     if(spectrum_range):
-        signal=signal[spectrum_range[0]:spectrum_range[1]]
-        t=t[spectrum_range[0]:spectrum_range[1]]
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])        
+        signal = signal[idx_low:idx_high]
+        t = t[idx_low:idx_high]
     
     if(bool_smooth):
         signal = SG_filter(signal,smooth_w,smooth_n)
     
     if(est_pos==0):
         est_pos = np.argmax(SG_filter(np.diff(signal)))
+    else:
+        est_pos = find_nearest(t,est_pos)        
     t0_f=t[est_pos] # this is the actual estimated first position in TOF [s]
 
     if (bool_print):
@@ -310,8 +209,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     params['a6'].vary = False
     params['sigma'].vary = False
     params['alpha'].vary = False
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     
     result3 = gmodel.fit(signal, params, t=t, method=method, nan_policy='propagate')
     t0_f = result3.best_values.get('t0')
@@ -322,8 +221,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     params['a5'].vary = False
     params['a1'].vary = False
     params['a6'].vary = False
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     params['alpha'].min = 0.0
     params['alpha'].max = 1.5
     params['sigma'].min = 0.0
@@ -352,8 +251,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     params['a5'].vary = False
     params['a1'].vary = False
     params['a6'].vary = False
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     params['alpha'].min = 0.0
     params['alpha'].max = 1.5
     params['sigma'].min = 0.0
@@ -366,8 +265,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
     
     #7th round to fit sigma alpha and t0 a1 a2 a5 a6 (all)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     params['alpha'].min = 0.0
     params['alpha'].max = 1.5
     params['sigma'].min = 0.0
@@ -476,3 +375,113 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=0,est_pos=0,est_sigm
         plt.show()
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
+
+def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+    """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
+    INPUTS:
+    signal = ndarray of the spectrum containing the Bragg edge(s)
+    spectrum = spectrum, length of this ndarray must correspond to size of Tspectrum(lambda)
+    spectrum_range = range corresponding to lambda where to perform the fitting
+    est_pos = estimated bragg edge position (in spectrum dimension)
+    est_wid = estimated bragg edge width (in spectrum dimension)
+    est_h = estimated bragg edge height (in spectrum dimension)
+    pos_BC = boundary conditions for the bragg edge position fit
+    wid_BC = boundary conditions for the bragg edge width fit
+    h_BC = boundary conditions for the bragg edge height fit
+    bool_log = set to True to perform log norm and convert to attenuation
+    bool_smooth = set to True to perform Savitzky-Golay filtering of the signal derivative
+    smooth_w = window size of S-G filter
+    smooth_n = order of S-G filter
+    bool_print = set to True to print output
+
+    OUTPUTS:
+    dictionary with the following fits
+    'edge_position' : edge position 
+    'edge_height': edge height 
+    'edge_width': edge width  
+    'edge_slope': edge slope 
+    'median_image': median Transmission image in the selected lambda range
+    """     
+    def gaussian(x, amp, cen, wid):
+        """1-d gaussian: gaussian(x, amp, cen, wid)"""
+        return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
+        
+    if(spectrum_range):
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])        
+        signal = signal[idx_low:idx_high]
+        spectrum = spectrum[idx_low:idx_high]
+        
+    if(bool_smooth):
+        signal = SG_filter(signal,smooth_w,smooth_n)    
+        
+    d_signal = np.diff(signal)
+    if(bool_log):
+        d_signal = -d_signal
+
+    d_spectrum = spectrum[0:-1]
+        
+    if (bool_smooth):
+        d_signal = SG_filter(d_signal,smooth_w,smooth_n)    
+
+    ## 2nd Appoach
+    method ='least_squares' # default and it implements the Levenberg-Marquardt
+    gmodel = Model(gaussian)
+    if(est_pos==0):
+        est_pos = d_spectrum[np.int(len(d_spectrum)/2)]
+    if(est_wid==0):
+        est_wid = 0.01
+    if(est_h==0):
+        est_h = signal[-2]-signal[2]
+
+    params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
+    if(pos_BC):
+        params['cen'].min = pos_BC[0]
+        params['cen'].max = pos_BC[1]
+    else:
+        params['cen'].min = spectrum[0]
+        params['cen'].max = spectrum[-1]
+    if(h_BC):
+        params['amp'].min = h_BC[0]
+        params['amp'].max = h_BC[1]
+    else:
+        params['amp'].min = 0
+        params['amp'].max = 1e2
+    if(wid_BC):
+        params['wid'].min = wid_BC[0]
+        params['wid'].max = wid_BC[1]
+    else:
+        params['wid'].min = 0
+        params['wid'].max = 1e2
+
+    result = gmodel.fit(d_signal, params, x=d_spectrum, method=method, nan_policy='propagate')
+    t0 = result.best_values.get('cen')
+    edge_width = result.best_values.get('wid')
+    fitted_data = result.best_fit       
+    
+    id_low = find_nearest(d_spectrum, t0-edge_width) # 3.7
+    id_high = find_nearest(d_spectrum, t0+edge_width) # 3.7
+    edge_height = np.sum(fitted_data[id_low:id_high])
+    edge_slope = result.best_values.get('amp')
+    
+    if (bool_print):
+        print('t0 = ',t0)
+        print('height = ',edge_height)
+        print('width = ',edge_width)
+        print('id_low = ',id_low,'id_high = ',id_high)
+        plt.figure()
+        plt.subplot(2,1,1), 
+        plt.plot(spectrum, signal)
+        plt.plot(t0, signal[find_nearest(d_spectrum, t0)],'x', markeredgewidth=3, c='orange')
+        plt.plot(t0-edge_width, signal[find_nearest(d_spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.plot(t0+edge_width, signal[find_nearest(d_spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
+        plt.subplot(2,1,2), 
+        plt.plot(d_spectrum, d_signal), plt.plot(d_spectrum, fitted_data)
+        plt.plot(t0, d_signal[find_nearest(d_spectrum, t0)],'x', markeredgewidth=3, c='orange')
+        plt.plot(t0-edge_width, d_signal[find_nearest(d_spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.plot(t0+edge_width, d_signal[find_nearest(d_spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.title('Bragg pattern derivative'), plt.xlabel('Wavelenght [Å]')
+        plt.show()
+        plt.close()
+    return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
