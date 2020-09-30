@@ -25,7 +25,9 @@ Currently implemented are:
 Functions for edge fitting of 1D-arrays
 
 ### AdvancedBraggEdgeFitting
-Advanced Bragg Edge Fitting
+Advanced Bragg Edge Fitting. Printout example:
+
+<img width="300" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
 
 __INPUTS__:
 |Parameter| Description|
@@ -55,7 +57,9 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'height' | fitted height of the bragg edge |
 
 ### GaussianBraggEdgeFitting
-Gaussian Bragg Edge Fitting
+Gaussian Bragg Edge Fitting. Printout example:
+
+<img width="300" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
 
 __INPUTS__:
 |Parameter| Description|
@@ -89,7 +93,9 @@ __OUTPUTS__: dictionary with the following fits
 Functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
 
 ### AdvancedBraggEdgeFitting_2D 
-Advanced Bragg Edge Fitting for all pixels in an image
+Advanced Bragg Edge Fitting for all pixels in an image. Printout example:
+
+<img width="300" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
 
 __INPUTS__:
 |Parameter| Description|
@@ -121,7 +127,9 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'median_image'| median Transmission image in the selected lambda range |
 
 ### GaussianBraggEdgeFitting_2D: 
-Gaussian Bragg Edge Fitting for all pixels in an image
+Gaussian Bragg Edge Fitting for all pixels in an image. Printout example:
+
+<img width="300" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
 
 __INPUTS__:
 |Parameter| Description|
