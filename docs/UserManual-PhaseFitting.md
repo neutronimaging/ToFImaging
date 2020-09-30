@@ -15,12 +15,12 @@ Currently implemented are the solvers for the 2 phases case (i=1,2) and 3 phases
 # FUNCTION LIST:
 
 ## phasefitting_1D.py: 
-Functions for phase fitting of 1D-arrays. Example:
-
-<img width="300" alt="Edge sample" src="Figures/phasefitting_1D-phase_ratio_linearcomb_example.png"><br />
+Functions for phase fitting of 1D-arrays. 
 
 ### phase_ratio_linearcomb: 
-Fit two phases
+Fit two phases. Printout example:
+
+<img width="300" alt="Edge sample" src="Figures/phasefitting_1D-phase_ratio_linearcomb_example.png"><br />
 
 __INPUTS__:
 |Parameter| Description|
@@ -45,7 +45,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'phi' | phase 1 weight |
 
 ### phase_ratio_linearcomb_three: 
-Fit three phases Example:
+Fit three phases. Printout example:
 
 <img width="300" alt="Edge sample" src="Figures/phasefitting_1D-phase_ratio_linearcomb_three_example.png"><br />
 
@@ -80,7 +80,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 Functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
 
 ### phase_ratio_linearcomb_2D: 
-Fit two phases. Example:
+Fit two phases. Printout example:
 
 <img width="250" alt="Edge sample" src="Figures/phasefitting_2D-phase_ratio_linearcomb_2D_example.png"><br />
 
@@ -113,7 +113,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'phase_ratio' | phase 1 weight|
 
 ### phase_ratio_linearcomb_three_2D: 
-Fit three phases. Example:
+Fit three phases. Printout example:
 
 <img width="500" alt="Edge sample" src="Figures/phasefitting_2D-phase_ratio_linearcomb_three_2D_example.png"><br />
 
