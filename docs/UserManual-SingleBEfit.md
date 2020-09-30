@@ -30,6 +30,7 @@ Advanced Bragg Edge Fitting. Printout example:
 <img width="400" alt="Edge sample" src="Figures/edgefitting_1D-AdvancedEdgeFitting_example.png"><br />
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | signal   | 1darray of the signal containing the Bragg edge (1darray) [REQUIRED]|
@@ -62,6 +63,7 @@ Gaussian Bragg Edge Fitting. Printout example:
 <img width="400" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | signal | 1darray of the spectrum containing the Bragg edge (1darray) [REQUIRED] |
@@ -81,6 +83,7 @@ __INPUTS__:
 | bool_print | flag to activate printing of figures [Default = False]|
 
 __OUTPUTS__: dictionary with the following fits
+
 |Parameter| Description|
 |----------|------------|
 | 'edge_position' | edge position |
@@ -96,6 +99,7 @@ Functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,
 Advanced Bragg Edge Fitting for all pixels in an image.
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | Ttof | 3darray of the image TOF stack containing the Bragg edge (x,y,lambda) [REQUIRED] |
@@ -128,6 +132,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 Gaussian Bragg Edge Fitting for all pixels in an image.
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | Ttof | 3darray of the image TOF stack containing the Bragg edge (x,y,lambda) [REQUIRED]|
@@ -152,6 +157,7 @@ __INPUTS__:
 | debug_idx | pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]|
 
 __OUTPUTS__: dictionary with the following fits
+
 |Parameter| Description|
 |----------|------------|
 | 'edge_position' | edge position |
