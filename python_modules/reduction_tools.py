@@ -337,7 +337,7 @@ def load_fits (pathdata, cut_last=0, bool_wavg = False):
             data[:,:,i] = medianimage(data_t)    
     return data
 
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask_path = 0, bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, k = 3, bool_custom_k = False, custom_k = 0):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, k = 3, custom_k = np.ndarray([0])):
     # Full loading routine. Load sample and open beam and normalize to TOF transmission T=(x,y,TOF). The tof spectrum is loaded as well and converted to lambda, when asked.
     
     #load rawdata
@@ -357,6 +357,6 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         I = moving_average_2D(I, kernel_size = k, custom_kernel = custom_k)
         I0 = moving_average_2D(I0, kernel_size = k, custom_kernel = custom_k)
     #normalize
-    T = transmission_normalization(I,I0,dose_mask_path)
+    T = transmission_normalization(I,I0,dose_mask)
         
     return{'T':T, 'spectrum':spectrum}
