@@ -6,9 +6,8 @@ Currently implemented packages:
   - Estimation of phase fraction, from a linear combination of basis functions (a priori defined phases)
   - Tools for Frame overlap Bragg edge imaging (FOBI) data reduction
   - Various tools for TOF imaging data processing / visualization
-  
-Please find the instruction for how to use the functions as comments in the modules.
-All the relevant files, with python modules and example jupyter notebooks are in /scripts/.
+ 
+For a detailed guid of how to use this package please open docs/index.md from the Github repository.
 For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch
 
 # How to Use
@@ -18,5 +17,3 @@ import sys
 sys.path.insert(0, "path-to-repository")
 ```
 This may require further installation of external modules.
-
-For documentation of the functions please open docs/index.md from the Github repository.
