@@ -95,13 +95,15 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
         idx_low = find_nearest(spectrum,spectrum_range[0])
         idx_high = find_nearest(spectrum,spectrum_range[1])        
         signal = signal[idx_low:idx_high]
-        spectrum = spectrum[idx_low:idx_high]
+        t = t[idx_low:idx_high]
     
     if(bool_smooth):
         signal = SG_filter(signal,smooth_w,smooth_n)
     
     if(est_pos==0):
         est_pos = np.argmax(SG_filter(np.diff(signal)))
+    else:
+        est_pos = find_nearest(t,est_pos)        
     t0_f=t[est_pos] # this is the actual estimated first position in TOF [s]
 
     if (bool_print):
@@ -207,8 +209,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     params['a6'].vary = False
     params['sigma'].vary = False
     params['alpha'].vary = False
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     
     result3 = gmodel.fit(signal, params, t=t, method=method, nan_policy='propagate')
     t0_f = result3.best_values.get('t0')
@@ -219,8 +221,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     params['a5'].vary = False
     params['a1'].vary = False
     params['a6'].vary = False
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     params['alpha'].min = 0.0
     params['alpha'].max = 1.5
     params['sigma'].min = 0.0
@@ -249,8 +251,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     params['a5'].vary = False
     params['a1'].vary = False
     params['a6'].vary = False
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     params['alpha'].min = 0.0
     params['alpha'].max = 1.5
     params['sigma'].min = 0.0
@@ -263,8 +265,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     
     #7th round to fit sigma alpha and t0 a1 a2 a5 a6 (all)
     params = gmodel.make_params(t0=t0_f,sigma=sigma_f, alpha=alpha_f, a1=a1_f, a2=a2_f, a5=a5_f, a6=a6_f)
-    params['t0'].min = spectrum[spectrum_range[0]]
-    params['t0'].max = spectrum[spectrum_range[1]]
+    params['t0'].min = t[0]
+    params['t0'].max = t[-1]
     params['alpha'].min = 0.0
     params['alpha'].max = 1.5
     params['sigma'].min = 0.0
