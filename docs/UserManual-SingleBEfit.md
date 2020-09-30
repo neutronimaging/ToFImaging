@@ -12,8 +12,12 @@ Currently implemented are:
 # IMPORTANT NOTES:
 
 - In the following functions spectrum and spectrum_range, and eventually initial guesses and boundary conditions must all be in the same domain (by default is lambda (wavelenght) but could be bin index or tof).
+- (!) For noisy data the fitting may be challenging. Try playing with initial guesses and boundary conditions to help the fitting module. Especially, try different inputs of initial guesses of the edge width and height.
 - For increased efficiency of the image fitting it is highly reccomended to run first the fitting in debugging mode by setting the debug_idx on a desired pixel location, and use the obtained values as initial guesses.
 - Boundary conditions may be useful in the cases of double edges / texture to impose the fitting of a specific bragg edge.
+
+## Known bugs
+- Fitting may fail in case of dataset containing inf's and NaN's values. If that is the case try increasing moving average or other image processing to cleanup data.
 
 # FUNCTION LIST:
 
