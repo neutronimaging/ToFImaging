@@ -131,6 +131,8 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 ### GaussianBraggEdgeFitting_2D: 
 Gaussian Bragg Edge Fitting for all pixels in an image.
 
+<img width="400" alt="Edge sample" src="Figures/edgefitting_2D-BraggEdgeFitting_2D_example.png"><br />
+
 __INPUTS__:
 
 |Parameter| Description|
