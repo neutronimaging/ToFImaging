@@ -17,3 +17,5 @@ import sys
 sys.path.insert(0, "path-to-repository")
 ```
 This may require further installation of external modules.
+
+For the software documentation please visit https://neutronimaging.github.io/ToFImaging/ 
