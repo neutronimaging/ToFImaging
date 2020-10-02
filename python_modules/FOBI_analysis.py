@@ -1,5 +1,6 @@
 import numpy as np
 import reduction_tools
+from tqdm import tqdm
 
 def chopper_time_delays_generator(time, nslits=8, nrep=2, mode='pseudorandom', rng = 0.25):
     """
@@ -277,7 +278,7 @@ def fobi_2d(I,I0,t,tmax,nrep,chopper_id,c=1e-1,roll_value=201,bool_smooth=True,S
     T_fobi = np.zeros((id_i,id_j,id_t))
     I0_fobi = np.zeros((id_i,id_j,id_t))
     I_fobi = np.zeros((id_i,id_j,id_t))
-    for i in range(0,id_i):
+    for i in tqdm(range(0,id_i)): #loop for all pixel position
         for j in range(0,id_j):
             [y0_rec,y_rec,T_rec,t_fobi] = full_fobi_reduction(I[i,j,:],I0[i,j,:],t=t,tmax=tmax,nrep=nrep,c=c,chopper_id=chopper_id,bool_smooth=bool_smooth,SG_w=SG_w,SG_o=SG_o)
             T_fobi[i,j,:] = np.roll(T_rec,-np.int(roll_value))

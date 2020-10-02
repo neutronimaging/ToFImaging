@@ -15,6 +15,7 @@ Currently implemented are:
 - (!) For noisy data the fitting may be challenging. Try playing with initial guesses and boundary conditions to help the fitting module. Especially, try different inputs of initial guesses of the edge width and height.
 - For increased efficiency of the image fitting it is highly reccomended to run first the fitting in debugging mode by setting the debug_idx on a desired pixel location, and use the obtained values as initial guesses.
 - Boundary conditions may be useful in the cases of double edges / texture to impose the fitting of a specific bragg edge.
+- The advance Bragg edge fitting method works best setting the spectral range inclue a single bragg edge.
 
 ## Known bugs
 - Fitting may fail in case of dataset containing inf's and NaN's values. If that is the case try increasing moving average or other image processing to cleanup data.
@@ -22,7 +23,7 @@ Currently implemented are:
 # FUNCTION LIST:
 
 ## edgefitting_1D.py: 
-Functions for edge fitting of 1D-arrays
+Functions for edge fitting of 1D-arrays.
 
 ### AdvancedBraggEdgeFitting
 Advanced Bragg Edge Fitting. Printout example:
@@ -93,7 +94,7 @@ __OUTPUTS__: dictionary with the following fits
 | 'median_image' | median Transmission image in the selected lambda range|
 
 ## edgefitting_2D.py: 
-Functions for phase fitting of 2D stack of TOF data in the form of 3darray (x,y,lambda)
+Functions for bragg edge fitting of 2D stack of TOF data in the form of 3Darray (x,y,lambda).
 
 ### AdvancedBraggEdgeFitting_2D 
 Advanced Bragg Edge Fitting for all pixels in an image.

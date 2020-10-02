@@ -48,6 +48,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
         plt.figure()
         plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.show(), plt.close()        
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):

@@ -48,6 +48,7 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         plt.figure()
         plt.subplot(1,2,1), plt.imshow(np.median(lac_tof,axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.show(), plt.close()        
         if( [np.shape(lac_tof)[0], np.shape(lac_tof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
