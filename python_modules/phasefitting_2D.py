@@ -110,7 +110,8 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
 
     if(bool_print):
         plt.figure()
-        plt.imshow(phase_ratio), plt.title('Phase ratio (ph1 %)')
+        plt.imshow(phase_ratio, cmap='jet'), plt.title('Phase ratio (%)')
+        plt.colorbar()
         plt.show(), plt.close()        
     if(bool_save):
         np.save('phase_ratio.npy', phase_ratio)
@@ -223,9 +224,9 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
 
     if(bool_print):
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(phase1_ratio), plt.title('Phase fraction (ph1 %)')
-        plt.subplot(1,3,2), plt.imshow(phase2_ratio), plt.title('Phase fraction (ph2 %)')
-        plt.subplot(1,3,3), plt.imshow(phase3_ratio), plt.title('Phase fraction (ph3 %)')
+        plt.subplot(1,3,1), plt.imshow(phase1_ratio, cmap='jet'), plt.title('Phase 1 weight (%)'), plt.colorbar()
+        plt.subplot(1,3,2), plt.imshow(phase2_ratio, cmap='jet'), plt.title('Phase 2 weight (%)'), plt.colorbar()
+        plt.subplot(1,3,3), plt.imshow(phase3_ratio, cmap='jet'), plt.title('Phase 3 weight (%)'), plt.colorbar()
         plt.tight_layout()
         plt.show()
         plt.close()      
