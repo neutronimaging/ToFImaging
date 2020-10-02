@@ -48,7 +48,9 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         plt.figure()
         plt.subplot(1,2,1), plt.imshow(np.median(lac_tof,axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
-        plt.show(), plt.close()        
+        plt.tight_layout()
+        plt.show()
+        plt.close()        
         if( [np.shape(lac_tof)[0], np.shape(lac_tof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
@@ -65,7 +67,9 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
         mymask = skimage.filters.gaussian(mymask,sigma=2)
         mymask[mymask>0] = 1.0
         plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
-        plt.show(), plt.close()        
+        plt.tight_layout()
+        plt.show()
+        plt.close()        
     else:
         mymask = np.ones([np.shape(lac_tof)[0], np.shape(lac_tof)[1]])
     
@@ -149,7 +153,11 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
         mymask = mask
         plt.figure()
         plt.subplot(1,2,1), plt.imshow(np.median(lac_tof,axis=2)), plt.title('Full-spectrum Image')
-        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.subplot(1,2,2), plt.imshow(mymask)
+        plt.title('Mask')
+        plt.tight_layout()
+        plt.show()
+        plt.close()
         if( [np.shape(lac_tof)[0], np.shape(lac_tof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
@@ -166,7 +174,9 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
         mymask = skimage.filters.gaussian(mymask,sigma=2)
         mymask[mymask>0] = 1.0
         plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
-        plt.show(), plt.close()        
+        plt.tight_layout()
+        plt.show()
+        plt.close()
     else:
         mymask = np.ones([np.shape(lac_tof)[0], np.shape(lac_tof)[1]])
     
@@ -216,7 +226,9 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
         plt.subplot(1,3,1), plt.imshow(phase1_ratio), plt.title('Phase fraction (ph1 %)')
         plt.subplot(1,3,2), plt.imshow(phase2_ratio), plt.title('Phase fraction (ph2 %)')
         plt.subplot(1,3,3), plt.imshow(phase3_ratio), plt.title('Phase fraction (ph3 %)')
-        plt.show(), plt.close()        
+        plt.tight_layout()
+        plt.show()
+        plt.close()      
     if(bool_save):
         np.save('phase1_ratio.npy', phase1_ratio)
         np.save('phase2_ratio.npy', phase2_ratio)

@@ -111,6 +111,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
         plt.plot(t, signal)
         plt.plot(t0_f, signal[est_pos],'x', markeredgewidth=3, c='orange')
         plt.title('Bragg edge pattern and initial guess'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+        plt.show()
+        plt.close()
         #plt.savefig('step1_fitting.pdf')
     
     t_before= t[0:est_pos]
@@ -136,6 +138,8 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
             plt.plot(t,interception_before+slope_before*t,'g')
             plt.plot(t,interception_after+slope_after*t,'r')
             plt.title('Linear fitting before and after the given edge position'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+            plt.show()
+            plt.close()
     else:
         exp_model_after = Model(exp_after)
         params = exp_model_after.make_params(a1=a1_f, a2=a2_f)
@@ -161,9 +165,12 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
             plt.plot(t,interception_after+slope_after*t,'--g', label='fitted line after')
             plt.plot(t,exp_after(t,a1_f,a2_f),'g', label='fitted exp before')
             plt.plot(t,exp_combined(t,a1_f,a2_f,a5_f,a6_f),'r', label='fitted exp after')
-            plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$'), plt.title('Exponential fitting before and after the given edge position')
+            plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$') 
+            plt.title('Exponential and line fitting adjacent to Bragg edge')
             plt.legend()
             plt.plot(t, BraggEdgeExponential(t,t0_f,est_alpha,est_sigma,a1_f,a2_f,a5_f,a6_f))
+            plt.show()
+            plt.close()
 
     sigma_f = est_sigma
     alpha_f = est_alpha
@@ -373,6 +380,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
         plt.plot(t[pos_extrema[1]],result7.best_fit[pos_extrema[1]],'ok')
         plt.title('Edge fitting with intermediate steps and estimated edge position')
         plt.show()
+        plt.close()
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
@@ -465,10 +473,11 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     edge_slope = result.best_values.get('amp')
     
     if (bool_print):
-        print('t0 = ',t0)
-        print('height = ',edge_height)
-        print('width = ',edge_width)
-        print('id_low = ',id_low,'id_high = ',id_high)
+        print('Edge position = ',t0)
+        print('Edge height = ',edge_height)
+        print('Edge width = ',edge_width)
+        print('idx_low = ',id_low,'idx_high = ',id_high)
+
         plt.figure()
         plt.subplot(2,1,1), 
         plt.plot(spectrum, signal)
@@ -482,6 +491,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         plt.plot(t0-edge_width, d_signal[find_nearest(d_spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
         plt.plot(t0+edge_width, d_signal[find_nearest(d_spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
         plt.title('Bragg pattern derivative'), plt.xlabel('Wavelenght [Å]')
+        plt.tight_layout()
         plt.show()
         plt.close()
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}

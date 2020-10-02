@@ -169,6 +169,9 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
         plt.figure()
         plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.tight_layout()
+        plt.show()
+        plt.close()  
         if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
@@ -185,7 +188,9 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
         mymask = skimage.filters.gaussian(mymask,sigma=2)
         mymask[mymask>0] = 1.0
         plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
-        plt.show(), plt.close()        
+        plt.tight_layout()
+        plt.show()
+        plt.close()        
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
@@ -245,7 +250,9 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range,calibration_matrix=
         plt.subplot(1,3,1), plt.imshow(edge_position), plt.title('Edge position')
         plt.subplot(1,3,2), plt.imshow(edge_width), plt.title('Edge width')
         plt.subplot(1,3,3), plt.imshow(edge_height), plt.title('Edge height')
-        plt.show(), plt.close()       
+        plt.tight_layout()
+        plt.show()
+        plt.close()       
     if(bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
