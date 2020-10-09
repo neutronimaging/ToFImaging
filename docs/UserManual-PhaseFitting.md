@@ -117,9 +117,7 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'phase_ratio' | phase 1 weight|
 
 ### phase_ratio_linearcomb_three_2D: 
-Fit three phases. Printout example:
-
-<img width="500" alt="Edge sample" src="Figures/phasefitting_2D-phase_ratio_linearcomb_three_2D_example.png"><br />
+Fit three phases. 
 
 __INPUTS__:
 
