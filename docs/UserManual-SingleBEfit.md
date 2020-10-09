@@ -14,8 +14,8 @@ Currently implemented are:
 - In the following functions spectrum and spectrum_range, and eventually initial guesses and boundary conditions must all be in the same domain (by default is lambda (wavelenght) but could be bin index or tof).
 - (!) For noisy data the fitting may be challenging. Try playing with initial guesses and boundary conditions to help the fitting module. Especially, try different inputs of initial guesses of the edge width and height.
 - For increased efficiency of the image fitting it is highly reccomended to run first the fitting in debugging mode by setting the debug_idx on a desired pixel location, and use the obtained values as initial guesses.
-- Boundary conditions may be useful in the cases of double edges / texture to impose the fitting of a specific bragg edge.
-- The advance Bragg edge fitting method works best setting the spectral range inclue a single bragg edge.
+- Boundary conditions may be useful in the cases of double edges / texture to impose the fitting of a specific Bragg edge.
+- The advance Bragg edge fitting method works best setting the spectral range inclue a single Bragg edge.
 
 ## Known bugs
 - Fitting may fail in case of dataset containing inf's and NaN's values. If that is the case try increasing moving average or other image processing to cleanup data.
@@ -55,8 +55,8 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'a1, a2, a5, a6' | parameters for spectrum besides the edge: a1 and a2 before, a5 and a6 after the edge |
 | 'final_result' | fitting result after 7th iteration |
 | 'fitted_data' | final fitted spectrum |
-| 'pos_extrema' | extrema of the bragg edges |
-| 'height' | fitted height of the bragg edge |
+| 'pos_extrema' | extrema of the Bragg edges |
+| 'height' | fitted height of the Bragg edge |
 
 ### GaussianBraggEdgeFitting
 Gaussian Bragg Edge Fitting. Printout example:
@@ -70,12 +70,12 @@ __INPUTS__:
 | signal | 1darray of the spectrum containing the Bragg edge (1darray) [REQUIRED] |
 | spectrum | spectrum range corresponding to signal (1darray) [REQUIRED]|
 | spectrum_range | range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]|
-| est_pos | estimated bragg edge position [Default = 0]|
-| est_wid | estimated bragg edge width [Default = 0]|
-| est_h | estimated bragg edge height [Default = 0]|
-| pos_BC | boundary conditions for the bragg edge position fit ([lambda1, lambda2]) [Default = 0]|
-| wid_BC | boundary conditions for the bragg edge width fit ([lambda1, lambda2]) [Default = 0]|
-| h_BC | boundary conditions for the bragg edge height fit ([lambda1, lambda2]) [Default = 0]|
+| est_pos | estimated Bragg edge position [Default = 0]|
+| est_wid | estimated Bragg edge width [Default = 0]|
+| est_h | estimated Bragg edge height [Default = 0]|
+| pos_BC | boundary conditions for the Bragg edge position fit ([lambda1, lambda2]) [Default = 0]|
+| wid_BC | boundary conditions for the Bragg edge width fit ([lambda1, lambda2]) [Default = 0]|
+| h_BC | boundary conditions for the Bragg edge height fit ([lambda1, lambda2]) [Default = 0]|
 | bool_log | set to True to perform log norm and convert to attenuation [Default = True]|
 | bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
 | smooth_w | window size of S-G filter [Default = 5]|
@@ -122,6 +122,7 @@ __INPUTS__:
 | debug_idx | pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]|
 
 __OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
 |Parameter| Description|
 |----------|------------|
 | 'edge_position' | edge position |

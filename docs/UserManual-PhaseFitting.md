@@ -23,6 +23,7 @@ Fit two phases. Printout example:
 <img width="300" alt="Edge sample" src="Figures/phasefitting_1D-phase_ratio_linearcomb_example.png"><br />
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | lac | 1d array the attenuation -log(I/I0) (1darray) [REQUIRED]|
@@ -40,16 +41,16 @@ __INPUTS__:
 | bool_print | set to True to print output [Default = False]|
 
 __OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
 |Parameter| Description|
 |----------|------------|
 | 'phi' | phase 1 weight |
 
 ### phase_ratio_linearcomb_three: 
-Fit three phases. Printout example:
-
-<img width="300" alt="Edge sample" src="Figures/phasefitting_1D-phase_ratio_linearcomb_three_example.png"><br />
+Fit three phases.
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | lac | 1d array the attenuation -log(I/I0) (1darray) [REQUIRED]|
@@ -70,6 +71,7 @@ __INPUTS__:
 | bool_print | set to True to print output [Default = False]|
 
 __OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
 |Parameter| Description|
 |----------|------------|
 | 'phi1' | phase 1 weight|
@@ -85,6 +87,7 @@ Fit two phases. Printout example:
 <img width="250" alt="Edge sample" src="Figures/phasefitting_2D-phase_ratio_linearcomb_2D_example.png"><br />
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | lac_tof | 3darray the attenuation -log(I/I0) (x,y,lambda) [REQUIRED]|
@@ -108,6 +111,7 @@ __INPUTS__:
 | debug_idx | pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]|
 
 __OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
 |Parameter| Description|
 |----------|------------|
 | 'phase_ratio' | phase 1 weight|
@@ -118,6 +122,7 @@ Fit three phases. Printout example:
 <img width="500" alt="Edge sample" src="Figures/phasefitting_2D-phase_ratio_linearcomb_three_2D_example.png"><br />
 
 __INPUTS__:
+
 |Parameter| Description|
 |----------|------------|
 | lac_tof | 3darray the attenuation -log(I/I0) (x,y,lambda) [REQUIRED]|
@@ -145,6 +150,7 @@ __INPUTS__:
 
 
 __OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
 |Parameter| Description|
 |----------|------------|
 | 'phase1_ratio' | phase 1 weight|
