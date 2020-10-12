@@ -97,7 +97,7 @@ def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0]
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
     
-def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0])):
+def moving_average_2D (mysignal, kernel_size = 3, rect_kernel = [], custom_kernel = np.ndarray([0])):
     # Moving average by kernel convolution to an image (2D) 
     # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
     import scipy.signal
@@ -105,6 +105,27 @@ def moving_average_2D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0]
         print('Data size is not either a 2D or ToF 2D')
     if(custom_kernel.any()):
         K = custom_kernel
+    elif(any(rect_kernel)):
+        M = np.max(rect_kernel)
+        m = np.min(rect_kernel)
+        d = np.argmin(rect_kernel)
+        K = np.zeros((M,M))
+        if(M%2==0):
+            if(m%2==0):
+                K[np.int(M/2-m/2):np.int(M/2+m/2),:]=1
+            else:
+                K[np.int(M/2-np.floor(m/2)):np.int(M/2+np.floor(m/2)),:]=1
+                K[np.int(M/2-np.floor(m/2))-1,:]=0.5
+                K[np.int(M/2+np.floor(m/2)),:]=0.5
+        else:
+            if(m%2==0):
+                K[np.int(M/2-(m-1)/2):np.int(M/2+(m-1)/2),:] = 1
+                K[np.int(M/2-(m-1)/2)-1,:] = 0.5
+                K[np.int(M/2+(m-1)/2),:] = 0.5       
+            else:      
+                K[np.int(M/2-m/2):np.int(M/2+m/2),:] = 1      
+        if(d==1):
+            K = np.transpose(K)        
     else:
         K = np.ones((kernel_size,kernel_size))
     K = K/np.sum(K)
