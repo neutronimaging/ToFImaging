@@ -12,8 +12,8 @@ __INPUTS__:
 |----------|------------|
 | mysignal | 2D or 3D array with the image or stack of images [REQUIRED]|
 | kernel_size | Size of a square kernel (integer) [Default = 3]|
-| rect_kernel | Row and columns of a rectangular kernel ([rows,columns])  [Default = []|
-| custom_kernel | A user defined kernel kernel [Default = []|
+| rect_kernel | Row and columns of a rectangular kernel ([rows,columns])  [Default = []]|
+| custom_kernel | A user defined custom kernel (2darray) [Default = []]|
 
 ## savitzky_golay
 Advance smoothing of a signal. For documentation see [here](https://scipy-cookbook.readthedocs.io/items/SavitzkyGolay.html).
