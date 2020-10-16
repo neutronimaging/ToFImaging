@@ -48,7 +48,7 @@ def weightedaverageimage(imgs,size=5):
     
     return img
     
-#Rebinning tools    
+#Rebinning/averaging tools    
 def binning_ndarray (mysignal, newsize):
     #Remnant from Chiara's code: Rebins an ndarray into the newsize.
     binned_signal = np.zeros(newsize)
@@ -173,6 +173,29 @@ def spatial_image_rebinning(image, new_shape, operation='sum'):
         op = getattr(image, operation)
         image = op(-1*(i+1))
     return image    
+
+def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
+    def rebin(a,new_shape,operation='mean'):
+        M,N = a.shape
+        m = new_shape[0]
+        n = new_shape[1]
+        if(operation=='sum'):
+            a = a.reshape((m,np.int(M/m),n,np.int(N/n))).sum(3).sum(1) 
+        if(operation=='mean'):
+            a = a.reshape((m,np.int(M/m),n,np.int(N/n))).mean(3).mean(1) 
+        return a
+
+    f_dim = (np.int(np.shape(image)[0]/rebinning_order),np.int(np.shape(image)[0]/rebinning_order))
+    if((np.shape(image)[0]%rebinning_order)!=0):
+        print('WARNING: the rebinning order does not divide the image dimension, please use a different function.')
+
+    if(len(np.shape(image))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
+        outsignal = np.zeros((f_dim[0],f_dim[1],np.int(np.shape(image)[2])))
+        for i in range(0,np.shape(image)[2]):
+            outsignal[:,:,i] = rebin(image[:,:,i],f_dim,operation)
+    else:
+        outsignal = rebin(image,f_dim,operation)
+    return outsignal    
 
 def spectral_image_rebinning(image, new_shape, operation='sum'):
     n_tof = np.shape(image)[2]
