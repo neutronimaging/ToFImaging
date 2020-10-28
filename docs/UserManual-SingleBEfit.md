@@ -47,6 +47,7 @@ __INPUTS__:
 | bool_print | flag to activate printing of figures [Default = False]|
 
 __OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
 |Parameter| Description|
 |----------|------------|
 | 't0' | fitted bragg edge position |
