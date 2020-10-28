@@ -3,7 +3,7 @@
 This package contains python functions for the fitting of a single Bragg edge pattern.
 Currently implemented are:
 
-- Advanced Bragg Edge Fitting: 7 parameters fit as in [Ramadhan et al., 2019](https://doi.org/10.1107/S1600576719001730) {a_0,b_0,a_{hkl},b_{hkl},λ_{hkl},σ,τ}
+- Advanced Bragg Edge Fitting: 7 parameters fit as in [Santisteban et al., 2019](https://scripts.iucr.org/cgi-bin/paper?ks0056) and [Ramadhan et al., 2019](https://doi.org/10.1107/S1600576719001730) {a_0,b_0,a_{hkl},b_{hkl},λ_{hkl},σ,τ}
 
 ![img](https://latex.codecogs.com/svg.latex?T(\lambda)=\exp{[-a_0+b_0\lambda]}\times(\exp{[-(a_{hkl}+b_{hkl}\lambda)]+\{1-\exp{[-(a_{hkl}+b_{hkl}\lambda)]\})\times\frac{1}{2}[\mathrm{erfc}(-\frac{\lambda-\lambda_{hkl}}{2^{1/2}\sigma})-\exp{(-\frac{\lambda-\lambda_{hkl}}{\tau}+\frac{\sigma^2}{2\tau^2})}\times\mathrm{erfc}(-\frac{\lambda-\lambda_{hkl}}{2^{1/2}\sigma}+\frac{\sigma}{\tau})])
 
