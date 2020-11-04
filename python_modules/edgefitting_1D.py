@@ -384,7 +384,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
-def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,interp_factor=0,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
@@ -400,6 +400,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     bool_smooth = set to True to perform Savitzky-Golay filtering of the signal derivative
     smooth_w = window size of S-G filter
     smooth_n = order of S-G filter
+    interp_factor = if set, this is the factor by which the number of bins are multiplied by interpolation
     bool_print = set to True to print output
 
     OUTPUTS:
@@ -431,6 +432,11 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         
     if (bool_smooth):
         d_signal = SG_filter(d_signal,smooth_w,smooth_n)    
+
+    if(interp_factor):
+        spectrum_n = np.linspace(d_spectrum[0],d_spectrum[-1],np.round(interp_factor*np.shape(d_spectrum)[0]))
+        d_signal = np.interp(spectrum_n,d_spectrum,d_signal)
+        d_spectrum = spectrum_n
 
     ## 2nd Appoach
     method ='least_squares' # default and it implements the Levenberg-Marquardt
@@ -481,9 +487,9 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         plt.figure()
         plt.subplot(2,1,1), 
         plt.plot(spectrum, signal)
-        plt.plot(t0, signal[find_nearest(d_spectrum, t0)],'x', markeredgewidth=3, c='orange')
-        plt.plot(t0-edge_width, signal[find_nearest(d_spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.plot(t0+edge_width, signal[find_nearest(d_spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.plot(t0, signal[find_nearest(spectrum, t0)],'x', markeredgewidth=3, c='orange')
+        plt.plot(t0-edge_width, signal[find_nearest(spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
+        plt.plot(t0+edge_width, signal[find_nearest(spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
         plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
         plt.subplot(2,1,2), 
         plt.plot(d_spectrum, d_signal), plt.plot(d_spectrum, fitted_data)
@@ -495,3 +501,154 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         plt.show()
         plt.close()
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
+
+def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+    """ Performs texture fitting for up to two lattice planes 
+    INPUTS:
+    signal = ndarray of the spectrum containing the Bragg edge(s)
+    spectrum = spectrum, length of this ndarray must correspond to size of Tspectrum(lambda)
+    ref = reference spectrum for untextured cross sections
+    ref_specturm = specturm of the reference
+    spectrum_range = range corresponding to lambda where to perform the fitting
+    l_hkl1 = wavelength of the first bragg edge
+    l_hkl2 = wavelength of the second bragg edge (optional)
+    bool_MD = switch for March-Dollase type texture fitting
+    est_A1 = initial guess for preferred orientation for first bragg edge
+    est_R1 = initial guess for anisotropy for first bragg edge
+    est_A2 = initial guess for preferred orientation for second bragg edge
+    est_R2 = initial guess for anisotropy for second bragg edge
+    Nbeta = sampling number of the Pole figure (this size highly influence the fitting speed)
+    est_S = initiaul guess for crystallite size (if set to 0 is not included in the fitting model)
+    bool_smooth = set to True to perform Savitzky-Golay filtering of the signal derivative
+    smooth_w = window size of S-G filter
+    smooth_n = order of S-G filter
+    bool_print = set to True to print output
+
+    OUTPUTS:
+    dictionary with the following fits
+    'A1': preferred orientation for first bragg edge
+    'R1': anisotropy for first bragg edge 
+    'A2': preferred orientation for second bragg edge
+    'R2': anisotropy for second bragg edge
+    'S': crystallite size
+    """   
+    def MarchDollase(A,R,l,l_hkl,Nbeta=50,bool_plotPole=False):
+        theta = np.arcsin(l/l_hkl)
+        beta = np.linspace(0,2*pi,Nbeta)
+        theta = np.matlib.repmat(theta, Nbeta,1)
+        beta = np.transpose(np.matlib.repmat(beta,np.shape(theta)[1],1))
+        B = np.cos(A)*np.sin(theta)+np.sin(A)*np.multiply(np.cos(theta),np.sin(beta))
+        P = np.sum(np.power(R**2*B**2+(1-B**2)/R,-3/2),axis=0)/(Nbeta)
+        P[np.isnan(P)]=1
+        if(bool_plotPole):
+            plt.figure
+            plt.imshow(np.power(R**2*B**2+(1-B**2)/R,-3/2))
+            plt.show(), plt.close()
+            plt.plot(l,P)
+            plt.show(), plt.close()
+        return P  
+
+    def SabinePrimaryExtinction(S,l,l_hkl):
+        N = np.shape(l)[0]
+        theta = np.arcsin(l/l_hkl)
+        x = S**2*(l)**2
+        E = np.zeros((N))
+        for i in range(0,N):
+            E_B = 1/np.sqrt(1+x[i])
+            if(x[i]>1):
+                E_L = np.sqrt(2/(pi*x[i]))*(1-1/(8*x[i])-3/(128*x[i]**2)-15/(1024*x[i]**3))
+            else:
+                E_L = 1-x[i]/2+x[i]**2/4-5*x[i]**3/48+7*x[i]**4/192
+            E[i] = E_L*np.cos(theta[i])**2+E_B*np.sin(theta[i])**2
+        return E
+        
+    if(spectrum_range):
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])
+        signal = signal[idx_low:idx_high]
+        spectrum = spectrum[idx_low:idx_high]
+
+    if(bool_smooth):
+        signal = SG_filter(signal,smooth_w,smooth_n)
+
+    norm_sp=np.nanmean(signal)        
+    ref_int = np.interp(spectrum,ref_spectrum,ref,left=np.nan,right=np.nan)
+    
+    def TexturedReference(ref_int,A1,R1,A2,R2,S):
+        f = ref_int
+        if(bool_MD): #if MarchDollase is set on apply it
+            P1 = MarchDollase(A1,R1,spectrum,l_hkl1,Nbeta = Nbeta)
+            P1[np.isnan(P1)]=1
+            P=P1
+            if(l_hkl2):
+                P2 = MarchDollase(A2,R2,spectrum,l_hkl2,Nbeta = Nbeta)            
+                P2[np.isnan(P2)]=1
+                P=(P1+P2)/2
+            f = np.multiply(f,P)                
+        
+        if(est_S): #if Crystallite size is set on apply it
+            E1 = SabinePrimaryExtinction(S,spectrum,l_hkl1)
+            E1[np.isnan(E1)]=1
+            E=E1
+            if(l_hkl2):
+                E2 = SabinePrimaryExtinction(S,spectrum,l_hkl2)
+                E2[np.isnan(E2)]=1
+                E=(E1+E2)/2
+            f = np.multiply(f,E)
+        else: #When Crystallite size is not included data has to be rescaled
+            f = f*norm_sp/np.nanmean(f)
+
+        return f
+        
+    gmodel = Model(TexturedReference,independent_vars=['ref_int'])
+
+    # if(bool_MD):
+    #     params = gmodel.make_params(A1=est_A1,R1=est_R1)   
+    #     if(l_hkl2):
+    #         params = gmodel.make_params(A2=est_A2,R2=est_R2) 
+    # if(est_S):
+    #     params = gmodel.make_params(S=est_S)
+    params = gmodel.make_params(A1=est_A1,R1=est_R1,A2=est_A2,R2=est_R2,S=est_S)
+
+    if(bool_MD):
+        params['A1'].min = 0.0
+        params['A1'].max = np.pi/2
+        params['R1'].min = 0.0
+        params['R1'].max = 10.0
+        if(l_hkl2):
+            params['A2'].min = 0.0
+            params['A2'].max = np.pi/2
+            params['R2'].min = 0.0
+            params['R2'].max = 10.0
+
+    if(est_S):
+        params['S'].min = 0.0
+        params['S'].max = 1000.0
+
+    method = 'least_squares'
+    result = gmodel.fit(signal, params, ref_int = ref_int, method=method, nan_policy='propagate')
+
+    #untextured default
+    A2_fit=0
+    R2_fit=1
+    A2_fit=0
+    R2_fit=1
+    S_fit=0
+    if(bool_MD):
+        A1_fit=result.best_values.get('A1')    
+        R1_fit=result.best_values.get('R1')         
+        if(l_hkl2):
+            A2_fit=result.best_values.get('A2')    
+            R2_fit=result.best_values.get('R2')     
+
+    if(est_S):
+        S_fit=result.best_values.get('S')     
+
+    if(bool_print):
+        plt.plot(spectrum,signal,label='data')
+        plt.plot(spectrum,ref_int,label='reference')
+        plt.plot(spectrum,TexturedReference(ref_int,est_A1,est_R1,est_A2,est_R2,est_S),'--',label='Initial guess')
+        plt.plot(spectrum,TexturedReference(ref_int,A1_fit,R1_fit,A2_fit,R2_fit,S_fit),'--',label='Fit')
+        plt.legend(),plt.show(),plt.close()
+
+    return {'A1': A1_fit, 'R1': R1_fit, 'A2': A2_fit, 'R2': R2_fit, 'S': S_fit}        
