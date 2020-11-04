@@ -137,6 +137,58 @@ def moving_average_2D (mysignal, box_kernel = [], custom_kernel = np.ndarray([0]
         outsignal = scipy.signal.convolve2d(mysignal,K,'same')
     return outsignal   
 
+def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = []):
+    import scipy.ndimage
+    # ERRORS in dataset
+    if(len(np.shape(mysignal))==1):
+        print('Data must be 2D image or 3D volume, or TOF stack of 2D images.')
+        return
+    if((len(np.shape(BoxKernel))==1 | len(np.shape(GaussianKernel))==1)):
+        print('Kernels must be at least of size 2.')
+        return
+    if(len(np.shape(mysignal))==2 & (len(np.shape(BoxKernel))==3 | len(np.shape(GaussianKernel))==3)):
+        print('Data is 2d but filtering kernel is 3D.')            
+        return
+
+    # TOF data (3D), 2D kernel
+    if(len(np.shape(mysignal))==3 & (len(np.shape(BoxKernel))==2 | len(np.shape(GaussianKernel))==2)):
+        print('Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).')    
+        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
+        if(any(BoxKernel)):
+            kernel = np.ones((BoxKernel[0],BoxKernel[1],BoxKernel[2]))
+            kernel = kernel/np.sum(np.ravel(kernel))            
+            for i in tqdm(range(0,np.shape(mysignal)[2])):  
+                outsignal[:,:,i] = scipy.ndimage.convolve(mysignal[:,:,i],kernel)
+            return outsignal
+        if(any(GaussianKernel)):   
+            for i in tqdm(range(0,np.shape(mysignal)[2])):  
+                outsignal[:,:,i] = scipy.ndimage.gaussian_filter(mysignal[:,:,i],GaussianKernel)
+            return outsignal
+
+    # TOF data (3D), 2D kernel
+    if(len(np.shape(mysignal))==3 & (len(np.shape(BoxKernel))==3 | len(np.shape(GaussianKernel))==3)):
+        print('Data and filtering kernel are 3D. Applying 3D filter convolution.')
+        if(any(BoxKernel)):
+            kernel = np.ones((BoxKernel[0],BoxKernel[1],BoxKernel[2]))
+            kernel = kernel/np.sum(np.ravel(kernel))            
+            outsignal = scipy.ndimage.convolve(mysignal,kernel)
+        if(any(GaussianKernel)):
+            outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel)
+        return outsignal
+
+    # image data (2D), 2D kernel            
+    if(len(np.shape(mysignal))==2 & (len(np.shape(BoxKernel))==2 | len(np.shape(GaussianKernel))==2)):
+        print('Data and filtering kernel are 2D. Applying 2D filter convolution.')
+        if(any(BoxKernel)):
+            kernel = np.ones((BoxKernel[0],BoxKernel[1]))
+            kernel = kernel/np.sum(np.ravel(kernel))            
+            outsignal = scipy.ndimage.convolve(mysignal,kernel)
+        if(any(GaussianKernel)):
+            outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel)   
+        return outsignal
+
+    return  
+                   
 def spatial_image_rebinning(image, new_shape, operation='sum'):
     """
     Bins an ndarray in all axes based on the target shape, by summing or
