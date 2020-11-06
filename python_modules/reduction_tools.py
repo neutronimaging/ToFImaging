@@ -195,14 +195,15 @@ def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = F
             if(bool_print):
                 plt.subplot(1,2,2), 
                 plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
-                plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()       
+                plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()   
+            return outsignal    
         if(any(GaussianKernel)):
             outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel)
             if(bool_print):
                 plt.subplot(1,2,2), 
                 plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()       
-        return outsignal
+            return outsignal
 
     # image data (2D), 2D kernel            
     if(len(np.shape(mysignal))==2 and (len(BoxKernel)==2 or len(GaussianKernel)==2)):
@@ -214,14 +215,15 @@ def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = F
             if(bool_print):
                 plt.subplot(1,2,2), 
                 plt.imshow(outsignal), plt.title('Input image')
-                plt.tight_layout(),        plt.show(),        plt.close()       
+                plt.tight_layout(),        plt.show(),        plt.close()    
+            return outsignal   
         if(any(GaussianKernel)):
             outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel) 
             if(bool_print):
                 plt.subplot(1,2,2), 
                 plt.imshow(outsignal), plt.title('Input image')
                 plt.tight_layout(),        plt.show(),        plt.close()         
-        return outsignal
+            return outsignal
 
     return  
 
