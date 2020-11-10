@@ -199,3 +199,37 @@ def phase_ratio_linearcomb_three(lac,spectrum,phase1lac,phase2lac,phase3lac,phas
         plt.legend(),        plt.show(),        plt.close()
 
     return {'phi1': phi1_n,'phi2': phi2_n,'phi3': phi3_n}
+
+def WavelengthSelectiveRatio(lac,spectrum,l1,l2,l1_w=0,l2_w=0,bool_SG=False,SG_w=5,SG_n=1,bool_print=False): 
+    """ Performs phase ratio fitting on linear combination of two basis functions, works with linear attenuation coefficient (LAC) spectra
+    INPUTS:
+    lac = 1d array the attenuation -log(I/I0) TOF images (x,y,lambda) 
+    spectrum = spectrum, length of this ndarray must correspond to size of lac_tof(lambda)
+    l1 = lambda position of the 1st point
+    l2 = lambda position of the 2nd point
+    l1_w = lambda window size (bi-directional) of the 1st point
+    l2_w = lambda window size (bi-directional) of the 2nd point
+    bool_SG = set to True to perform Savitzky-Golay filtering of the transmission derivative
+    SG_w = window size of S-G filter
+    SG_n = order of S-G filter
+
+    OUTPUTS:
+    #dictionary with the following fit in the dimension of the mask
+    'WSR' : Wavelength Selective Ratio
+    """ 
+
+    if(bool_SG):
+        lac = SG_filter(lac,SG_w,SG_n)
+
+    idx_1 = find_nearest(spectrum,l1)
+    idx_2 = find_nearest(spectrum,l2)
+
+    WSR = np.nanmean(lac[idx_1-l1_w:idx_1+l1_w+1])/np.nanmean(lac[idx_2-l2_w:idx_2+l2_w+1])
+    
+    if(bool_print):
+        plt.plot(spectrum,lac)
+        plt.plot(spectrum[idx_1-l1_w:idx_1+l1_w+1],lac[idx_1-l1_w:idx_1+l1_w+1],'x', markeredgewidth=3, c='orange')
+        plt.plot(spectrum[idx_2-l2_w:idx_2+l2_w+1],lac[idx_2-l2_w:idx_2+l2_w+1],'o', markeredgewidth=3, c='orange')
+        print(WSR)
+
+    return {'WSR': WSR}    

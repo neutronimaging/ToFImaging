@@ -1,4 +1,6 @@
 import numpy as np
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
@@ -48,7 +50,7 @@ def weightedaverageimage(imgs,size=5):
     
     return img
     
-#Rebinning tools    
+#Rebinning/averaging tools    
 def binning_ndarray (mysignal, newsize):
     #Remnant from Chiara's code: Rebins an ndarray into the newsize.
     binned_signal = np.zeros(newsize)
@@ -97,18 +99,19 @@ def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0]
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
     
-def moving_average_2D (mysignal, kernel_size = 3, rect_kernel = [], custom_kernel = np.ndarray([0])):
+def moving_average_2D (mysignal, box_kernel = [], custom_kernel = np.ndarray([0])):
     # Moving average by kernel convolution to an image (2D) 
     # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
     import scipy.signal
+        
     if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
         print('Data size is not either a 2D or ToF 2D')
     if(custom_kernel.any()):
         K = custom_kernel
-    elif(any(rect_kernel)):
-        M = np.max(rect_kernel)
-        m = np.min(rect_kernel)
-        d = np.argmin(rect_kernel)
+    elif(any(box_kernel)):
+        M = np.max(box_kernel)
+        m = np.min(box_kernel)
+        d = np.argmin(box_kernel)
         K = np.zeros((M,M))
         if(M%2==0):
             if(m%2==0):
@@ -126,17 +129,103 @@ def moving_average_2D (mysignal, kernel_size = 3, rect_kernel = [], custom_kerne
                 K[np.int(M/2-m/2):np.int(M/2+m/2),:] = 1      
         if(d==1):
             K = np.transpose(K)        
-    else:
-        K = np.ones((kernel_size,kernel_size))
     K = K/np.sum(K)
     
     if(len(np.shape(mysignal))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
         outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
-        for i in range(0,np.shape(mysignal)[2]):
+        for i in tqdm(range(0,np.shape(mysignal)[2])): 
             outsignal[:,:,i] = scipy.signal.convolve2d(mysignal[:,:,i],K,'same')
     else:
         outsignal = scipy.signal.convolve2d(mysignal,K,'same')
     return outsignal   
+
+def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = False):
+    import scipy.ndimage
+    # ERRORS in dataset
+    if(len(np.shape(mysignal))==1):
+        print('Data must be 2D image or 3D volume, or TOF stack of 2D images.')
+        return
+    if((len(BoxKernel)==1 or len(GaussianKernel)==1)):
+        print('Kernels must be at least of size 2.')
+        return
+    if(len(np.shape(mysignal))==2 and (len(BoxKernel)==3 or len(GaussianKernel)==3)):
+        print('Data is 2d but filtering kernel is 3D.')            
+        return
+
+    if(bool_print):
+        plt.figure()
+        plt.subplot(1,2,1), 
+        if(len(np.shape(mysignal))==3):
+            plt.imshow(np.nanmean(mysignal,axis=2)), plt.title('Input image'), plt.colorbar()
+        else:
+            plt.imshow(mysignal), plt.title('Input image'), plt.colorbar()
+
+    # TOF data (3D), 2D kernel
+    if(len(np.shape(mysignal))==3 and (len(BoxKernel)==2 or len(GaussianKernel)==2)):
+        print('Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).')    
+        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
+        if(any(BoxKernel)):
+            kernel = np.ones((BoxKernel[0],BoxKernel[1]))
+            kernel = kernel/np.sum(np.ravel(kernel))            
+            for i in tqdm(range(0,np.shape(mysignal)[2])):  
+                outsignal[:,:,i] = scipy.ndimage.convolve(mysignal[:,:,i],kernel)
+
+            if(bool_print):
+                plt.subplot(1,2,2), 
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()       
+            return outsignal
+        if(any(GaussianKernel)):   
+            for i in tqdm(range(0,np.shape(mysignal)[2])):  
+                outsignal[:,:,i] = scipy.ndimage.gaussian_filter(mysignal[:,:,i],GaussianKernel)
+
+            if(bool_print):
+                plt.subplot(1,2,2), 
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()                   
+            return outsignal
+
+    # TOF data (3D), 3D kernel
+    if(len(np.shape(mysignal))==3 and (len(BoxKernel)==3 or len(GaussianKernel)==3)):
+        print('Data and filtering kernel are 3D. Applying 3D filter convolution.')
+        if(any(BoxKernel)):
+            kernel = np.ones((BoxKernel[0],BoxKernel[1],BoxKernel[2]))
+            kernel = kernel/np.sum(np.ravel(kernel))            
+            outsignal = scipy.ndimage.convolve(mysignal,kernel)
+            if(bool_print):
+                plt.subplot(1,2,2), 
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()   
+            return outsignal    
+        if(any(GaussianKernel)):
+            outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel)
+            if(bool_print):
+                plt.subplot(1,2,2), 
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()       
+            return outsignal
+
+    # image data (2D), 2D kernel            
+    if(len(np.shape(mysignal))==2 and (len(BoxKernel)==2 or len(GaussianKernel)==2)):
+        print('Data and filtering kernel are 2D. Applying 2D filter convolution.')
+        if(any(BoxKernel)):
+            kernel = np.ones((BoxKernel[0],BoxKernel[1]))
+            kernel = kernel/np.sum(np.ravel(kernel))            
+            outsignal = scipy.ndimage.convolve(mysignal,kernel)
+            if(bool_print):
+                plt.subplot(1,2,2), 
+                plt.imshow(outsignal), plt.title('Input image')
+                plt.tight_layout(),        plt.show(),        plt.close()    
+            return outsignal   
+        if(any(GaussianKernel)):
+            outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel) 
+            if(bool_print):
+                plt.subplot(1,2,2), 
+                plt.imshow(outsignal), plt.title('Input image')
+                plt.tight_layout(),        plt.show(),        plt.close()         
+            return outsignal
+
+    return  
 
 def spatial_image_rebinning(image, new_shape, operation='sum'):
     """
@@ -174,10 +263,33 @@ def spatial_image_rebinning(image, new_shape, operation='sum'):
         image = op(-1*(i+1))
     return image    
 
+def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
+    def rebin(a,new_shape,operation='mean'):
+        M,N = a.shape
+        m = new_shape[0]
+        n = new_shape[1]
+        if(operation=='sum'):
+            a = a.reshape((m,np.int(M/m),n,np.int(N/n))).sum(3).sum(1) 
+        if(operation=='mean'):
+            a = a.reshape((m,np.int(M/m),n,np.int(N/n))).mean(3).mean(1) 
+        return a
+
+    f_dim = (np.int(np.shape(image)[0]/rebinning_order),np.int(np.shape(image)[0]/rebinning_order))
+    if((np.shape(image)[0]%rebinning_order)!=0):
+        print('WARNING: the rebinning order does not divide the image dimension, please use a different function.')
+
+    if(len(np.shape(image))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
+        outsignal = np.zeros((f_dim[0],f_dim[1],np.int(np.shape(image)[2])))
+        for i in tqdm(range(0,np.shape(image)[2])):
+            outsignal[:,:,i] = rebin(image[:,:,i],f_dim,operation)
+    else:
+        outsignal = rebin(image,f_dim,operation)
+    return outsignal    
+
 def spectral_image_rebinning(image, new_shape, operation='sum'):
     n_tof = np.shape(image)[2]
     image_rebin = np.zeros((new_shape[0],new_shape[1],n_tof))
-    for i in range(0,n_tof):
+    for i in tqdm(range(0,n_tof)):
         image_rebin[:,:,i] = spatial_image_rebinning(image[:,:,i],new_shape,operation)
     return image_rebin
 
@@ -348,7 +460,8 @@ def load_fits (pathdata, cut_last=0, bool_wavg = False):
     # would maybe nice to add check before this stage that the signals are similar before merging  
     # data /= len(subfolders)
     data_t = np.zeros([det_shape[0], det_shape[1],len(subfolders)])
-    for i in range(0,len(files)-cut_last):
+    print('Loading ' + pathdata)
+    for i in tqdm(range(0,len(files)-cut_last)):
         for j in range(0,len(subfolders)):
             files = sorted(fnmatch.filter(listdir(pathdata+'\\'+subfolders[j]),'*.fits'))
             data_t[:,:,j] = fits.getdata(pathdata+'\\'+subfolders[j]+'\\'+files[i])
@@ -358,7 +471,7 @@ def load_fits (pathdata, cut_last=0, bool_wavg = False):
             data[:,:,i] = medianimage(data_t)    
     return data
 
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, k = 3, custom_k = np.ndarray([0])):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, box_kernel = [], custom_k = np.ndarray([0])):
     # Full loading routine. Load sample and open beam and normalize to TOF transmission T=(x,y,TOF). The tof spectrum is loaded as well and converted to lambda, when asked.
     
     #load rawdata
@@ -375,8 +488,8 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         I = binning_ndarray(I,bin_size)
         I0 = binning_ndarray(I0,bin_size)
     if(bool_mavg):
-        I = moving_average_2D(I, kernel_size = k, custom_kernel = custom_k)
-        I0 = moving_average_2D(I0, kernel_size = k, custom_kernel = custom_k)
+        I = moving_average_2D(I, box_kernel = box_kernel, custom_kernel = custom_k)
+        I0 = moving_average_2D(I0, box_kernel = box_kernel, custom_kernel = custom_k)
     #normalize
     T = transmission_normalization(I,I0,dose_mask)
         
