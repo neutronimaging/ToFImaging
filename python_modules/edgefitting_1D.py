@@ -632,8 +632,8 @@ def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l
     result = gmodel.fit(signal, params, ref_int = ref_int, method=method, nan_policy='propagate')
 
     #untextured default
-    A2_fit=0
-    R2_fit=1
+    A1_fit=0
+    R1_fit=1
     A2_fit=0
     R2_fit=1
     S_fit=0
