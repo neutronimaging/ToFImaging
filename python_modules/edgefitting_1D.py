@@ -504,6 +504,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
 
 #------------------------------ MICROSTRUCTURE FITTING ------------------------#
 def MarchDollase(A,R,l,l_hkl,Nbeta=50,bool_plotPole=False):
+    #A : angle between the hkl plane and preferred orientation
     theta = np.arcsin(l/l_hkl)
     beta = np.linspace(0,2*pi,Nbeta)
     theta = np.matlib.repmat(theta, Nbeta,1)
