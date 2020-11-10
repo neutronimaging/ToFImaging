@@ -502,6 +502,37 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         plt.close()
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
 
+#------------------------------ MICROSTRUCTURE FITTING ------------------------#
+def MarchDollase(A,R,l,l_hkl,Nbeta=50,bool_plotPole=False):
+    theta = np.arcsin(l/l_hkl)
+    beta = np.linspace(0,2*pi,Nbeta)
+    theta = np.matlib.repmat(theta, Nbeta,1)
+    beta = np.transpose(np.matlib.repmat(beta,np.shape(theta)[1],1))
+    B = np.cos(A)*np.sin(theta)+np.sin(A)*np.multiply(np.cos(theta),np.sin(beta))
+    P = np.sum(np.power(R**2*B**2+(1-B**2)/R,-3/2),axis=0)/(Nbeta)
+    P[np.isnan(P)]=1
+    if(bool_plotPole):
+        plt.figure
+        plt.imshow(np.power(R**2*B**2+(1-B**2)/R,-3/2))
+        plt.show(), plt.close()
+        plt.plot(l,P)
+        plt.show(), plt.close()
+    return P  
+
+def SabinePrimaryExtinction(S,l,l_hkl):
+    N = np.shape(l)[0]
+    theta = np.arcsin(l/l_hkl)
+    x = S**2*(l)**2
+    E = np.zeros((N))
+    for i in range(0,N):
+        E_B = 1/np.sqrt(1+x[i])
+        if(x[i]>1):
+            E_L = np.sqrt(2/(pi*x[i]))*(1-1/(8*x[i])-3/(128*x[i]**2)-15/(1024*x[i]**3))
+        else:
+            E_L = 1-x[i]/2+x[i]**2/4-5*x[i]**3/48+7*x[i]**4/192
+        E[i] = E_L*np.cos(theta[i])**2+E_B*np.sin(theta[i])**2
+    return E
+
 def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
     """ Performs texture fitting for up to two lattice planes 
     INPUTS:
@@ -532,36 +563,7 @@ def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l
     'R2': anisotropy for second bragg edge
     'S': crystallite size
     """   
-    def MarchDollase(A,R,l,l_hkl,Nbeta=50,bool_plotPole=False):
-        theta = np.arcsin(l/l_hkl)
-        beta = np.linspace(0,2*pi,Nbeta)
-        theta = np.matlib.repmat(theta, Nbeta,1)
-        beta = np.transpose(np.matlib.repmat(beta,np.shape(theta)[1],1))
-        B = np.cos(A)*np.sin(theta)+np.sin(A)*np.multiply(np.cos(theta),np.sin(beta))
-        P = np.sum(np.power(R**2*B**2+(1-B**2)/R,-3/2),axis=0)/(Nbeta)
-        P[np.isnan(P)]=1
-        if(bool_plotPole):
-            plt.figure
-            plt.imshow(np.power(R**2*B**2+(1-B**2)/R,-3/2))
-            plt.show(), plt.close()
-            plt.plot(l,P)
-            plt.show(), plt.close()
-        return P  
 
-    def SabinePrimaryExtinction(S,l,l_hkl):
-        N = np.shape(l)[0]
-        theta = np.arcsin(l/l_hkl)
-        x = S**2*(l)**2
-        E = np.zeros((N))
-        for i in range(0,N):
-            E_B = 1/np.sqrt(1+x[i])
-            if(x[i]>1):
-                E_L = np.sqrt(2/(pi*x[i]))*(1-1/(8*x[i])-3/(128*x[i]**2)-15/(1024*x[i]**3))
-            else:
-                E_L = 1-x[i]/2+x[i]**2/4-5*x[i]**3/48+7*x[i]**4/192
-            E[i] = E_L*np.cos(theta[i])**2+E_B*np.sin(theta[i])**2
-        return E
-        
     if(spectrum_range):
         idx_low = find_nearest(spectrum,spectrum_range[0])
         idx_high = find_nearest(spectrum,spectrum_range[1])
