@@ -11,11 +11,17 @@ For a detailed guid of how to use this package please open docs/index.md from th
 For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch
 
 # How to Use
-Clone or download the codes to your local machine, then insert the following two lines to your python codes:
-```python
-import sys  
-sys.path.insert(0, "path-to-repository")
+Clone or download the codes to your local machine, move to the right folder then install the
+dependencies using the following command
+
 ```
-This may require further installation of external modules.
+$ pip install -r requirements.txt
+```
+
+and then to install the package
+
+```
+$ pip install -e .
+```
 
 For the software documentation please visit https://neutronimaging.github.io/ToFImaging/ 

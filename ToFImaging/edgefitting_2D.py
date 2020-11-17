@@ -6,10 +6,10 @@ import os, fnmatch
 from os import listdir
 from astropy.io import fits
 
-import edgefitting_1D
-import reduction_tools
-from reduction_tools import tof2l
-from reduction_tools import find_nearest
+from ToFImaging import edgefitting_1D
+from ToFImaging import reduction_tools
+# from ToFImaging.reduction_tools import tof2l
+# from ToFImaging.reduction_tools import find_nearest
 
 from tqdm import tqdm
 import time
