@@ -7,7 +7,7 @@ Currently implemented packages:
   - Tools for Frame overlap Bragg edge imaging (FOBI) data reduction
   - Various tools for TOF imaging data processing / visualization
  
-For a detailed guid of how to use this package please open docs/index.md from the Github repository.
+For a detailed guide of how to use this package please open docs/index.md from the Github repository.
 For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch
 
 # How to Use
