@@ -7,7 +7,8 @@ Currently implemented packages:
   - Tools for Frame overlap Bragg edge imaging (FOBI) data reduction
   - Various tools for TOF imaging data processing / visualization
  
-For a detailed guide of how to use this package please visit https://neutronimaging.github.io/ToFImaging/ .
+For a detailed guide of how to use this package please visit https://neutronimaging.github.io/ToFImaging/.
+
 For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch
 
 # How to Use
