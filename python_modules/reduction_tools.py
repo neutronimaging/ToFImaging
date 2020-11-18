@@ -172,7 +172,7 @@ def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = F
 
             if(bool_print):
                 plt.subplot(1,2,2), 
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Output image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()       
             return outsignal
         if(any(GaussianKernel)):   
@@ -181,7 +181,7 @@ def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = F
 
             if(bool_print):
                 plt.subplot(1,2,2), 
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Output image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()                   
             return outsignal
 
@@ -194,14 +194,14 @@ def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = F
             outsignal = scipy.ndimage.convolve(mysignal,kernel)
             if(bool_print):
                 plt.subplot(1,2,2), 
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Output image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()   
             return outsignal    
         if(any(GaussianKernel)):
             outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel)
             if(bool_print):
                 plt.subplot(1,2,2), 
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Output image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()       
             return outsignal
 
@@ -214,14 +214,14 @@ def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = F
             outsignal = scipy.ndimage.convolve(mysignal,kernel)
             if(bool_print):
                 plt.subplot(1,2,2), 
-                plt.imshow(outsignal), plt.title('Input image')
+                plt.imshow(outsignal), plt.title('Output image')
                 plt.tight_layout(),        plt.show(),        plt.close()    
             return outsignal   
         if(any(GaussianKernel)):
             outsignal = scipy.ndimage.gaussian_filter(mysignal,GaussianKernel) 
             if(bool_print):
                 plt.subplot(1,2,2), 
-                plt.imshow(outsignal), plt.title('Input image')
+                plt.imshow(outsignal), plt.title('Output image')
                 plt.tight_layout(),        plt.show(),        plt.close()         
             return outsignal
 

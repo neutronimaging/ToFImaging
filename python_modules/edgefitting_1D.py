@@ -7,6 +7,7 @@ import numpy.matlib
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
+#------------------------------ SINGLE EDGE FITTING ------------------------#
 def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,bool_print=False): 
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
 
