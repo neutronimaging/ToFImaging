@@ -23,26 +23,17 @@ def tof2l_t0k(t,t0,k):
 
 #Multiple frame merging tools, useful when an acquisition is split into sub-acquisitions (axis=2)
 def averageimage(images):
-    """
-    Calculate the mean of all the images provided
-    Parameters
-    ----------
-    images: list of 2D numpy array
-    Returns
-    -------
-    the mean 2D numpy array
-    """
     img = images.mean(axis=2)
     return img
 
 
 def average_image(images):
     """
-    Calculate the mean of all the images provided
+    Calculate the mean of the 3D images array provided
 
     Parameters
     ----------
-    images: 3D array [x,y,tof]
+    images: 3D array [x, y, tof]
 
     Returns
     -------
@@ -52,6 +43,24 @@ def average_image(images):
         return images
 
     img = images.mean(axis=2)
+    return img
+
+def median_image(images):
+    """
+    Calculate the median of the 3D images array provided
+
+    Parameters
+    ----------
+    images: 3D array [x, y, tof]
+
+    Returns
+    -------
+    the median 2D numpy array
+    """
+    if len(np.shape(images)) == 2:
+        return images
+
+    img = np.median(images, axis=2)
     return img
 
 def medianimage(imgs):
@@ -524,5 +533,20 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         
     return{'T':T, 'spectrum':spectrum}
 
-def combine_images(list_array=None):
-    print("in combine images")
+def combine_images(images=None, algorithm='mean'):
+    """
+    Combine a 3D array according to the algorithm name provided
+
+    Parameters
+    ----------
+    images: 3D array [x, y, tof]
+    algorithm: default 'mean', but can be 'weighted_mean', 'median'
+
+    Returns
+    -------
+    2D array [x, y]
+
+    """
+    if algorithm == 'mean':
+        return averageimage(images)
+
