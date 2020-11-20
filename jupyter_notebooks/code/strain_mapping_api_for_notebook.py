@@ -24,22 +24,31 @@ class StrainMappingAPIForNotebook:
     def __init__(self):
         pass
 
-    def load_tif(self, input_folder):
-        self.working_dir = input_folder
-        list_tif = glob.glob(input_folder + "/*.tif")
-        list_tif.sort()
-        o_norm = Normalization()
-        o_norm.load(file=list_tif, notebook=True)
-        self.projections = np.array(o_norm.data['sample']['data'])
-        self.projections = self.projections.transpose(1, 2, 0)   # x, y, lambda
+    def load_sample(self, input_folders):
+        if len(input_folders) == 1:
+            self.working_dir = input_folders[0]
+            list_tif = glob.glob(input_folders[0] + "/*.tif")
+            list_tif.sort()
+            o_norm = Normalization()
+            o_norm.load(file=list_tif, notebook=True)
+            self.projections = np.array(o_norm.data['sample']['data'])
+            self.projections = self.projections.transpose(1, 2, 0)   # x, y, lambda
+        else:
+            print(f"load all folders and combine them")
 
-    def select_projections(self):
-        fsel_ui = ipywe.fileselector.FileSelectorPanel(instruction='Select data folder ...',
+    def select_projections(self, next_method=None, instruction='Select data folder ...'):
+        fsel_ui = ipywe.fileselector.FileSelectorPanel(instruction=instruction,
                                                        start_dir=self.working_dir,
                                                        type='directory',
-                                                       next=self.load_tif,
-                                                       multiple=False)
+                                                       next=next_method,
+                                                       multiple=True)
         fsel_ui.show()
+
+    def select_sample(self):
+        next_method = self.load_sample
+        self.select_projections(next_method=next_method,
+                                instruction="Select sample data folder ...")
+
 
     def display_integrated_signal(self):
         plt.imshow(np.nanmean(self.projections, axis=2))

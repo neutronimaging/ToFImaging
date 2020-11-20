@@ -16,19 +16,30 @@ def tof2l(tof, L, lambda_0 = 0, tof_0 = 0):
 def l2tof(l, t0, L):
     tof=t0+(l*1e-10)*(L)*m/h
     return tof
-    
+
 def tof2l_t0k(t,t0,k):
     return t0+k*t
 
 #Multiple frame merging tools, useful when an acquisition is split into sub-acquisitions (axis=2)    
-def averageimage(imgs):
-    img=imgs.mean(axis=2)
+def averageimage(images):
+    """
+    Calculate the mean of all the images provided
+
+    Parameters
+    ----------
+    images: list of 2D numpy array
+
+    Returns
+    -------
+    the mean 2D numpy array
+    """
+    img = images.mean(axis=2)
     return img
-    
+
 def medianimage(imgs):
     img=np.median(imgs,axis=2)
     return img
-    
+
 def weightedaverageimage(imgs,size=5):
     import scipy.ndimage
     dims=imgs.shape
@@ -49,7 +60,7 @@ def weightedaverageimage(imgs,size=5):
     img=imgs.sum(axis=2)
     
     return img
-    
+
 #Rebinning/averaging tools    
 def binning_ndarray (mysignal, newsize):
     #Remnant from Chiara's code: Rebins an ndarray into the newsize.
@@ -59,7 +70,7 @@ def binning_ndarray (mysignal, newsize):
         bin_value = np.median(mysignal[i*bin_size:i*bin_size+bin_size])
         binned_signal[i]=bin_value
     return (binned_signal)
-    
+
 def spectral_binning_resolution (mysignal, spectrum, d_spectrum):
     # Rebins an (spectrum) or (x,spectrum) or (x,y,spectrum) matrix to match a new bin_width (e.g. instrumental resolution)
     spectrum_range = spectrum[-1]-spectrum[0]
@@ -98,7 +109,7 @@ def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0]
     K = K/np.sum(K)
     outsignal = np.convolve(mysignal,K,'same')
     return outsignal
-    
+
 def moving_average_2D (mysignal, box_kernel = [], custom_kernel = np.ndarray([0])):
     # Moving average by kernel convolution to an image (2D) 
     # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
@@ -494,3 +505,6 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
     T = transmission_normalization(I,I0,dose_mask)
         
     return{'T':T, 'spectrum':spectrum}
+
+def combine_images(list_array=None):
+    print("in combine images")
