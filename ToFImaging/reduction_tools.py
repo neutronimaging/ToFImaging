@@ -20,19 +20,37 @@ def l2tof(l, t0, L):
 def tof2l_t0k(t,t0,k):
     return t0+k*t
 
-#Multiple frame merging tools, useful when an acquisition is split into sub-acquisitions (axis=2)    
+
+#Multiple frame merging tools, useful when an acquisition is split into sub-acquisitions (axis=2)
 def averageimage(images):
+    """
+    Calculate the mean of all the images provided
+    Parameters
+    ----------
+    images: list of 2D numpy array
+    Returns
+    -------
+    the mean 2D numpy array
+    """
+    img = images.mean(axis=2)
+    return img
+
+
+def average_image(images):
     """
     Calculate the mean of all the images provided
 
     Parameters
     ----------
-    images: list of 2D numpy array
+    images: 3D array [x,y,tof]
 
     Returns
     -------
     the mean 2D numpy array
     """
+    if len(np.shape(images)) == 2:
+        return images
+
     img = images.mean(axis=2)
     return img
 
