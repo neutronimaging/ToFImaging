@@ -286,13 +286,6 @@ def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
         outsignal = rebin(image,f_dim,operation)
     return outsignal    
 
-def spectral_image_rebinning(image, new_shape, operation='sum'):
-    n_tof = np.shape(image)[2]
-    image_rebin = np.zeros((new_shape[0],new_shape[1],n_tof))
-    for i in tqdm(range(0,n_tof)):
-        image_rebin[:,:,i] = spatial_image_rebinning(image[:,:,i],new_shape,operation)
-    return image_rebin
-
 def tof_image_rebinning(image, rebinning_order, operation='mean'):
     tof_n = np.shape(image)[2]
     tof_n_new = np.round(tof_n/rebinning_order)
