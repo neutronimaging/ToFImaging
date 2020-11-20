@@ -293,6 +293,17 @@ def spectral_image_rebinning(image, new_shape, operation='sum'):
         image_rebin[:,:,i] = spatial_image_rebinning(image[:,:,i],new_shape,operation)
     return image_rebin
 
+def tof_image_rebinning(image, rebinning_order, operation='mean'):
+    tof_n = np.shape(image)[2]
+    tof_n_new = np.round(tof_n/rebinning_order)
+    image_out = np.zeros((np.shape(image)[0],np.shape(image)[1],tof_n_new))
+    for i in tqdm(range(0,tof_n_new)):
+        if(operation=='sum'):
+            image_out[:,:,i] = np.nansum(image[:,:,rebinning_order*i:rebinning_order*i+rebinning_order],axis=2)
+        elif(operation=='mean'):
+            image_out[:,:,i] = np.nanmean(image[:,:,rebinning_order*i:rebinning_order*i+rebinning_order],axis=2)
+    return image_out
+
 def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
@@ -471,7 +482,7 @@ def load_fits (pathdata, cut_last=0, bool_wavg = False):
             data[:,:,i] = medianimage(data_t)    
     return data
 
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d_spectrum = 0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_mavg = 0, box_kernel = [], custom_k = np.ndarray([0])):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_tofrebin=False, tofrebin_order = 2):
     # Full loading routine. Load sample and open beam and normalize to TOF transmission T=(x,y,TOF). The tof spectrum is loaded as well and converted to lambda, when asked.
     
     #load rawdata
@@ -481,15 +492,14 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
     if(bool_lambda):
         spectrum = tof2l(spectrum, L, lambda_0, tof_0)
     #rebinning
-    if(d_spectrum):
-        I = spectral_binning_resolution(I,spectrum,d_spectrum)
-        I0 = spectral_binning_resolution(I0,spectrum,d_spectrum)
-    if(bin_size):
-        I = binning_ndarray(I,bin_size)
-        I0 = binning_ndarray(I0,bin_size)
-    if(bool_mavg):
-        I = moving_average_2D(I, box_kernel = box_kernel, custom_kernel = custom_k)
-        I0 = moving_average_2D(I0, box_kernel = box_kernel, custom_kernel = custom_k)
+    if(bool_tofrebin):
+        sp = spectrum
+        I = tof_image_rebinning(I,tofrebin_order)
+        I0 = tof_image_rebinning(I0,tofrebin_order)
+        spectrum = np.zeros((np.shape(I)[2]))
+        for i in range(0,np.shape(I)[2]):
+            spectrum[i] = sp[i*tofrebin_order]
+        
     #normalize
     T = transmission_normalization(I,I0,dose_mask)
         
