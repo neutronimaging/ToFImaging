@@ -103,6 +103,33 @@ def time_delays_4x10(time):
 
     D = np.squeeze(D)
     return D
+    
+def time_delays_5x8(time):
+    """
+    Generates time delays for the 4x10 disk chopper:
+    
+    INPUTS:
+    time = time-of-flight bins
+    
+    OUTPUT:
+    D =  array with discretized dirac deltas at the chopper time delays.
+    """    
+    Nt = int(np.shape(time)[0])
+    angles = np.array([4.81, 17.09, 24.47, 31.35, 36.48, 48.21, 59.64, 66.64])
+    angles =  angles-angles[0]
+
+    angles = np.concatenate((angles, angles+1.0*72.0, angles+2.0*72.0, angles+3.0*72.0, angles+3.0*72.0))/360.0
+    shifts = Nt*angles
+    D = np.zeros((Nt,1))
+    for i in range(0,np.shape(shifts)[0]):
+        sfloor = np.floor(shifts[i])
+        rest = shifts[i]-sfloor
+        sfloor = np.int(sfloor+1)
+        D[sfloor] = 1-rest
+        D[sfloor+1] = rest
+
+    D = np.squeeze(D)
+    return D    
 
 def wiener_decorrelation(f, g, c=1e-1):
     """
