@@ -475,7 +475,7 @@ def load_fits (pathdata, cut_last=0, bool_wavg = False):
             data[:,:,i] = medianimage(data_t)    
     return data
 
-def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, bool_tofrebin=False, tofrebin_order = 2):
+def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np.ndarray([0]), bool_lambda=False, L = 0, tof_0 = 0, lambda_0 = 0, bool_wavg = False, tofrebin_order = 0):
     # Full loading routine. Load sample and open beam and normalize to TOF transmission T=(x,y,TOF). The tof spectrum is loaded as well and converted to lambda, when asked.
     
     #load rawdata
@@ -485,7 +485,7 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np
     if(bool_lambda):
         spectrum = tof2l(spectrum, L, lambda_0, tof_0)
     #rebinning
-    if(bool_tofrebin):
+    if(tofrebin_order):
         sp = spectrum
         I = tof_image_rebinning(I,tofrebin_order)
         I0 = tof_image_rebinning(I0,tofrebin_order)
