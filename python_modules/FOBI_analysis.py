@@ -233,6 +233,8 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,chopper_id,c=1e-1,bool_roll=False,bool_
         D = time_delays_poldi(tn)
     if(chopper_id=='4x10'):
         D = time_delays_4x10(tn)
+    if(chopper_id=='5x8'):
+        D = time_delays_5x8(tn)
 
     # FIXED POLDI angles: now it's working as deconvolution!
     # x0rec = reduction_tools.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
