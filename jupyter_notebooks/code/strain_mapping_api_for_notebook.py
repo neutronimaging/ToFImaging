@@ -58,14 +58,13 @@ class StrainMappingAPIForNotebook:
         self.dsd = box2.children[1]
         self.doff = box3.children[1]
 
-    def load_sample(self, input_folders):
-
+    def load_files(self, input_folders=None, data_type='sample'):
         if self.is_mcp_corrected_ui.value:
             input_folders = StrainMappingAPIForNotebook.mcp_correct_input_folders(input_folders=input_folders)
             clear_output(wait=False)
             display(HTML('<span style="font-size: 15px; color:blue">MCP detector correction: </span>'
                          '<span style="font-size: 15px; color:green">DONE</span>'))
-            display(HTML('<span style="font-size: 15px; color:blue">List of corrected sample folders:</span>'))
+            display(HTML('<span style="font-size: 15px; color:blue">List of corrected ' + data_type + ' folders:</span>'))
             for _folder in input_folders:
                 display(HTML('<span style="font-size: 15px; color:blue">- ' + _folder + '</span>'))
 
@@ -87,17 +86,26 @@ class StrainMappingAPIForNotebook:
                 list_projections.append(projection)
             projections = reduction_tools.mean_of_tof_arrays(list_array_3d=list_projections)
 
-        self.sample_projections = projections.transpose(1, 2, 0)   # x, y, lambda
-        self.display_integrated_signal(self.sample_projections)
+        if data_type == 'sample':
+            self.sample_projections = projections.transpose(1, 2, 0)  # x, y, lambda
+            self.display_integrated_signal(self.sample_projections)
+            self.locate_and_load_spectra_file(input_folder=input_folders[0])
+        elif data_type == 'ob':
+            self.ob_projections = projections.transpose(1, 2, 0)
+        else:
+            raise NotImplementedError("Data type not implemented!")
 
-        self.locate_and_load_spectra_file(input_folder=input_folders[0])
+    def load_sample(self, input_folders):
+        self.load_files(input_folders=input_folders, data_type='sample')
+        display(HTML('<span style="font-size: 15px; color:blue">Sample loaded successfully!</span>'))
 
     def load_ob(self, input_folders):
-        pass
+        self.load_files(input_folders=input_folders, data_type='ob')
+        display(HTML('<span style="font-size: 15px; color:blue">OB loaded successfully!</span>'))
 
     def locate_and_load_spectra_file(self, input_folder=None):
         spectra_file_name = glob.glob(input_folder + "/*_Spectra.txt")
-        if spectra_file_name == []:
+        if not spectra_file_name:
             self.locate_spectra_file(input_folder=input_folder)
         else:
             self.load_spectra_file(spectra_file_name[0])
@@ -137,6 +145,7 @@ class StrainMappingAPIForNotebook:
 
     def select_ob(self):
         next_method = self.load_ob
+        self.working_dir = os.path.dirname(self.working_dir)
         self.select_projections(next_method=next_method,
                                 instruction="Select open beam folder ...")
 
