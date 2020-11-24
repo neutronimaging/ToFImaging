@@ -13,6 +13,7 @@ class Interface(QMainWindow):
     default_roi = {'x0': 0, 'y0': 0, 'x1': 50, 'y1': 50, 'id': None}
     live_image = None
     roi_width = 0.01
+    integrated_image_size = {'width': -1, 'height': -1}
 
     def __init__(self, parent=None, working_dir="", sample_projections=None, spectra_file=None):
         super(Interface, self).__init__(parent)
@@ -49,9 +50,62 @@ class Interface(QMainWindow):
         sample_projections = self.sample_projections
         self.live_image = np.transpose(np.mean(sample_projections, axis=2))
         self.ui.image_view.setImage(self.live_image)
+        self.integrated_image_size['height'], self.integrated_image_size['width'] = np.shape(self.live_image)
 
-    def update_table_roi(self):
-        pass
+    def check_roi_validity(self, value, x_axis=True):
+        """Make sure the ROI selected or defined stays within the image size"""
+        min_value = 0
+
+        value = np.int(value)
+
+        if x_axis:
+            max_value = self.integrated_image_size['width']
+        else:
+            max_value = self.integrated_image_size['height']
+
+        if value < 0:
+            return min_value
+
+        if value > max_value:
+            return max_value
+
+        return value
+
+    def update_table_roi(self, item):
+        """Using the table_roi_ui as reference, will update the list_roi dictionary"""
+        self.ui.table_roi.blockSignals(True)
+
+        nbr_row = self.ui.table_roi.rowCount()
+        new_list_roi = OrderedDict()
+        old_list_roi = self.list_roi
+        for _row in np.arange(nbr_row):
+            _roi = {}
+
+            # checking that x0, y0, x1 and y1 stay within the range of the image
+            _x0 = self.check_roi_validity(self._get_item_value(_row, 0))
+            _y0 = self.check_roi_validity(self._get_item_value(_row, 1), x_axis=False)
+
+            _x1 = self.check_roi_validity(self._get_item_value(_row, 2))
+            _y1 = self.check_roi_validity(self._get_item_value(_row, 3), x_axis=False)
+
+            # updating table content (in case some of the roi were out of scope
+            self._set_item_value(_row, 0, _x0)
+            self._set_item_value(_row, 1, _y0)
+            self._set_item_value(_row, 2, _x1)
+            self._set_item_value(_row, 3, _y1)
+
+            _roi['x0'] = _x0
+            _roi['y0'] = _y0
+            _roi['x1'] = _x1
+            _roi['y1'] = _y1
+            _roi['id'] = old_list_roi[_row]['id']
+
+            new_list_roi[_row] = _roi
+
+        self.list_roi = new_list_roi
+        self.update_image_view_item()
+        self.update_plot_view()
+        self.ui.table_roi.blockSignals(False)
 
     def clear_roi_on_image_view(self):
         """remove all ROI from image_view"""
@@ -120,6 +174,7 @@ class Interface(QMainWindow):
         self.list_roi = list_roi
         self.ui.table_roi.blockSignals(False)
         self.check_add_remove_button_widgets_status()
+        self.update_plot_view()
 
         if not _selection:
             _new_selection = QTableWidgetSelectionRange(0, 0, 0, 3)
@@ -163,6 +218,7 @@ class Interface(QMainWindow):
         # update selection
         new_nbr_row = self.ui.table_roi.rowCount()
         if new_nbr_row == 0:
+            self.update_plot_view()
             return
 
         if row == (old_nbr_row - 1):
@@ -170,6 +226,7 @@ class Interface(QMainWindow):
 
         _new_selection = QTableWidgetSelectionRange(row, 0, row, 3)
         self.ui.table_roi.setRangeSelected(_new_selection, True)
+        self.update_plot_view()
 
     def clear_table(self):
         nbr_row = self.ui.table_roi.rowCount()
@@ -246,7 +303,32 @@ class Interface(QMainWindow):
 
         self.list_roi = list_roi
         self.update_table_roi_ui()
+        self.update_plot_view()
 
+    def update_image_view_item(self):
+        self.clear_roi_on_image_view()
+
+        list_roi = self.list_roi
+        for _row in list_roi.keys():
+            _roi = list_roi[_row]
+
+            _x0 = np.int(_roi['x0'])
+            _y0 = np.int(_roi['y0'])
+            _x1 = np.int(_roi['x1'])
+            _y1 = np.int(_roi['y1'])
+
+            _width = np.abs(_x1 - _x0)
+            _height = np.abs(_y1 - _y0)
+
+            _roi_id = self.init_roi(x0=_x0, y0=_y0,
+                                    width=_width, height=_height)
+            _roi['id'] = _roi_id
+            list_roi[_row] = _roi
+
+        self.list_roi = list_roi
+
+    def update_plot_view(self):
+        print("update counts vs file index")
 
     def cancel_clicked(self):
         self.close()
