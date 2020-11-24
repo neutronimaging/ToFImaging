@@ -1,6 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import scipy.ndimage
 
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
@@ -37,13 +38,14 @@ def average_image(images):
 
     Returns
     -------
-    the mean 2D numpy array
+    the mean 2D numpy array [x, y]
     """
     if len(np.shape(images)) == 2:
         return images
 
     img = images.mean(axis=2)
     return img
+
 
 def median_image(images):
     """
@@ -55,7 +57,7 @@ def median_image(images):
 
     Returns
     -------
-    the median 2D numpy array
+    the median 2D numpy array [x, y]
     """
     if len(np.shape(images)) == 2:
         return images
@@ -63,9 +65,45 @@ def median_image(images):
     img = np.median(images, axis=2)
     return img
 
+
 def medianimage(imgs):
     img=np.median(imgs,axis=2)
     return img
+
+
+def weighted_average_image(images, size=5):
+    """
+    Parameters
+    ----------
+    images: 3D array [x, y, tof]
+    size: default 5
+
+    Returns
+    -------
+    2D array [x, y]
+    """
+    if len(np.shape(images)) == 2:
+        return images
+
+    dims = images.shape
+    weight = np.zeros(images.shape)
+    M = size ** 2
+    for i in np.arange(dims[2]):
+        f = scipy.ndimage.uniform_filter(images[:, :, i], size=size) * M
+        f2 = scipy.ndimage.uniform_filter(images[:, :, i] ** 2, size=size) * M
+        sigma = np.sqrt(1 / (M - 1) * (f2 - (f ** 2) / M))
+
+        weight[:, :, i] = 1.0 / sigma
+
+    wsum = weight.sum(axis=2)
+    for i in np.arange(dims[2]):
+        weight[:, :, i] = weight[:, :, i] / wsum
+
+    imgs = weight * images
+    img = imgs.sum(axis=2)
+
+    return img
+
 
 def weightedaverageimage(imgs,size=5):
     import scipy.ndimage
@@ -533,6 +571,7 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, bin_size=0, d
         
     return{'T':T, 'spectrum':spectrum}
 
+
 def combine_images(images=None, algorithm='mean'):
     """
     Combine a 3D array according to the algorithm name provided
@@ -545,8 +584,12 @@ def combine_images(images=None, algorithm='mean'):
     Returns
     -------
     2D array [x, y]
-
     """
     if algorithm == 'mean':
-        return averageimage(images)
+        return average_image(images)
+    if algorithm == 'median':
+        return median_image(images)
 
+
+def mean_of_tof_arrays(list_array_3d=None):
+    return np.mean(list_array_3d, axis=0)
