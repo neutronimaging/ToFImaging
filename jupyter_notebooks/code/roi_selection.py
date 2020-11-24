@@ -19,9 +19,13 @@ class Interface(QMainWindow):
     def __init__(self, parent=None, main_api=None):
         super(Interface, self).__init__(parent)
 
-        self.sample_projections = main_api.sample_projections
+        self.sample_projections = main_api.sample_projections  # x, y, lambda
+        self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
         self.tof_array = main_api.tof_array
         self.lambda_array = main_api.lambda_array
+
+        print(f"np.shape(self.sample_projections): {np.shape(self.sample_projections)}")
+        print(f"np.shape(self.sample_projections_lambda_x_y): {np.shape(self.sample_projections_lambda_x_y)}")
 
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_roi_selection.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
@@ -52,11 +56,16 @@ class Interface(QMainWindow):
         # splitters
         self.ui.splitter_2.setSizes([400, 0])
 
+        # x_axis buttons
+        self.ui.tof_radioButton.setText(u"TOF (\u03BCs)")
+        self.ui.lambda_radioButton.setText(u"\u03BB (\u212B)")
+
     def display_image(self):
         sample_projections = self.sample_projections
-        self.live_image = np.transpose(np.mean(sample_projections, axis=2))
-        self.ui.image_view.setImage(self.live_image)
-        self.integrated_image_size['height'], self.integrated_image_size['width'] = np.shape(self.live_image)
+        self.live_image = np.mean(sample_projections, axis=2)
+        live_image = np.transpose(self.live_image)
+        self.ui.image_view.setImage(live_image)
+        self.integrated_image_size['height'], self.integrated_image_size['width'] = np.shape(live_image)
 
     def check_roi_validity(self, value, x_axis=True):
         """Make sure the ROI selected or defined stays within the image size"""
@@ -295,7 +304,7 @@ class Interface(QMainWindow):
             _roi = list_roi[_row]
 
             roi_id = _roi['id']
-            region = roi_id.getArraySlice(self.live_image,
+            region = roi_id.getArraySlice(np.transpose(self.live_image),
                                           self.ui.image_view.imageItem)
 
             x0 = region[0][0].start
@@ -340,6 +349,9 @@ class Interface(QMainWindow):
         pass
 
     def update_plot_view(self):
+
+        self.ui.plot_view.clear()
+
         # only run if splitter never been resized
         if (not self.splitter_2_has_been_resized) and \
                 (not self.ui.splitter_2.sizes()[1] == 0):
@@ -353,7 +365,27 @@ class Interface(QMainWindow):
             self.x_axis_units_widgets_enabled(state=False)
         else:
             self.x_axis_units_widgets_enabled(state=True)
-        
+
+        y_axis = []
+        total_number_of_pixels_in_roi = 0
+        for _projection_index, _projection in enumerate(self.sample_projections_lambda_x_y):
+
+            total_counts_of_roi = 0
+            for _index_roi in self.list_roi.keys():
+                _roi = self.list_roi[_index_roi]
+                _x0 = _roi['x0']
+                _y0 = _roi['y0']
+                _x1 = _roi['x1']
+                _y1 = _roi['y1']
+
+                if _projection_index == 0:
+                    total_number_of_pixels_in_roi += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
+                total_counts_of_roi += np.sum(_projection[_y0: _y1+1, _x0: _x1+1])
+
+            mean_counts_of_roi = total_counts_of_roi / total_number_of_pixels_in_roi
+            y_axis.append(mean_counts_of_roi)
+
+        self.ui.plot_view.plot(np.arange(len(self.sample_projections_lambda_x_y)), y_axis)
 
     def x_axis_units_widgets_enabled(self, state=True):
         list_ui = [self.ui.file_index_radioButton,
