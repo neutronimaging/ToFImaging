@@ -212,7 +212,7 @@ class Interface(QMainWindow):
         _selection = self.ui.table_roi.selectedRanges()
         if not _selection:
             return
-        
+
         row = _selection[0].topRow()
         old_nbr_row = self.ui.table_roi.rowCount()
 
@@ -340,7 +340,6 @@ class Interface(QMainWindow):
         pass
 
     def update_plot_view(self):
-
         # only run if splitter never been resized
         if (not self.splitter_2_has_been_resized) and \
                 (not self.ui.splitter_2.sizes()[1] == 0):
@@ -350,6 +349,18 @@ class Interface(QMainWindow):
             self.ui.splitter_2.setSizes([200, 200])
 
         list_roi = self.list_roi
+        if not list_roi:
+            self.x_axis_units_widgets_enabled(state=False)
+        else:
+            self.x_axis_units_widgets_enabled(state=True)
+        
+
+    def x_axis_units_widgets_enabled(self, state=True):
+        list_ui = [self.ui.file_index_radioButton,
+                   self.ui.tof_radioButton,
+                   self.ui.lambda_radioButton]
+        for _ui in list_ui:
+            _ui.setEnabled(state)
 
     def cancel_clicked(self):
         self.close()

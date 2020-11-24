@@ -197,7 +197,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton">
+           <widget class="QRadioButton" name="file_index_radioButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -210,7 +210,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton_2">
+           <widget class="QRadioButton" name="tof_radioButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -220,7 +220,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton_3">
+           <widget class="QRadioButton" name="lambda_radioButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -376,7 +376,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton</sender>
+   <sender>file_index_radioButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>x_axis_units_changed()</slot>
@@ -392,7 +392,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_2</sender>
+   <sender>tof_radioButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>x_axis_units_changed()</slot>
@@ -408,7 +408,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_3</sender>
+   <sender>lambda_radioButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>x_axis_units_changed()</slot>
