@@ -14,6 +14,7 @@ class Interface(QMainWindow):
     live_image = None
     roi_width = 0.01
     integrated_image_size = {'width': -1, 'height': -1}
+    splitter_2_has_been_resized = False
 
     def __init__(self, parent=None, main_api=None):
         super(Interface, self).__init__(parent)
@@ -47,6 +48,9 @@ class Interface(QMainWindow):
         nbr_columns = self.ui.table_roi.columnCount()
         for _col in range(nbr_columns):
             self.ui.table_roi.setColumnWidth(_col, 70)
+
+        # splitters
+        self.ui.splitter_2.setSizes([400, 0])
 
     def display_image(self):
         sample_projections = self.sample_projections
@@ -206,6 +210,9 @@ class Interface(QMainWindow):
         self.ui.table_roi.blockSignals(True)
 
         _selection = self.ui.table_roi.selectedRanges()
+        if not _selection:
+            return
+        
         row = _selection[0].topRow()
         old_nbr_row = self.ui.table_roi.rowCount()
 
@@ -329,11 +336,20 @@ class Interface(QMainWindow):
 
         self.list_roi = list_roi
 
+    def x_axis_units_changed(self):
+        pass
+
     def update_plot_view(self):
+
+        # only run if splitter never been resized
+        if (not self.splitter_2_has_been_resized) and \
+                (not self.ui.splitter_2.sizes()[1] == 0):
+            self.splitter_2_has_been_resized = True
+
+        if not self.splitter_2_has_been_resized:
+            self.ui.splitter_2.setSizes([200, 200])
+
         list_roi = self.list_roi
-
-
-
 
     def cancel_clicked(self):
         self.close()

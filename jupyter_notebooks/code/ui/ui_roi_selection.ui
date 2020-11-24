@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QSplitter" name="splitter_2">
       <property name="orientation">
@@ -163,19 +163,88 @@
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="widget_plot" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>800</width>
-         <height>0</height>
-        </size>
-       </property>
+      <widget class="QWidget" name="">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QWidget" name="widget_plot" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>800</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>File index</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_2">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>TOF (micros)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_3">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Lambda</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -233,8 +302,8 @@
    <slot>cancel_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>512</y>
+     <x>83</x>
+     <y>743</y>
     </hint>
     <hint type="destinationlabel">
      <x>179</x>
@@ -249,8 +318,8 @@
    <slot>apply_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1214</x>
-     <y>512</y>
+     <x>1127</x>
+     <y>743</y>
     </hint>
     <hint type="destinationlabel">
      <x>552</x>
@@ -265,8 +334,8 @@
    <slot>remove_roi_button_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>938</x>
-     <y>256</y>
+     <x>874</x>
+     <y>593</y>
     </hint>
     <hint type="destinationlabel">
      <x>770</x>
@@ -281,8 +350,8 @@
    <slot>add_roi_button_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1083</x>
-     <y>264</y>
+     <x>926</x>
+     <y>593</y>
     </hint>
     <hint type="destinationlabel">
      <x>1127</x>
@@ -306,6 +375,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>x_axis_units_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>475</x>
+     <y>689</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>752</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>x_axis_units_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>598</x>
+     <y>688</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>599</x>
+     <y>749</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>x_axis_units_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>676</x>
+     <y>693</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>706</x>
+     <y>721</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>cancel_clicked()</slot>
@@ -318,5 +435,6 @@
   <slot>remove_roi_button_clicked()</slot>
   <slot>add_roi_button_clicked()</slot>
   <slot>update_table_roi()</slot>
+  <slot>x_axis_units_changed()</slot>
  </slots>
 </ui>
