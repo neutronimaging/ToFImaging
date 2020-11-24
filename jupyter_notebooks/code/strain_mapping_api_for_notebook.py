@@ -30,6 +30,9 @@ class StrainMappingAPIForNotebook:
     sample_projections = None
     ob_projections = None
 
+    tof_array = None
+    lambda_array = None
+
     def __init__(self):
         pass
 
@@ -128,6 +131,7 @@ class StrainMappingAPIForNotebook:
                                      distance_source_detector_m=np.float(self.dsd.value),
                                      detector_offset_micros=np.float(self.doff.value))
             self.lambda_array = exp_handler.lambda_array * 1e10  # to be in Angstroms
+            self.tof_array = tof_handler.tof_array
             display(HTML('<span style="font-size: 15px; color:blue">Spectra file has been loaded successfully!</span>'))
 
     def select_projections(self, next_method=None, instruction='Select data folder ...'):

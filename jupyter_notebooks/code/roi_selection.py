@@ -15,10 +15,12 @@ class Interface(QMainWindow):
     roi_width = 0.01
     integrated_image_size = {'width': -1, 'height': -1}
 
-    def __init__(self, parent=None, working_dir="", sample_projections=None, spectra_file=None):
+    def __init__(self, parent=None, main_api=None):
         super(Interface, self).__init__(parent)
 
-        self.sample_projections = sample_projections
+        self.sample_projections = main_api.sample_projections
+        self.tof_array = main_api.tof_array
+        self.lambda_array = main_api.lambda_array
 
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_roi_selection.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
@@ -328,7 +330,10 @@ class Interface(QMainWindow):
         self.list_roi = list_roi
 
     def update_plot_view(self):
-        print("update counts vs file index")
+        list_roi = self.list_roi
+
+
+
 
     def cancel_clicked(self):
         self.close()
