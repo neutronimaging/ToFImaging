@@ -2,6 +2,7 @@ from pathlib import Path
 from astropy.io import fits
 import numpy as np
 import glob
+import pytest
 
 from NeuNorm.normalization import Normalization
 
@@ -86,7 +87,6 @@ class TestReductionTools:
     def test_mean_of_tof_array(self):
         images_path = str(self.images_path)
         full_list_tif = np.array(glob.glob(images_path + '/*.tif'))
-        print(full_list_tif)
         list_tif_1_index = [0, 1, 2, 4]
         list_tif_2_index = [1, 2, 3, 0]
         list_tif_3_index = [2, 3, 4, 1]
@@ -115,7 +115,4 @@ class TestReductionTools:
         del o_norm2
 
         mean_of_tof_arrays_returned = reduction_tools.mean_of_tof_arrays(data)
-        print()
-        assert False
-
-
+        assert pytest.approx(mean_of_tof_arrays_returned[0][0][0], 1e-5) == 1.1293992
