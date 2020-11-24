@@ -92,16 +92,35 @@ class StrainMappingAPIForNotebook:
 
         self.locate_and_load_spectra_file(input_folder=input_folders[0])
 
+    def load_ob(self, input_folders):
+        pass
+
     def locate_and_load_spectra_file(self, input_folder=None):
         spectra_file_name = glob.glob(input_folder + "/*_Spectra.txt")
         if spectra_file_name == []:
-            sfil_ui = ipywe.fileselector.FileSelectorPanel(instruction="Select Time Spectra File ...",
-                                                           start_dir=input_folder,
-                                                           multiple=False,
-                                                           next=self.load_spectra_file)
-            sfil_ui.show()
+            self.locate_spectra_file(input_folder=input_folder)
         else:
             self.load_spectra_file(spectra_file_name[0])
+
+    def locate_spectra_file(self, input_folder=None):
+        sfil_ui = ipywe.fileselector.FileSelectorPanel(instruction="Select Time Spectra File ...",
+                                                       start_dir=input_folder,
+                                                       multiple=False,
+                                                       next=self.load_spectra_file)
+        sfil_ui.show()
+
+    def load_spectra_file(self, spectra_file):
+        # make sure the name is right
+        base_file_name = str(PurePath(spectra_file).name)
+        if not "_Spectra.txt" in base_file_name:
+            self.locate_spectra_file(input_folder=str(Path(spectra_file).parent))
+        else:
+            tof_handler = TOF(filename=spectra_file)
+            exp_handler = Experiment(tof=tof_handler.tof_array,
+                                     distance_source_detector_m=np.float(self.dsd.value),
+                                     detector_offset_micros=np.float(self.doff.value))
+            self.lambda_array = exp_handler.lambda_array * 1e10  # to be in Angstroms
+            display(HTML('<span style="font-size: 15px; color:blue">Spectra file has been loaded successfully!</span>'))
 
     def select_projections(self, next_method=None, instruction='Select data folder ...'):
         fsel_ui = ipywe.fileselector.FileSelectorPanel(instruction=instruction,
@@ -116,6 +135,11 @@ class StrainMappingAPIForNotebook:
         self.select_projections(next_method=next_method,
                                 instruction="Select sample data folder ...")
 
+    def select_ob(self):
+        next_method = self.load_ob
+        self.select_projections(next_method=next_method,
+                                instruction="Select open beam folder ...")
+
     def display_integrated_signal(self, projections):
         plt.imshow(np.nanmean(projections, axis=2))
         plt.title('Integrated sample image'), plt.colorbar()
@@ -128,14 +152,6 @@ class StrainMappingAPIForNotebook:
                                                      filters={'ASCII': ['*.txt']},
                                                      start_dir=self.working_dir)
         ts_ui.show()
-
-    def load_spectra_file(self, spectra_file):
-        tof_handler = TOF(filename=spectra_file)
-        exp_handler = Experiment(tof=tof_handler.tof_array,
-                                 distance_source_detector_m=np.float(self.dsd.value),
-                                 detector_offset_micros=np.float(self.doff.value))
-        self.lambda_array = exp_handler.lambda_array * 1e10  # to be in Angstroms
-        display(HTML('<span style="font-size: 15px; color:blue">Spectra file has been loaded successfully!</span>'))
 
     def prepare_fitting_mask(self, mask=None, plot=False):
         # mask[mask<0.7]=0
