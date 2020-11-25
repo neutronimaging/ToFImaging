@@ -24,9 +24,6 @@ class Interface(QMainWindow):
         self.tof_array = main_api.tof_array
         self.lambda_array = main_api.lambda_array
 
-        print(f"np.shape(self.sample_projections): {np.shape(self.sample_projections)}")
-        print(f"np.shape(self.sample_projections_lambda_x_y): {np.shape(self.sample_projections_lambda_x_y)}")
-
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_roi_selection.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Region of Interest Tool")
@@ -346,7 +343,7 @@ class Interface(QMainWindow):
         self.list_roi = list_roi
 
     def x_axis_units_changed(self):
-        pass
+        self.update_plot_view()
 
     def update_plot_view(self):
 
@@ -385,7 +382,18 @@ class Interface(QMainWindow):
             mean_counts_of_roi = total_counts_of_roi / total_number_of_pixels_in_roi
             y_axis.append(mean_counts_of_roi)
 
-        self.ui.plot_view.plot(np.arange(len(self.sample_projections_lambda_x_y)), y_axis)
+        x_axis = self.calculate_x_axis()
+        self.ui.plot_view.plot(x_axis, y_axis)
+
+    def calculate_x_axis(self):
+        if self.ui.file_index_radioButton.isChecked():
+            return np.arange(len(self.sample_projections_lambda_x_y))
+        elif self.ui.tof_radioButton.isChecked():
+            return self.tof_array * 1e6
+        elif self.ui.lambda_radioButton.isChecked():
+            return self.lambda_array
+        else:
+            return []
 
     def x_axis_units_widgets_enabled(self, state=True):
         list_ui = [self.ui.file_index_radioButton,
