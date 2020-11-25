@@ -6,12 +6,19 @@ import pyqtgraph as pg
 import numpy as np
 from collections import OrderedDict
 
+MARKER_HEIGHT, MARKER_WIDTH = 20, 20
+
 
 class Interface(QMainWindow):
 
     o_roi = None
     o_api = None
     live_image = None
+
+    pixel_marker = {'x': 0,
+                    'y': 0}
+    cross_of_pixel_to_fit = None
+
 
     # list_roi = OrderedDict()
     # default_roi = {'x0': 0, 'y0': 0, 'x1': 50, 'y1': 50, 'id': None}
@@ -36,13 +43,30 @@ class Interface(QMainWindow):
         self.setWindowTitle("Fit Interface")
 
         self.init_widgets()
+        self.initialize_pixel_marker()
         self.display_image()
         self.display_profile()
         self.display_roi()
+        self.display_cross_of_pixel_to_fit()
+        self.display_box_around_pixel_to_fit()
+
+    def initialize_pixel_marker(self):
+        for _index_roi in self.o_roi.list_roi:
+            _roi = self.o_roi.list_roi[_index_roi]
+            _x0 = _roi['x0']
+            _y0 = _roi['y0']
+            _x1 = _roi['x1']
+            _y1 = _roi['y1']
+
+            x = np.mean([_x0, _x1])
+            y = np.mean([_y0, _y1])
+
+            self.pixel_marker = {'x': x,
+                                 'y': y}
 
     def init_widgets(self):
         # pyqtgraphs
-        self.ui.image_view = pg.ImageView()
+        self.ui.image_view = pg.ImageView(view=pg.PlotItem())
         self.ui.image_view.ui.roiBtn.hide()
         self.ui.image_view.ui.menuBtn.hide()
         verti_layout1 = QVBoxLayout()
@@ -57,6 +81,63 @@ class Interface(QMainWindow):
         # splitters
         self.ui.splitter.setSizes([550, 50])
         self.ui.splitter_2.setSizes([200, 2])
+
+    def pixel_marker_changed(self):
+        region = self.pixel_marker_item.getArraySlice(self.live_image,
+                                                      self.ui.image_view.imageItem)
+
+        x0 = region[0][0].start
+        y0 = region[0][1].start
+        self.pixel_marker['x'] = x0
+        self.pixel_marker['y'] = y0
+
+        self.display_cross_of_pixel_to_fit()
+        
+
+    def display_box_around_pixel_to_fit(self):
+        x, y = self.pixel_marker['x'], self.pixel_marker['y']
+
+        self.pixel_marker_item = pg.ROI([x, y],
+                                   [MARKER_WIDTH, MARKER_HEIGHT],
+                                   scaleSnap=True)
+        self.ui.image_view.addItem(self.pixel_marker_item)
+        self.pixel_marker_item.sigRegionChanged.connect(self.pixel_marker_changed)
+
+    def display_cross_of_pixel_to_fit(self):
+
+        if self.cross_of_pixel_to_fit:
+            self.ui.image_view.removeItem(self.cross_of_pixel_to_fit)
+
+        x, y = self.pixel_marker['x'], self.pixel_marker['y']
+
+        pos = []
+        adj = []
+
+        # vertical guide
+        pos.append([x + MARKER_WIDTH / 2, y - MARKER_HEIGHT / 2])
+        pos.append([x + MARKER_WIDTH / 2, y + MARKER_HEIGHT + MARKER_HEIGHT / 2])
+        adj.append([0, 1])
+
+        # horizontal guide
+        pos.append([x - MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
+        pos.append([x + MARKER_WIDTH + MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
+        adj.append([2, 3])
+
+        pos = np.array(pos)
+        adj = np.array(adj)
+
+        line_color = (255, 0, 0, 255, 1)
+        lines = np.array([line_color for _ in np.arange(len(pos))],
+                         dtype=[('red', np.ubyte), ('green', np.ubyte),
+                                ('blue', np.ubyte), ('alpha', np.ubyte),
+                                ('width', float)])
+        self.cross_of_pixel_to_fit = pg.GraphItem()
+        self.ui.image_view.addItem(self.cross_of_pixel_to_fit)
+        self.cross_of_pixel_to_fit.setData(pos=pos,
+                                  adj=adj,
+                                  pen=lines,
+                                  symbol=None,
+                                  pxMode=False)
 
     def display_roi(self):
         for _index_roi in self.o_roi.list_roi:
