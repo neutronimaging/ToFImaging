@@ -38,6 +38,7 @@ class Interface(QMainWindow):
         self.init_widgets()
         self.display_image()
         self.display_profile()
+        self.display_roi()
 
     def init_widgets(self):
         # pyqtgraphs
@@ -56,6 +57,17 @@ class Interface(QMainWindow):
         # splitters
         self.ui.splitter.setSizes([550, 50])
         self.ui.splitter_2.setSizes([200, 2])
+
+    def display_roi(self):
+        for _index_roi in self.o_roi.list_roi:
+            _roi = self.o_roi.list_roi[_index_roi]
+            _id = _roi['id']
+
+            pos = _id.pos()
+            size = _id.size()
+
+            new_id = pg.ROI(pos, size, movable=False)
+            self.ui.image_view.addItem(new_id)
 
     def display_image(self):
         self.live_image = self.o_roi.live_image
