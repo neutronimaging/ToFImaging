@@ -92,7 +92,29 @@ class Interface(QMainWindow):
         self.pixel_marker['y'] = y0
 
         self.display_cross_of_pixel_to_fit()
-        
+        self.check_status_of_fit_buttons()
+
+    def check_status_of_fit_buttons(self):
+
+        # we need to make sure the pixel selected is inside one of the ROI
+        x_pixel, y_pixel = self.pixel_marker['x'], self.pixel_marker['y']
+
+        list_roi = self.o_roi.list_roi
+        for _index_roi in list_roi.keys():
+            _roi = list_roi[_index_roi]
+            _x0 = _roi['x0']
+            _y0 = _roi['y0']
+            _x1 = _roi['x1']
+            _y1 = _roi['y1']
+
+            if (x_pixel >= _x0) and (x_pixel <= _x1) and \
+                (y_pixel >= _y0) and (y_pixel <= _y1):
+                self.ui.step3_fit_pixel_pushButton.setEnabled(True)
+                self.ui.statusbar.showMessage("")
+                return
+        self.ui.step3_fit_pixel_pushButton.setEnabled(False)
+        self.ui.statusbar.showMessage("Pixel must be inside one of the ROI selected!")
+        self.ui.statusbar.setStyleSheet("color: red")
 
     def display_box_around_pixel_to_fit(self):
         x, y = self.pixel_marker['x'], self.pixel_marker['y']
