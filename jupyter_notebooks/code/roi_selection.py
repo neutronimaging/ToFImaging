@@ -414,3 +414,5 @@ class Interface(QMainWindow):
             _x1 = _roi['x1']
             _y1 = _roi['y1']
             mask[_y0: _y1+1, _x0: _x1+1] = 1
+        self.mask = mask
+        self.close()

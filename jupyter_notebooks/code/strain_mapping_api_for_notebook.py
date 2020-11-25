@@ -27,8 +27,8 @@ class StrainMappingAPIForNotebook:
     working_dir = DEBUG_PATH if DEBUG else "./"
     is_working_with_raw_data_default = False
 
-    sample_projections = None
-    ob_projections = None
+    sample_projections = None     # x, y, lambda
+    ob_projections = None         # x, y, lamba
 
     tof_array = None
     lambda_array = None
@@ -45,13 +45,13 @@ class StrainMappingAPIForNotebook:
         self.is_mcp_corrected_ui = box1.children[0]
         display(box1)
 
-        box2 = widgets.HBox([widgets.Label("dSD (m)",
-                                           layout=widgets.Layout(width="150px")),
+        box2 = widgets.HBox([widgets.Label("distance source-detector (m)",
+                                           layout=widgets.Layout(width="200px")),
                              widgets.Text(str(16.08),
                                           layout=widgets.Layout(width='30%'))])
 
         box3 = widgets.HBox([widgets.Label("detector offset (microns)",
-                                           layout=widgets.Layout(width="150px")),
+                                           layout=widgets.Layout(width="200px")),
                              widgets.Text(str(3700),
                                           layout=widgets.Layout(width='30%'))])
 
@@ -93,7 +93,7 @@ class StrainMappingAPIForNotebook:
             self.sample_projections = projections.transpose(1, 2, 0)  # x, y, lambda
             self.locate_and_load_spectra_file(input_folder=input_folders[0])
         elif data_type == 'ob':
-            self.ob_projections = projections.transpose(1, 2, 0)
+            self.ob_projections = projections.transpose(1, 2, 0)  # x, y, lambda
         else:
             raise NotImplementedError("Data type not implemented!")
 
@@ -168,18 +168,6 @@ class StrainMappingAPIForNotebook:
                                                      start_dir=self.working_dir)
         ts_ui.show()
 
-    def prepare_fitting_mask(self, mask=None, plot=False):
-        # mask[mask<0.7]=0
-        # mask[mask>0]=1
-
-        if plot:
-            plt.imshow(mask)
-            plt.title('Sample mask')
-            plt.colorbar()
-            plt.show()
-            plt.close()
-        self.mask = mask
-
     def calculate_moving_average(self, plot=False):
         # moving average with custom kernel to increase neutron statistics
         # custom_kernel = np.zeros((10,10))
@@ -195,6 +183,14 @@ class StrainMappingAPIForNotebook:
         T_mavg = reduction_tools.moving_average_2D(self.projections,
                                                    custom_kernel=custom_kernel)
         self.T_mavg = T_mavg
+
+    # def normalize_data(self, list_roi=None):
+    #     sample_projections = self.sample_projections
+    #     ob_projections = self.ob_projections
+    #
+    #     for _index_projection, _sample, _ob in enumerate(zip(sample_projections, ob_projections)):
+
+
 
     @staticmethod
     def make_or_reset_folder(folder_name):
