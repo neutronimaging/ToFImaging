@@ -28,10 +28,13 @@ class StrainMappingAPIForNotebook:
     is_working_with_raw_data_default = False
 
     sample_projections = None     # x, y, lambda
-    ob_projections = None         # x, y, lamba
+    ob_projections = None         # x, y, lambda
+    normalize_projections = None  # x, y, lambda
 
     tof_array = None
     lambda_array = None
+
+    message = []
 
     def __init__(self):
         pass
@@ -168,10 +171,18 @@ class StrainMappingAPIForNotebook:
                                                      start_dir=self.working_dir)
         ts_ui.show()
 
+    def display_message(self):
+        clear_output(wait=False)
+        message = self.message
+        message = "\n".join(message)
+        print(message)
+
     def calculate_moving_average(self, plot=False):
         # moving average with custom kernel to increase neutron statistics
         # custom_kernel = np.zeros((10,10))
         # custom_kernel[:,3:7] = 1
+        self.message.append("Calculate moving average ... IN PROGRESS")
+        self.display_message()
         custom_kernel = np.ones((5, 5))
 
         if plot:
@@ -180,17 +191,67 @@ class StrainMappingAPIForNotebook:
             plt.show()
             plt.close()
 
-        T_mavg = reduction_tools.moving_average_2D(self.projections,
+        T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
                                                    custom_kernel=custom_kernel)
         self.T_mavg = T_mavg
+        self.message[-1] = "Calculate moving average ... Done"
+        self.display_message()
 
-    # def normalize_data(self, list_roi=None):
-    #     sample_projections = self.sample_projections
-    #     ob_projections = self.ob_projections
-    #
-    #     for _index_projection, _sample, _ob in enumerate(zip(sample_projections, ob_projections)):
+    def prepare_data(self, o_gui=None):
+        self.normalize_data(list_roi=o_gui.list_roi)
+        self.calculate_moving_average()
 
+    def normalize_data(self, list_roi=None):
 
+        w = widgets.IntProgress(description="Normalization")
+        w.max = len(self.lambda_array)
+        display(w)
+
+        self.message.append("Normalization ... in progress")
+        self.display_message()
+
+        sample_projections = self.sample_projections
+        ob_projections = self.ob_projections
+
+        working_sample_projections = sample_projections.transpose(2, 0, 1)
+        working_ob_projections = ob_projections.transpose(2, 0, 1)
+        normalize_projections = list()
+
+        total_number_of_pixels_in_rois = 0
+        for _index_roi in list_roi.keys():
+            _roi = list_roi[_index_roi]
+            _x0 = _roi['x0']
+            _y0 = _roi['y0']
+            _x1 = _roi['x1']
+            _y1 = _roi['y1']
+            total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
+
+        for _sample, _ob in zip(working_sample_projections, working_ob_projections):
+
+            mean_ob_value = 0
+            for _index_roi in list_roi.keys():
+                _roi = list_roi[_index_roi]
+                _x0 = _roi['x0']
+                _y0 = _roi['y0']
+                _x1 = _roi['x1']
+                _y1 = _roi['y1']
+
+                mean_ob_value += np.sum(_ob[_y0: _y1+1, _x0: _x1+1])
+
+            w.value += 1
+
+            mean_ob = mean_ob_value / total_number_of_pixels_in_rois
+            _normalize = _sample / mean_ob
+
+            normalize_projections.append(_normalize)
+
+        normalize_projections = np.array(normalize_projections)
+        self.debug_normalize_projections = normalize_projections
+
+        self.normalize_projections = normalize_projections.transpose(1, 2, 0)
+        w.close()
+        self.message[-1] = "Normalization ... Done"
+        self.display_message()
 
     @staticmethod
     def make_or_reset_folder(folder_name):
