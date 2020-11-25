@@ -199,7 +199,7 @@ class StrainMappingAPIForNotebook:
 
     def prepare_data(self, o_gui=None):
         self.normalize_data(list_roi=o_gui.list_roi)
-        self.calculate_moving_average()
+        # self.calculate_moving_average()   # TURNED OFF FOR NOW - FIXME
 
     def normalize_data(self, list_roi=None):
 

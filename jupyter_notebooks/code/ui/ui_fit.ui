@@ -24,7 +24,7 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <widget class="QWidget" name="widget" native="true">
+       <widget class="QWidget" name="widget_image" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -119,7 +119,7 @@
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="widget_2" native="true">
+      <widget class="QWidget" name="widget_plot" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -145,7 +145,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="done_pushButton">
         <property name="text">
          <string>Done</string>
         </property>
@@ -168,5 +168,25 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>done_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>apply_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1111</x>
+     <y>705</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1034</x>
+     <y>703</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>apply_clicked()</slot>
+ </slots>
 </ui>
