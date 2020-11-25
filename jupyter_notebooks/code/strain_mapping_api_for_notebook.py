@@ -91,7 +91,6 @@ class StrainMappingAPIForNotebook:
 
         if data_type == 'sample':
             self.sample_projections = projections.transpose(1, 2, 0)  # x, y, lambda
-            self.display_integrated_signal(self.sample_projections)
             self.locate_and_load_spectra_file(input_folder=input_folders[0])
         elif data_type == 'ob':
             self.ob_projections = projections.transpose(1, 2, 0)
@@ -142,7 +141,7 @@ class StrainMappingAPIForNotebook:
                                                        multiple=True)
         fsel_ui.show()
 
-    def select_and_display_sample(self):
+    def select_sample(self):
         next_method = self.load_sample
         self.select_projections(next_method=next_method,
                                 instruction="Select sample data folder ...")
@@ -152,6 +151,9 @@ class StrainMappingAPIForNotebook:
         self.working_dir = os.path.dirname(self.working_dir)
         self.select_projections(next_method=next_method,
                                 instruction="Select open beam folder ...")
+
+    def preview_sample(self):
+        self.display_integrated_signal(self.sample_projections)
 
     def display_integrated_signal(self, projections):
         plt.imshow(np.nanmean(projections, axis=2))

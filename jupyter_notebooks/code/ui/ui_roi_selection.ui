@@ -273,7 +273,7 @@
       <item>
        <widget class="QPushButton" name="apply_button">
         <property name="text">
-         <string>OK</string>
+         <string>Done</string>
         </property>
        </widget>
       </item>
