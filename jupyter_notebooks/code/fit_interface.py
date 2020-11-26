@@ -19,6 +19,7 @@ class Interface(QMainWindow):
                     'y': 0}
     cross_of_pixel_to_fit = None
 
+    default_bragg_peak_range = None
 
     # list_roi = OrderedDict()
     # default_roi = {'x0': 0, 'y0': 0, 'x1': 50, 'y1': 50, 'id': None}
@@ -49,6 +50,7 @@ class Interface(QMainWindow):
         self.display_roi()
         self.display_cross_of_pixel_to_fit()
         self.display_box_around_pixel_to_fit()
+        self.display_lambda_range_to_fit()
 
     def initialize_pixel_marker(self):
         for _index_roi in self.o_roi.list_roi:
@@ -115,6 +117,19 @@ class Interface(QMainWindow):
         self.ui.step3_fit_pixel_pushButton.setEnabled(False)
         self.ui.statusbar.showMessage("Pixel must be inside one of the ROI selected!")
         self.ui.statusbar.setStyleSheet("color: red")
+
+    def display_lambda_range_to_fit(self):
+        if self.default_bragg_peak_range is None:
+            lambda_array = self.o_roi.lambda_array
+            nbr_lambda = len(lambda_array)
+            self.default_bragg_peak_range = [lambda_array[np.int(nbr_lambda/2)],
+                                             lambda_array[np.int(nbr_lambda/2) + 10]]
+
+        self.bragg_peak_range_ui = pg.LinearRegionItem(values=self.default_bragg_peak_range,
+                                                       orientation=None,
+                                                       movable=True)
+        self.bragg_peak_range_ui.setZValue(-10)
+        self.ui.plot_view.addItem(self.bragg_peak_range_ui)
 
     def display_box_around_pixel_to_fit(self):
         x, y = self.pixel_marker['x'], self.pixel_marker['y']
