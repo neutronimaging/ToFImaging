@@ -20,6 +20,7 @@ class Interface(QMainWindow):
     cross_of_pixel_to_fit = None
 
     default_bragg_peak_range = None
+    bragg_peak_range_ui = None
 
     # list_roi = OrderedDict()
     # default_roi = {'x0': 0, 'y0': 0, 'x1': 50, 'y1': 50, 'id': None}
@@ -63,8 +64,8 @@ class Interface(QMainWindow):
             x = np.mean([_x0, _x1])
             y = np.mean([_y0, _y1])
 
-            self.pixel_marker = {'x': x,
-                                 'y': y}
+            self.pixel_marker = {'x': np.int(x),
+                                 'y': np.int(y)}
 
     def init_widgets(self):
         # pyqtgraphs
@@ -95,6 +96,7 @@ class Interface(QMainWindow):
 
         self.display_cross_of_pixel_to_fit()
         self.check_status_of_fit_buttons()
+        self.display_profile()
 
     def check_status_of_fit_buttons(self):
 
@@ -193,9 +195,31 @@ class Interface(QMainWindow):
         self.ui.image_view.setImage(live_image)
 
     def display_profile(self):
+        self.ui.plot_view.clear()
+
+        self.calculate_profile_of_roi()
+        x_axis = self.o_roi.lambda_array
+        self.ui.plot_view.plot(x_axis, self.profile_y_axis)
+
+        self.calculate_profile_of_pixel_selected()
+        _color = [250, 128, 247]
+        self.ui.plot_view.plot(x_axis, self.profile_of_pixel_selected, pen=_color)
+
+        if self.bragg_peak_range_ui:
+            self.ui.plot_view.addItem(self.bragg_peak_range_ui)
+
+    def calculate_profile_of_pixel_selected(self):
+        pixel_marker = self.pixel_marker
+        x = pixel_marker['x']
+        y = pixel_marker['y']
+        normalize_projections = self.o_api.normalize_projections
+
+        profile = normalize_projections[y, x, :]
+        self.profile_of_pixel_selected = profile
+
+    def calculate_profile_of_roi(self):
         normalize_projections_lambda_x_y = self.o_api.normalize_projections.transpose(2, 0, 1)
         list_roi = self.o_roi.list_roi
-
         profile_y_axis = []
         total_number_of_pixels_in_rois = 0
         for _index_roi in list_roi.keys():
@@ -205,7 +229,6 @@ class Interface(QMainWindow):
             _x1 = _roi['x1']
             _y1 = _roi['y1']
             total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
-
         for _projection in normalize_projections_lambda_x_y:
 
             total_counts_of_roi = 0
@@ -219,11 +242,7 @@ class Interface(QMainWindow):
 
             mean_counts_of_roi = total_counts_of_roi / total_number_of_pixels_in_rois
             profile_y_axis.append(mean_counts_of_roi)
-
         self.profile_y_axis = profile_y_axis
-
-        x_axis = self.o_roi.lambda_array
-        self.ui.plot_view.plot(x_axis, profile_y_axis)
 
     def apply_clicked(self):
         self.close()
