@@ -212,7 +212,7 @@ class Interface(QMainWindow):
         pixel_marker = self.pixel_marker
         x = pixel_marker['x']
         y = pixel_marker['y']
-        normalize_projections = self.o_api.normalize_projections
+        normalize_projections = self.o_api.T_mavg
 
         profile = normalize_projections[y, x, :]
         self.profile_of_pixel_selected = profile

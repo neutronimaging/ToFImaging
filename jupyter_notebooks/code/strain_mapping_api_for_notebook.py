@@ -17,7 +17,6 @@ from ToFImaging import reduction_tools
 from jupyter_notebooks.code import detector_correction
 from jupyter_notebooks.code import utilities
 
-
 DEBUG = True
 DEBUG_PATH = "/Users/j35/IPTS/IPTS-strain-mapping/raw"
 
@@ -197,9 +196,9 @@ class StrainMappingAPIForNotebook:
         self.message[-1] = "Calculate moving average ... Done"
         self.display_message()
 
-    def prepare_data(self, o_gui=None):
-        self.normalize_data(list_roi=o_gui.list_roi)
-        # self.calculate_moving_average()   # TURNED OFF FOR NOW - FIXME
+    def prepare_data(self, list_roi=None):
+        self.normalize_data(list_roi=list_roi)
+        self.calculate_moving_average()
 
     def normalize_data(self, list_roi=None):
 
