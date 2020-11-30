@@ -280,7 +280,7 @@
    <sender>left_number_of_files_to_exclude_slider</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>numer_of_files_to_exclude_slider_changed()</slot>
+   <slot>number_of_files_to_exclude_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>166</x>
@@ -296,7 +296,7 @@
    <sender>right_number_of_files_to_exclude_slider</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>numer_of_files_to_exclude_slider_changed()</slot>
+   <slot>number_of_files_to_exclude_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>992</x>
@@ -313,6 +313,6 @@
   <slot>apply_clicked()</slot>
   <slot>fit_pixel_clicked()</slot>
   <slot>fit_full_roi_clicked()</slot>
-  <slot>numer_of_files_to_exclude_slider_changed()</slot>
+  <slot>number_of_files_to_exclude_slider_changed()</slot>
  </slots>
 </ui>
