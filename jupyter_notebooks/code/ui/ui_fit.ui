@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
      <widget class="QSplitter" name="splitter_2">
       <property name="orientation">
@@ -32,7 +32,7 @@
          </sizepolicy>
         </property>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QGroupBox" name="groupBox">
@@ -86,7 +86,7 @@
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Step3: Fit pixel</string>
+               <string>Step3: Fit selected pixel</string>
               </property>
              </widget>
             </item>
@@ -96,7 +96,7 @@
                <bool>false</bool>
               </property>
               <property name="text">
-               <string>Step4: Fit ROI</string>
+               <string>Step4: Fit all pixels of ROI</string>
               </property>
              </widget>
             </item>
@@ -119,13 +119,72 @@
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="widget_plot" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+      <widget class="QWidget" name="">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QWidget" name="widget_plot" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Number of files to exclude</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>At the beginning </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSlider" name="left_number_of_files_to_exclude_slider">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QSlider" name="right_number_of_files_to_exclude_slider">
+             <property name="layoutDirection">
+              <enum>Qt::RightToLeft</enum>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>At the end</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -185,8 +244,75 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>step3_fit_pixel_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>fit_pixel_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>778</x>
+     <y>216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1156</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>step4_fit_roi_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>fit_full_roi_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>723</x>
+     <y>247</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1155</x>
+     <y>341</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>left_number_of_files_to_exclude_slider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>numer_of_files_to_exclude_slider_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>653</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>667</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>right_number_of_files_to_exclude_slider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>numer_of_files_to_exclude_slider_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>992</x>
+     <y>651</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1158</x>
+     <y>650</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>apply_clicked()</slot>
+  <slot>fit_pixel_clicked()</slot>
+  <slot>fit_full_roi_clicked()</slot>
+  <slot>numer_of_files_to_exclude_slider_changed()</slot>
  </slots>
 </ui>

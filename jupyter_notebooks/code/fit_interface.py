@@ -22,6 +22,9 @@ class Interface(QMainWindow):
     default_bragg_peak_range = None
     bragg_peak_range_ui = None
 
+    nbr_files_to_exclude_from_plot = {'left': 20,
+                                      'right': 20}
+
     # list_roi = OrderedDict()
     # default_roi = {'x0': 0, 'y0': 0, 'x1': 50, 'y1': 50, 'id': None}
     # live_image = None
@@ -84,6 +87,13 @@ class Interface(QMainWindow):
         # splitters
         self.ui.splitter.setSizes([550, 50])
         self.ui.splitter_2.setSizes([200, 2])
+
+        # sliders
+        half_number_of_files = np.int(len(self.o_roi.lambda_array))/2
+        self.ui.right_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
+        self.ui.left_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
+        self.ui.right_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['left'])
+        self.ui.left_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['right'])
 
     def pixel_marker_changed(self):
         region = self.pixel_marker_item.getArraySlice(self.live_image,
@@ -199,11 +209,20 @@ class Interface(QMainWindow):
 
         self.calculate_profile_of_roi()
         x_axis = self.o_roi.lambda_array
-        self.ui.plot_view.plot(x_axis, self.profile_y_axis)
+
+        # remove left and right files
+        nbr_left = self.nbr_files_to_exclude_from_plot['left']
+        nbr_right = len(x_axis) - self.nbr_files_to_exclude_from_plot['right']
+
+        x_axis = x_axis[nbr_left: nbr_right]
+        profile_y_axis = self.profile_y_axis[nbr_left: nbr_right]
+        self.ui.plot_view.plot(x_axis, profile_y_axis)
 
         self.calculate_profile_of_pixel_selected()
         _color = [250, 128, 247]
-        self.ui.plot_view.plot(x_axis, self.profile_of_pixel_selected, pen=_color)
+
+        profile_of_pixel_selected = self.profile_of_pixel_selected[nbr_left: nbr_right]
+        self.ui.plot_view.plot(x_axis, profile_of_pixel_selected, pen=_color)
 
         if self.bragg_peak_range_ui:
             self.ui.plot_view.addItem(self.bragg_peak_range_ui)
@@ -243,6 +262,19 @@ class Interface(QMainWindow):
             mean_counts_of_roi = total_counts_of_roi / total_number_of_pixels_in_rois
             profile_y_axis.append(mean_counts_of_roi)
         self.profile_y_axis = profile_y_axis
+
+    def number_of_files_to_exclude_slider_changed(self, value):
+        left_number = np.int(str(self.ui.left_number_of_files_to_exclude_slider.value()))
+        right_number = np.int(str(self.ui.right_number_of_files_to_exclude_slider.value()))
+        self.nbr_files_to_exclude_from_plot['left'] = left_number
+        self.nbr_files_to_exclude_from_plot['right'] = right_number
+        self.display_profile()
+
+    def fit_pixel_clicked(self):
+        pass
+
+    def fit_full_roi_clicked(self):
+        pass
 
     def apply_clicked(self):
         self.close()
