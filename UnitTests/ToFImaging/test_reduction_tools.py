@@ -116,3 +116,64 @@ class TestReductionTools:
 
         mean_of_tof_arrays_returned = reduction_tools.mean_of_tof_arrays(data)
         assert pytest.approx(mean_of_tof_arrays_returned[0][0][0], 1e-5) == 1.1293992
+
+
+class TestMovingAverage1D:
+
+    def test_wrong_input_raises_errors(self):
+        input_array = np.ones((3, 3))
+        with pytest.raises(ValueError):
+            reduction_tools.moving_average_1D(input_array=input_array)
+
+        with pytest.raises(ValueError):
+            reduction_tools.moving_average_1D()
+
+    def test_default_custom_kernel(self):
+        input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
+        output_array = reduction_tools.moving_average_1D(input_array=input_array, kernel_size=1)
+        assert len(input_array) == len(output_array)
+        for _input, _output in zip(input_array, output_array):
+            assert _input == _output
+
+        input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
+        output_array = reduction_tools.moving_average_1D(input_array=input_array, kernel_size=2)
+        expected_array = np.array([1/2, 11/2, 21/2, 20/2, 11/2, 3/2, 2/2, 31/2, 45/2, 15/2])
+        assert len(output_array) == len(expected_array)
+        for _input, _output in zip(expected_array, output_array):
+            assert _input == _output
+
+        input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
+        output_array = reduction_tools.moving_average_1D(input_array=input_array, kernel_size=3)
+        expected_array = np.array([(1+10)/3, (1+10+11)/3, (10+11+9)/3, (11+9+2)/3,
+                                   (9+2+1)/3, (2+1+1)/3, (1+1+30)/3,
+                                   (1+30+15)/3, (30+15+0)/3, (15+0)/3])
+        assert len(output_array) == len(expected_array)
+        for _input, _output in zip(expected_array, output_array):
+            assert _input == _output
+
+    def test_custom_kernel(self):
+        input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
+        output_array = reduction_tools.moving_average_1D(input_array=input_array, custom_kernel=np.array([1, 1]))
+        expected_array = np.array([1 / 2, 11 / 2, 21 / 2, 20 / 2, 11 / 2, 3 / 2, 2 / 2, 31 / 2, 45 / 2, 15 / 2])
+        assert len(output_array) == len(expected_array)
+        print(expected_array)
+        for _input, _output in zip(expected_array, output_array):
+            assert _input == _output
+
+        input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
+        output_array = reduction_tools.moving_average_1D(input_array=input_array, custom_kernel=np.array([1, 1, 1]))
+        expected_array = np.array([(1 + 10) / 3, (1 + 10 + 11) / 3, (10 + 11 + 9) / 3, (11 + 9 + 2) / 3,
+                                   (9 + 2 + 1) / 3, (2 + 1 + 1) / 3, (1 + 1 + 30) / 3,
+                                   (1 + 30 + 15) / 3, (30 + 15 + 0) / 3, (15 + 0) / 3])
+        assert len(output_array) == len(expected_array)
+        for _input, _output in zip(expected_array, output_array):
+            assert _input == _output
+
+        input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
+        output_array = reduction_tools.moving_average_1D(input_array=input_array, custom_kernel=np.array([1, 2, 1]))
+        expected_array = np.array([(2*1 + 10) / 4, (1 + 2*10 + 11) / 4, (10 + 2*11 + 9) / 4, (11 + 2*9 + 2) / 4,
+                                   (9 + 2*2 + 1) / 4, (2 + 2*1 + 1) / 4, (1 + 2*1 + 30) / 4,
+                                   (1 + 2*30 + 15) / 4, (30 + 2*15 + 0) / 4, (15 + 2*0) / 4])
+        assert len(output_array) == len(expected_array)
+        for _input, _output in zip(expected_array, output_array):
+            assert _input == _output

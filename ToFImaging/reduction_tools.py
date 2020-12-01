@@ -126,6 +126,43 @@ def weightedaverageimage(imgs,size=5):
     
     return img
 
+
+def moving_average_1D (input_array=None, kernel_size=3, custom_kernel=np.ndarray([0])):
+    """
+    Parameters
+    ----------
+    input_array (mandatory): 1D array
+    kernel_size: size of kernel to use (default 3)
+    custom_kernel: custom kernel (default [0])
+
+    Raises
+    ------
+    ValueError if input array is not a 1D array
+
+    Returns
+    -------
+    array of the same size as input array (mysignal)
+
+    """
+
+    # Moving average by kernel convolution to a ndarray
+    if len(np.shape(input_array)) != 1:
+        raise ValueError("Input array must be of dimension 1!")
+
+    if input_array is None:
+        raise ValueError("Please provide a 1D input array!")
+
+    if(custom_kernel.any()):
+        kernel = custom_kernel
+    else:
+        kernel = np.ones((kernel_size))
+
+    kernel = kernel/np.sum(kernel)
+    outsignal = np.convolve(input_array, kernel, 'same')
+
+    return outsignal
+
+
 #Rebinning/averaging tools    
 def binning_ndarray (mysignal, newsize):
     #Remnant from Chiara's code: Rebins an ndarray into the newsize.
@@ -163,17 +200,6 @@ def spectral_binning_resolution (mysignal, spectrum, d_spectrum):
     
     return (binned_signal, new_spectrum)
 
-def moving_average_1D (mysignal, kernel_size = 3, custom_kernel = np.ndarray([0])):
-    # Moving average by kernel convolution to a ndarray
-    if(len(np.shape(mysignal))!=1):
-        print('Data size is not 1D')
-    if(custom_kernel.any()):
-        K = custom_kernel
-    else:
-        K = np.ones((kernel_size))
-    K = K/np.sum(K)
-    outsignal = np.convolve(mysignal,K,'same')
-    return outsignal
 
 def moving_average_2D (mysignal, box_kernel = [], custom_kernel = np.ndarray([0])):
     # Moving average by kernel convolution to an image (2D) 
