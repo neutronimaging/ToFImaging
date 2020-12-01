@@ -130,6 +130,8 @@ def weightedaverageimage(imgs,size=5):
 
 def moving_average_1D (input_array=None, kernel_size=3, custom_kernel=np.ndarray([0])):
     """
+    Program will first look at the custom_kernel. If there is one defined, the kernel size will be ignored
+
     Parameters
     ----------
     input_array (mandatory): 1D array
@@ -153,7 +155,7 @@ def moving_average_1D (input_array=None, kernel_size=3, custom_kernel=np.ndarray
     if input_array is None:
         raise ValueError("Please provide a 1D input array!")
 
-    if(custom_kernel.any()):
+    if custom_kernel.any():
         kernel = custom_kernel
     else:
         kernel = np.ones((kernel_size))
@@ -168,6 +170,9 @@ def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0]
     """
     Moving average by kernel convolution to an image (2D)
     !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
+
+    Program will first look at the custom kernel. If there is one, the box_kernel will be
+    ignored.
 
     Parameters
     ----------
@@ -187,7 +192,10 @@ def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0]
         kernel = custom_kernel
     
     elif not (box_kernel is None):
-        
+
+        if len(box_kernel) != 2:
+            raise ValueError("Box kernel should be a 2 element list!")
+
         max_kernel = np.max(box_kernel)
         min_kernel = np.min(box_kernel)
         d = np.argmin(box_kernel)
