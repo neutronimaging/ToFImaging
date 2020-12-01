@@ -2,9 +2,11 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import scipy.ndimage
+import scipy.signal
 
-h=6.62607004e-34 #Planck constant [m^2 kg / s]
-m=1.674927471e-27 #Neutron mass [kg]
+h = 6.62607004e-34 #Planck constant [m^2 kg / s]
+m = 1.674927471e-27 #Neutron mass [kg]
+
 
 #Calibration functions
 def tof2l(tof, L, lambda_0 = 0, tof_0 = 0):
@@ -106,7 +108,6 @@ def weighted_average_image(images, size=5):
 
 
 def weightedaverageimage(imgs,size=5):
-    import scipy.ndimage
     dims=imgs.shape
     w=np.zeros(imgs.shape)
     M=size**2
@@ -141,7 +142,7 @@ def moving_average_1D (input_array=None, kernel_size=3, custom_kernel=np.ndarray
 
     Returns
     -------
-    array of the same size as input array (mysignal)
+    array of the same size as input array
 
     """
 
@@ -161,6 +162,65 @@ def moving_average_1D (input_array=None, kernel_size=3, custom_kernel=np.ndarray
     outsignal = np.convolve(input_array, kernel, 'same')
 
     return outsignal
+
+
+def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0])):
+    """
+    Moving average by kernel convolution to an image (2D)
+    !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
+
+    Parameters
+    ----------
+    input_array
+    box_kernel
+    custom_kernel
+
+    Returns
+    -------
+    array of the same size as input array
+
+    """
+    if not len(np.shape(input_array)) in [2, 3]:
+        raise ValueError("Input array must be a 2 or 3D array!")
+
+    if custom_kernel.any():
+        kernel = custom_kernel
+    
+    elif not (box_kernel is None):
+        
+        max_kernel = np.max(box_kernel)
+        min_kernel = np.min(box_kernel)
+        d = np.argmin(box_kernel)
+        kernel = np.zeros((max_kernel, min_kernel))
+        
+        if max_kernel % 2 == 0:
+            if min_kernel % 2 == 0:
+                kernel[np.int(max_kernel/2 - min_kernel/2):np.int(max_kernel/2 + min_kernel/2), :] = 1
+            else:
+                kernel[np.int(max_kernel/2 - np.floor(min_kernel/2)):np.int(max_kernel/2 +
+                                                                            np.floor(min_kernel/2)), :] = 1
+                kernel[np.int(max_kernel/2 - np.floor(min_kernel/2)) - 1, :] = 0.5
+                kernel[np.int(max_kernel/2 + np.floor(min_kernel/2)), :] = 0.5
+        else:
+            if min_kernel % 2 == 0:
+                kernel[np.int(max_kernel/2 - (min_kernel-1)/2):np.int(max_kernel/2 + (min_kernel-1) / 2), :] = 1
+                kernel[np.int(max_kernel/2 - (min_kernel-1)/2) - 1, :] = 0.5
+                kernel[np.int(max_kernel/2 + (min_kernel-1)/2), :] = 0.5
+            else:
+                kernel[np.int(max_kernel/2 - min_kernel/2):np.int(max_kernel/2 + min_kernel/2), :] = 1
+
+        if d == 1:
+            kernel = np.transpose(kernel)
+
+    kernel = kernel / np.sum(kernel)
+
+    if len(np.shape(input_array)) == 3:  # if finds 3d matrix assume it's ToF data and apply to each tof frame
+        output_array = np.zeros((np.shape(input_array)[0], np.shape(input_array)[1], np.shape(input_array)[2]))
+        for i in tqdm(range(0, np.shape(input_array)[2])):
+            output_array[:, :, i] = scipy.signal.convolve2d(input_array[:, :, i], kernel, 'same')
+    else:
+        output_array = scipy.signal.convolve2d(input_array, kernel, 'same')
+    return output_array
 
 
 #Rebinning/averaging tools    
@@ -201,45 +261,7 @@ def spectral_binning_resolution (mysignal, spectrum, d_spectrum):
     return (binned_signal, new_spectrum)
 
 
-def moving_average_2D (mysignal, box_kernel = [], custom_kernel = np.ndarray([0])):
-    # Moving average by kernel convolution to an image (2D) 
-    # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
-    import scipy.signal
-        
-    if(len(np.shape(mysignal))!=3 | len(np.shape(mysignal))!=2):
-        print('Data size is not either a 2D or ToF 2D')
-    if(custom_kernel.any()):
-        K = custom_kernel
-    elif(any(box_kernel)):
-        M = np.max(box_kernel)
-        m = np.min(box_kernel)
-        d = np.argmin(box_kernel)
-        K = np.zeros((M,M))
-        if(M%2==0):
-            if(m%2==0):
-                K[np.int(M/2-m/2):np.int(M/2+m/2),:]=1
-            else:
-                K[np.int(M/2-np.floor(m/2)):np.int(M/2+np.floor(m/2)),:]=1
-                K[np.int(M/2-np.floor(m/2))-1,:]=0.5
-                K[np.int(M/2+np.floor(m/2)),:]=0.5
-        else:
-            if(m%2==0):
-                K[np.int(M/2-(m-1)/2):np.int(M/2+(m-1)/2),:] = 1
-                K[np.int(M/2-(m-1)/2)-1,:] = 0.5
-                K[np.int(M/2+(m-1)/2),:] = 0.5       
-            else:      
-                K[np.int(M/2-m/2):np.int(M/2+m/2),:] = 1      
-        if(d==1):
-            K = np.transpose(K)        
-    K = K/np.sum(K)
-    
-    if(len(np.shape(mysignal))==3): #if finds 3d matrix assume it's ToF data and apply to each tof frame
-        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1], np.shape(mysignal)[2]))
-        for i in tqdm(range(0,np.shape(mysignal)[2])): 
-            outsignal[:,:,i] = scipy.signal.convolve2d(mysignal[:,:,i],K,'same')
-    else:
-        outsignal = scipy.signal.convolve2d(mysignal,K,'same')
-    return outsignal   
+
 
 def DataFiltering (mysignal, BoxKernel = [], GaussianKernel = [], bool_print = False):
     import scipy.ndimage

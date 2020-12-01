@@ -128,7 +128,7 @@ class TestMovingAverage1D:
         with pytest.raises(ValueError):
             reduction_tools.moving_average_1D()
 
-    def test_default_custom_kernel(self):
+    def test_using_kernel_size(self):
         input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
         output_array = reduction_tools.moving_average_1D(input_array=input_array, kernel_size=1)
         assert len(input_array) == len(output_array)
@@ -151,7 +151,7 @@ class TestMovingAverage1D:
         for _input, _output in zip(expected_array, output_array):
             assert _input == _output
 
-    def test_custom_kernel(self):
+    def test_using_custom_kernel(self):
         input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
         output_array = reduction_tools.moving_average_1D(input_array=input_array, custom_kernel=np.array([1, 1]))
         expected_array = np.array([1 / 2, 11 / 2, 21 / 2, 20 / 2, 11 / 2, 3 / 2, 2 / 2, 31 / 2, 45 / 2, 15 / 2])
@@ -177,3 +177,27 @@ class TestMovingAverage1D:
         assert len(output_array) == len(expected_array)
         for _input, _output in zip(expected_array, output_array):
             assert _input == _output
+
+
+class TestMovingAverage2D:
+
+    def test_wrong_input_raises_errors(self):
+        input_array = np.array([1, 10, 11, 9, 2, 1, 1, 30, 15, 0])
+        with pytest.raises(ValueError):
+            reduction_tools.moving_average_2D(input_array=input_array)
+
+        input_array = np.ones((3, 4, 5, 6))
+        with pytest.raises(ValueError):
+            reduction_tools.moving_average_2D(input_array=input_array)
+
+    def test_using_custom_kernel(self):
+        input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
+        output_array = reduction_tools.moving_average_2D(input_array=input_array,
+                                                         custom_kernel=np.ones((3, 3)))
+        expected_array = np.array([[(1+10+9+2)/9, (1+10+11+9+2+1)/9, (10+11+2+1)/9],
+                                   [(1+10+9+2+1+30)/9, (1+10+11+9+2+1+1+30+15)/9, (10+11+2+1+30+15)/9],
+                                   [(9+2+1+30)/9, (9+2+1+1+30+15)/9, (2+1+30+15)/9]])
+        assert np.shape(input_array) == np.shape(output_array)
+        for _output_row, _expected_row in zip(output_array, expected_array):
+            for _output, _expected in zip(_output_row, _expected_row):
+                assert _output == pytest.approx(_expected, 1e-5)
