@@ -13,7 +13,8 @@ from ToFImaging import reduction_tools
 
 from tqdm import tqdm
 import time
-   
+
+
 def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_idx=[]):            
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:

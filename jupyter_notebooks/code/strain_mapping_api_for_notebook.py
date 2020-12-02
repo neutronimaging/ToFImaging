@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path, PurePath
 import shutil
+from qtpy import QtGui
 
 import ipywe.fileselector
 import ipywe.fileselector
@@ -251,6 +252,7 @@ class StrainMappingAPIForNotebook:
         w.close()
         self.message[-1] = "Normalization ... Done"
         self.display_message()
+        QtGui.QGuiApplication.processEvents()
 
     @staticmethod
     def make_or_reset_folder(folder_name):

@@ -6,6 +6,8 @@ import pyqtgraph as pg
 import numpy as np
 from collections import OrderedDict
 
+from jupyter_notebooks.code.fit_handler import FitHandler
+
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 
 
@@ -89,11 +91,16 @@ class Interface(QMainWindow):
         self.ui.splitter_2.setSizes([200, 2])
 
         # sliders
-        half_number_of_files = np.int(len(self.o_roi.lambda_array))/2
+        half_number_of_files = np.int(len(self.o_roi.lambda_array)/2)
         self.ui.right_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
         self.ui.left_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
         self.ui.right_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['left'])
         self.ui.left_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['right'])
+
+        # mid_lambda = self.o_roi.lambda_array[half_number_of_files]
+        # self.ui.rough_lambda_peak_position_slider.setMinimum(self.ui.left_number_of_files_to_exclude_slider.value())
+        # self.ui.rough_lambda_peak_position_slider.setMaximum(self.ui.right_number_of_files_to_exclude_slider.value())
+        # self.ui.rough_lambda_peak_position_slider.setValue(mid_lambda)
 
     def pixel_marker_changed(self):
         region = self.pixel_marker_item.getArraySlice(self.live_image,
@@ -268,10 +275,18 @@ class Interface(QMainWindow):
         right_number = np.int(str(self.ui.right_number_of_files_to_exclude_slider.value()))
         self.nbr_files_to_exclude_from_plot['left'] = left_number
         self.nbr_files_to_exclude_from_plot['right'] = right_number
+
+        self.ui.rough_lambda_peak_position_slider.setMinimum(left_number)
+        self.ui.rough_lambda_peak_position_slider.setMaximum(right_number)
+
         self.display_profile()
 
-    def fit_pixel_clicked(self):
+    def rough_lambda_peak_position_slider_changed(self):
         pass
+
+    def fit_pixel_clicked(self):
+        o_fit = FitHandler(parent=self)
+        o_fit.fit_pixel()
 
     def fit_full_roi_clicked(self):
         pass
