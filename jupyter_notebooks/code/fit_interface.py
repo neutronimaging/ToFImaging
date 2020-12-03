@@ -1,10 +1,8 @@
 import os
-from qtpy.QtWidgets import QMainWindow, QVBoxLayout, QTableWidgetItem, QTableWidgetSelectionRange
-from qtpy.QtGui import QColor, QPen
+from qtpy.QtWidgets import QMainWindow, QVBoxLayout
 from jupyter_notebooks.code import load_ui
 import pyqtgraph as pg
 import numpy as np
-from collections import OrderedDict
 
 from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities import find_nearest_index
@@ -27,8 +25,8 @@ class Interface(QMainWindow):
     default_bragg_peak_range = None
     bragg_peak_range_ui = None
 
-    nbr_files_to_exclude_from_plot = {'left': 20,
-                                      'right': 20}
+    nbr_files_to_exclude_from_plot = {'left': 40,
+                                      'right': 40}
     rough_peak_index_position = 0
     rough_peak_ui = None
 
@@ -260,7 +258,7 @@ class Interface(QMainWindow):
         rough_peak = self.o_roi.lambda_array[self.ui.rough_lambda_peak_position_slider.value()]
         self.rough_peak_ui = pg.InfiniteLine(rough_peak,
                                              pen=COLOR_ROUGH_LAMBDA,
-                                             label='Bragg Peak')
+                                             label='Estimated Bragg Peak')
         self.ui.plot_view.addItem(self.rough_peak_ui)
 
     def calculate_profile_of_pixel_selected(self):
@@ -309,15 +307,20 @@ class Interface(QMainWindow):
     def rough_lambda_peak_position_slider_changed(self, value):
         self.display_rough_peak_position()
 
+    def get_rough_peak_position(self):
+        return self.rough_peak_ui.pos()[0]
+
     def lambda_range_changed(self):
-        rough_peak_index_position = self.rough_peak_index_position
+        rough_peak_position = self.get_rough_peak_position()
 
         new_lambda_range = self.bragg_peak_range_ui.getRegion()
         left_index = find_nearest_index(self.o_roi.lambda_array, new_lambda_range[0])
         right_index = find_nearest_index(self.o_roi.lambda_array, new_lambda_range[1])
 
-        if (rough_peak_index_position <= left_index) or (rough_peak_index_position >= right_index):
-            rough_peak_index_position = np.mean([left_index, right_index])
+        if (rough_peak_position <= new_lambda_range[0]) or (rough_peak_position >= new_lambda_range[1]):
+            self.rough_peak_index_position = np.mean([left_index, right_index])
+
+        rough_peak_index_position = find_nearest_index(self.o_roi.lambda_array, rough_peak_position)
 
         self.ui.rough_lambda_peak_position_slider.setMinimum(left_index)
         self.ui.rough_lambda_peak_position_slider.setMaximum(right_index)

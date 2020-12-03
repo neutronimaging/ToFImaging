@@ -34,6 +34,7 @@ class StrainMappingAPIForNotebook:
 
     tof_array = None
     lambda_array = None
+    list_roi = None
 
     message = []
 
@@ -204,10 +205,34 @@ class StrainMappingAPIForNotebook:
         self.message[-1] = "Calculate moving average ... Done"
         self.display_message()
 
+    def calculate_mask(self):
+
+        self.message.append("Calculate mask ... IN PROGRESS")
+        self.display_message()
+
+        list_roi = self.list_roi
+        [height, width, _] = np.shape(self.T_mavg)
+        mask = np.zeros((height, width))
+
+        for _roi_key in list_roi.keys():
+            _roi = list_roi[_roi_key]
+            x0 = _roi['x0']
+            y0 = _roi['y0']
+            x1 = _roi['x1']
+            y1 = _roi['y1']
+            mask[y0:y1+1, x0:x1+1] = 1
+
+        self.mask = mask
+
+        self.message[-1] = "Calculate mask ... Done"
+        self.display_message()
+
     def prepare_data(self, list_roi=None):
         if list_roi:
+            self.list_roi = list_roi
             self.normalize_data(list_roi=list_roi)
             self.calculate_moving_average()
+            self.calculate_mask()
         else:
             display(HTML('<span style="font-size: 15px; color:red">ERROR! Please select a ROI first!</span>'))
 
