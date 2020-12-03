@@ -2,6 +2,7 @@ from collections import Counter
 import os
 import glob
 import shutil
+import numpy as np
 
 
 def retrieve_list_of_most_dominant_extension_from_folder(folder='', files=None):
@@ -44,3 +45,8 @@ def make_or_reset_folder(folder_name):
     if os.path.exists(folder_name):
         shutil.rmtree(folder_name)
     os.makedirs(folder_name)
+
+
+def find_nearest_index(array, value):
+    idx = (np.abs(np.array(array) - value)).argmin()
+    return idx

@@ -2,6 +2,7 @@ from ipywidgets import widgets
 from IPython.core.display import HTML
 from IPython.display import display, clear_output
 import os
+import copy
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
@@ -178,6 +179,12 @@ class StrainMappingAPIForNotebook:
         print(message)
 
     def calculate_moving_average(self, plot=False):
+
+        display(HTML('<span style="font-size: 15px; color:blue">FOR DEBUGGING ONLY</span>'))
+        self.T_mavg = copy.deepcopy(self.normalize_projections)
+
+        return
+
         # moving average with custom kernel to increase neutron statistics
         # custom_kernel = np.zeros((10,10))
         # custom_kernel[:,3:7] = 1
@@ -198,8 +205,11 @@ class StrainMappingAPIForNotebook:
         self.display_message()
 
     def prepare_data(self, list_roi=None):
-        self.normalize_data(list_roi=list_roi)
-        self.calculate_moving_average()
+        if list_roi:
+            self.normalize_data(list_roi=list_roi)
+            self.calculate_moving_average()
+        else:
+            display(HTML('<span style="font-size: 15px; color:red">ERROR! Please select a ROI first!</span>'))
 
     def normalize_data(self, list_roi=None):
 
@@ -252,7 +262,6 @@ class StrainMappingAPIForNotebook:
         w.close()
         self.message[-1] = "Normalization ... Done"
         self.display_message()
-        QtGui.QGuiApplication.processEvents()
 
     @staticmethod
     def make_or_reset_folder(folder_name):

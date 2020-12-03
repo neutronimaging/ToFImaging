@@ -7,8 +7,11 @@ import numpy as np
 from collections import OrderedDict
 
 from jupyter_notebooks.code.fit_handler import FitHandler
+from jupyter_notebooks.code.utilities import find_nearest_index
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
+COLOR_LAMBDA_RANGE = [250, 128, 247]
+COLOR_ROUGH_LAMBDA = [50, 255, 50]
 
 
 class Interface(QMainWindow):
@@ -26,6 +29,8 @@ class Interface(QMainWindow):
 
     nbr_files_to_exclude_from_plot = {'left': 20,
                                       'right': 20}
+    rough_peak_index_position = 0
+    rough_peak_ui = None
 
     # list_roi = OrderedDict()
     # default_roi = {'x0': 0, 'y0': 0, 'x1': 50, 'y1': 50, 'id': None}
@@ -57,6 +62,22 @@ class Interface(QMainWindow):
         self.display_cross_of_pixel_to_fit()
         self.display_box_around_pixel_to_fit()
         self.display_lambda_range_to_fit()
+        self.init_rough_peak_slider()
+        self.display_rough_peak_position()
+
+    def init_rough_peak_slider(self):
+        lambda_range = self.bragg_peak_range_ui.getRegion()
+        minimum_value = find_nearest_index(self.o_roi.lambda_array, lambda_range[0])
+        maximum_value = find_nearest_index(self.o_roi.lambda_array, lambda_range[1])
+
+        current_rough_peak_value = self.ui.rough_lambda_peak_position_slider.value()
+        if (current_rough_peak_value <= minimum_value) or (current_rough_peak_value >= maximum_value):
+            current_rough_peak_value = np.int(np.mean([minimum_value, maximum_value]))
+            self.rough_peak_index_position = current_rough_peak_value
+
+        self.ui.rough_lambda_peak_position_slider.setMinimum(minimum_value)
+        self.ui.rough_lambda_peak_position_slider.setMaximum(maximum_value)
+        self.ui.rough_lambda_peak_position_slider.setValue(current_rough_peak_value)
 
     def initialize_pixel_marker(self):
         for _index_roi in self.o_roi.list_roi:
@@ -96,11 +117,6 @@ class Interface(QMainWindow):
         self.ui.left_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
         self.ui.right_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['left'])
         self.ui.left_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['right'])
-
-        # mid_lambda = self.o_roi.lambda_array[half_number_of_files]
-        # self.ui.rough_lambda_peak_position_slider.setMinimum(self.ui.left_number_of_files_to_exclude_slider.value())
-        # self.ui.rough_lambda_peak_position_slider.setMaximum(self.ui.right_number_of_files_to_exclude_slider.value())
-        # self.ui.rough_lambda_peak_position_slider.setValue(mid_lambda)
 
     def pixel_marker_changed(self):
         region = self.pixel_marker_item.getArraySlice(self.live_image,
@@ -147,6 +163,8 @@ class Interface(QMainWindow):
         self.bragg_peak_range_ui = pg.LinearRegionItem(values=self.default_bragg_peak_range,
                                                        orientation=None,
                                                        movable=True)
+        self.bragg_peak_range_ui.sigRegionChanged.connect(self.lambda_range_changed)
+
         self.bragg_peak_range_ui.setZValue(-10)
         self.ui.plot_view.addItem(self.bragg_peak_range_ui)
 
@@ -226,13 +244,24 @@ class Interface(QMainWindow):
         self.ui.plot_view.plot(x_axis, profile_y_axis)
 
         self.calculate_profile_of_pixel_selected()
-        _color = [250, 128, 247]
 
         profile_of_pixel_selected = self.profile_of_pixel_selected[nbr_left: nbr_right]
-        self.ui.plot_view.plot(x_axis, profile_of_pixel_selected, pen=_color)
+        self.ui.plot_view.plot(x_axis, profile_of_pixel_selected, pen=COLOR_LAMBDA_RANGE)
 
         if self.bragg_peak_range_ui:
             self.ui.plot_view.addItem(self.bragg_peak_range_ui)
+
+        self.display_rough_peak_position()
+
+    def display_rough_peak_position(self):
+        if self.rough_peak_ui:
+            self.ui.plot_view.removeItem(self.rough_peak_ui)
+
+        rough_peak = self.o_roi.lambda_array[self.ui.rough_lambda_peak_position_slider.value()]
+        self.rough_peak_ui = pg.InfiniteLine(rough_peak,
+                                             pen=COLOR_ROUGH_LAMBDA,
+                                             label='Bragg Peak')
+        self.ui.plot_view.addItem(self.rough_peak_ui)
 
     def calculate_profile_of_pixel_selected(self):
         pixel_marker = self.pixel_marker
@@ -275,14 +304,26 @@ class Interface(QMainWindow):
         right_number = np.int(str(self.ui.right_number_of_files_to_exclude_slider.value()))
         self.nbr_files_to_exclude_from_plot['left'] = left_number
         self.nbr_files_to_exclude_from_plot['right'] = right_number
-
-        self.ui.rough_lambda_peak_position_slider.setMinimum(left_number)
-        self.ui.rough_lambda_peak_position_slider.setMaximum(right_number)
-
         self.display_profile()
 
-    def rough_lambda_peak_position_slider_changed(self):
-        pass
+    def rough_lambda_peak_position_slider_changed(self, value):
+        self.display_rough_peak_position()
+
+    def lambda_range_changed(self):
+        rough_peak_index_position = self.rough_peak_index_position
+
+        new_lambda_range = self.bragg_peak_range_ui.getRegion()
+        left_index = find_nearest_index(self.o_roi.lambda_array, new_lambda_range[0])
+        right_index = find_nearest_index(self.o_roi.lambda_array, new_lambda_range[1])
+
+        if (rough_peak_index_position <= left_index) or (rough_peak_index_position >= right_index):
+            rough_peak_index_position = np.mean([left_index, right_index])
+
+        self.ui.rough_lambda_peak_position_slider.setMinimum(left_index)
+        self.ui.rough_lambda_peak_position_slider.setMaximum(right_index)
+        self.ui.rough_lambda_peak_position_slider.setValue(rough_peak_index_position)
+
+        self.number_of_files_to_exclude_slider_changed(0)
 
     def fit_pixel_clicked(self):
         o_fit = FitHandler(parent=self)
