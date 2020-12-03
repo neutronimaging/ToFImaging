@@ -232,8 +232,22 @@ def GaussianBraggEdgeFitting_2D(Ttof,
         else:
             lambd = spectrum
 
-        edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=True)
-        return
+        result = edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,
+                                                         spectrum=lambd,
+                                                         spectrum_range=spectrum_range,
+                                                         est_pos=est_pos,
+                                                         est_wid=est_wid,
+                                                         est_h=est_h,
+                                                         pos_BC=pos_BC,
+                                                         wid_BC=wid_BC,
+                                                         h_BC=h_BC,
+                                                         interp_factor=interp_factor,
+                                                         bool_log=bool_log,
+                                                         bool_smooth=bool_smooth,
+                                                         smooth_w=smooth_w,
+                                                         smooth_n=smooth_n,
+                                                         bool_print=True)
+        return result
 
     median_image = reduction_tools.medianimage(Ttof)
     edge_position = np.zeros(np.shape(mymask))
@@ -279,8 +293,12 @@ def GaussianBraggEdgeFitting_2D(Ttof,
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
         np.save('edge_slope.npy', edge_slope)
-   
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
+
+    return {'edge_position': edge_position,
+            'edge_height': edge_height,
+            'edge_width': edge_width,
+            'edge_slope': edge_slope,
+            'median_image': median_image}
 
 def TextureFitting2D(Ttof,spectrum,ref,ref_spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)

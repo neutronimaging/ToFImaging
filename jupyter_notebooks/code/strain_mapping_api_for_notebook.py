@@ -181,10 +181,10 @@ class StrainMappingAPIForNotebook:
 
     def calculate_moving_average(self, plot=False):
 
-        display(HTML('<span style="font-size: 15px; color:blue">FOR DEBUGGING ONLY</span>'))
-        self.T_mavg = copy.deepcopy(self.normalize_projections)
-
-        return
+#        display(HTML('<span style="font-size: 15px; color:blue">FOR DEBUGGING ONLY</span>'))
+#        self.T_mavg = copy.deepcopy(self.normalize_projections)
+#
+#        return
 
         # moving average with custom kernel to increase neutron statistics
         # custom_kernel = np.zeros((10,10))

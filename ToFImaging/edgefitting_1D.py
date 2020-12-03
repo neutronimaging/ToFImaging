@@ -479,10 +479,11 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     edge_slope = result.best_values.get('amp')
     
     if (bool_print):
-        print('Edge position = ',t0)
-        print('Edge height = ',edge_height)
-        print('Edge width = ',edge_width)
-        print('idx_low = ',id_low,'idx_high = ',id_high)
+        print('Edge position = ', t0)
+        print('Edge height = ', edge_height)
+        print('Edge width = ', edge_width)
+        print('idx_low = ', id_low,
+              'idx_high = ', id_high)
 
         plt.figure()
         plt.subplot(2,1,1), 
@@ -500,7 +501,13 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         plt.tight_layout()
         plt.show()
         plt.close()
-    return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
+
+    return {'fitted_data': fitted_data,
+            'edge_position': t0,
+            't0': t0,
+            'edge_width': edge_width,
+            'edge_height': edge_height,
+            'edge_slope': edge_slope}
 
 #------------------------------ MICROSTRUCTURE FITTING ------------------------#
 def MarchDollase(A,R,l,l_hkl,Nbeta=50,bool_plotPole=False):

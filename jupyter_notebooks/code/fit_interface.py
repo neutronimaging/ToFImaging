@@ -30,6 +30,9 @@ class Interface(QMainWindow):
     rough_peak_index_position = 0
     rough_peak_ui = None
 
+    pixel_fit_result = None
+    full_fit_result = None
+
     # list_roi = OrderedDict()
     # default_roi = {'x0': 0, 'y0': 0, 'x1': 50, 'y1': 50, 'id': None}
     # live_image = None
@@ -330,10 +333,11 @@ class Interface(QMainWindow):
 
     def fit_pixel_clicked(self):
         o_fit = FitHandler(parent=self)
-        o_fit.fit_pixel()
+        o_fit.fit(mode='pixel')
 
     def fit_full_roi_clicked(self):
-        pass
+        o_fit = FitHandler(parent=self)
+        o_fit.fit(mode='full')
 
     def apply_clicked(self):
         self.close()
