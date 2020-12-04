@@ -54,7 +54,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         import skimage.filters
-        mymask = reduction_tools.medianimage(Ttof)
+        mymask = reduction_tools.median_image(Ttof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
@@ -85,7 +85,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
         edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
         return
 
-    median_image = reduction_tools.medianimage(Ttof)
+    median_image = reduction_tools.median_image(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
@@ -199,7 +199,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,
 
     elif auto_mask:
         import skimage.filters
-        mymask = reduction_tools.medianimage(Ttof)
+        mymask = reduction_tools.median_image(Ttof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
@@ -249,7 +249,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,
                                                          bool_print=True)
         return result
 
-    median_image = reduction_tools.medianimage(Ttof)
+    median_image = reduction_tools.median_image(Ttof)
     edge_position = np.zeros(np.shape(mymask))
     edge_width = np.zeros(np.shape(mymask))
     edge_height = np.zeros(np.shape(mymask))
@@ -351,7 +351,7 @@ def TextureFitting2D(Ttof,spectrum,ref,ref_spectrum,spectrum_range=[],calibratio
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         import skimage.filters
-        mymask = reduction_tools.medianimage(Ttof)
+        mymask = reduction_tools.median_image(Ttof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
@@ -387,7 +387,7 @@ def TextureFitting2D(Ttof,spectrum,ref,ref_spectrum,spectrum_range=[],calibratio
         edgefitting_1D.TextureFitting(signal,lambd,ref,ref_spectrum,spectrum_range,l_hkl1,l_hkl2,bool_MD,est_A1,est_R1,est_A2,est_R2,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,True)
         return
 
-    median_image = reduction_tools.medianimage(Ttof)
+    median_image = reduction_tools.median_image(Ttof)
     A1_map = np.zeros(np.shape(mymask))
     R1_map = np.zeros(np.shape(mymask))
     A2_map = np.zeros(np.shape(mymask))

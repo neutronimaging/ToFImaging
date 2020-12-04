@@ -264,3 +264,35 @@ class TestMovingAverage2D:
         #     for _output, _expected in zip(_output_row, _expected_row):
         #         assert _output == pytest.approx(_expected, 1e-5)
 
+
+class TestDataFiltering:
+
+    def test_error_raised(self):
+        input_array = np.array([1, 2, 3, 4, 5, 6])
+        with pytest.raises(ValueError):
+            reduction_tools.data_filtering(input_array)
+
+        input_array = np.ones((3, 3, 4, 5))
+        with pytest.raises(ValueError):
+            reduction_tools.data_filtering(input_array)
+
+        input_array = np.array([[1, 2, 3], [4, 5, 6]])
+        with pytest.raises(ValueError):
+            reduction_tools.data_filtering(input_array)
+
+        input_array = np.array([[1, 2, 3], [4, 5, 6]])
+        box_kernel = np.array([1])
+        with pytest.raises(ValueError):
+            reduction_tools.data_filtering(input_array,
+                                           box_kernel=box_kernel)
+
+        input_array = np.array([[1, 2, 3], [4, 5, 6]])
+        gaussian_kernel = np.array([1])
+        with pytest.raises(ValueError):
+            reduction_tools.data_filtering(input_array,
+                                           box_kernel=gaussian_kernel)
+
+
+
+
+

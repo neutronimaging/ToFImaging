@@ -55,7 +55,7 @@ def phase_ratio_linearcomb_2D(lac_tof,spectrum,phase1lac,phase2lac,spectrum_phas
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         import skimage.filters
-        mymask = reduction_tools.medianimage(lac_tof)
+        mymask = reduction_tools.median_image(lac_tof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
@@ -161,7 +161,7 @@ def phase_ratio_linearcomb_three_2D(lac_tof,spectrum,phase1lac,phase2lac,phase3l
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         import skimage.filters
-        mymask = reduction_tools.medianimage(lac_tof)
+        mymask = reduction_tools.median_image(lac_tof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
@@ -267,7 +267,7 @@ def WavelengthSelectiveRatio2D(lac_tof,spectrum,l1,l2,l1_w=0,l2_w=0,calibration_
             print('WARNING: Mask size does not match frames size')
     elif(auto_mask):
         import skimage.filters
-        mymask = reduction_tools.medianimage(lac_tof)
+        mymask = reduction_tools.median_image(lac_tof)
         plt.figure()
         plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask>mask_thresh[1]] = 0.0
