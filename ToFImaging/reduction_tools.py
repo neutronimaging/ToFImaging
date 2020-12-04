@@ -256,19 +256,20 @@ def data_filtering(input_array, box_kernel=None, gaussian_kernel=None, bool_prin
         raise ValueError("Please provides a kernel (box or gaussian)!")
 
     if not (box_kernel is None):
-        print(len(box_kernel))
         if len(box_kernel) == 1:
             raise ValueError("box_kernel must contain at least 2 elements!")
     elif not (gaussian_kernel is None):
         if len(gaussian_kernel) == 1:
             raise ValueError("gaussian kernel must contain at least 2 elements!")
 
+    if len(np.shape(input_array)) == 2:
+        if box_kernel:
+            if len(box_kernel) != 2:
+                raise ValueError('box_kernel must have the same dimension as the input array (2D)!')
+        else:
+            if len(gaussian_kernel) != 2:
+                raise ValueError('gaussian_kernel must have the same dimension as the input array (2D)!')
 
-
-
-    if(len(np.shape(input_array))==2 and (len(box_kernel)==3 or len(gaussian_kernel)==3)):
-        print('Data is 2d but filtering kernel is 3D.')
-        return
 
     if(bool_print):
         plt.figure()
