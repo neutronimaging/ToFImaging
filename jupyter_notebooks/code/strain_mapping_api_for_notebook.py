@@ -43,24 +43,32 @@ class StrainMappingAPIForNotebook:
 
     def general_settings(self):
         box1 = widgets.HBox([widgets.Checkbox(value=self.is_working_with_raw_data_default,
-                                              layout=widgets.Layout(width="150px")),
+                                              layout=widgets.Layout(width="200px")),
                              widgets.HTML("Are you working with <b>raw data</b> (i.e. not MCP corrected)?",
                                           layout=widgets.Layout(width="400px")),
                              ])
         self.is_mcp_corrected_ui = box1.children[0]
-        display(box1)
 
-        box2 = widgets.HBox([widgets.Label("distance source-detector (m)",
+        box2 = widgets.HBox([widgets.Checkbox(value=True,
+                                              layout=widgets.Layout(width="200px")),
+                             widgets.Label("Do you want to normalize your data?",
+                                           layout=widgets.Layout(width="400px")),
+                                         ])
+        vertical_box_1 = widgets.VBox([box1, box2])
+        display(vertical_box_1)
+
+        box3 = widgets.HBox([widgets.Label("distance source-detector",
                                            layout=widgets.Layout(width="200px")),
                              widgets.Text(str(16.08),
-                                          layout=widgets.Layout(width='30%'))])
+                                          layout=widgets.Layout(width='10%')),
+                             widgets.Label("m")])
 
-        box3 = widgets.HBox([widgets.Label("detector offset (microns)",
+        box4 = widgets.HBox([widgets.Label("detector offset",
                                            layout=widgets.Layout(width="200px")),
                              widgets.Text(str(3700),
-                                          layout=widgets.Layout(width='30%'))])
-
-        vertical_box = widgets.VBox([box2, box3])
+                                          layout=widgets.Layout(width='10%')),
+                             widgets.Label(u"\u00B5s")])
+        vertical_box = widgets.VBox([box3, box4])
         display(vertical_box)
 
         self.dsd = box2.children[1]

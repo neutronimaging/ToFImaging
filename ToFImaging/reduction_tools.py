@@ -231,15 +231,17 @@ def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0]
     return output_array
 
 
-def data_filtering(input_array, box_kernel=None, gaussian_kernel=None, bool_print=False):
+def data_filtering(input_array, box_kernel=None, gaussian_kernel=None, bool_print=False, bool_log=False):
     """
-    
+    if both box_kernel and gaussian_kernel are provided, box_kernel will be used by default
+
     Parameters
     ----------
-    input_array
+    input_array: if 3D, dimensions must be given as followed (x, y, tof)
     box_kernel
     gaussian_kernel
     bool_print
+    bool_log: display log messages (default False)
 
     Raises
     ------
@@ -270,39 +272,86 @@ def data_filtering(input_array, box_kernel=None, gaussian_kernel=None, bool_prin
             if len(gaussian_kernel) != 2:
                 raise ValueError('gaussian_kernel must have the same dimension as the input array (2D)!')
 
-
-    if(bool_print):
+    if bool_print:
         plt.figure()
-        plt.subplot(1,2,1),
-        if(len(np.shape(input_array))==3):
-            plt.imshow(np.nanmean(input_array,axis=2)), plt.title('Input image'), plt.colorbar()
+        plt.subplot(1, 2, 1),
+        if len(np.shape(input_array)) == 3:
+            plt.imshow(np.nanmean(input_array, axis=2))
+            plt.title('Input image')
+            plt.colorbar()
         else:
-            plt.imshow(input_array), plt.title('Input image'), plt.colorbar()
+            plt.imshow(input_array)
+            plt.title('Input image')
+            plt.colorbar()
+
+    # image data (2D), 2D kernel
+    if len(np.shape(input_array)) == 2 and (len(box_kernel) == 2 or len(gaussian_kernel) == 2):
+        if bool_log:
+            print('Data and filtering kernel are 2D. Applying 2D filter convolution.')
+
+        if any(box_kernel):
+            kernel = np.ones((box_kernel[0], box_kernel[1]))
+            kernel = kernel/np.sum(np.ravel(kernel))
+            print(kernel)
+            print(input_array)
+            # output_array = scipy.ndimage.convolve2d(input_array, kernel, 'same')
+            output_array = scipy.signal.convolve2d(input_array, kernel, 'same')
+
+        elif any(gaussian_kernel):
+            output_array = scipy.ndimage.gaussian_filter(input_array, gaussian_kernel)
+
+        if bool_print:
+            plt.subplot(1, 2, 2)
+            plt.imshow(output_array)
+            plt.title('Input image')
+            plt.tight_layout()
+            plt.show()
+            plt.close()
+
+        return output_array
+
+
+
 
     # TOF data (3D), 2D kernel
-    if(len(np.shape(input_array))==3 and (len(box_kernel)==2 or len(gaussian_kernel)==2)):
-        print('Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).')
-        outsignal = np.zeros((np.shape(input_array)[0], np.shape(input_array)[1], np.shape(input_array)[2]))
-        if(any(box_kernel)):
-            kernel = np.ones((box_kernel[0],box_kernel[1]))
-            kernel = kernel/np.sum(np.ravel(kernel))
-            for i in tqdm(range(0,np.shape(input_array)[2])):
-                outsignal[:,:,i] = scipy.ndimage.convolve(input_array[:,:,i],kernel)
+    if (len(np.shape(input_array)) == 3) and (len(box_kernel) == 2 or len(gaussian_kernel) == 2):
+        if bool_log:
+            print('Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third '
+                   'dimension).')
 
-            if(bool_print):
-                plt.subplot(1,2,2),
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
-                plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()
-            return outsignal
+        print(np.shape(input_array))
+
+        output_array = np.zeros((np.shape(input_array)[0], 
+                                 np.shape(input_array)[1],
+                                 np.shape(input_array)[2]))
+
+        if any(box_kernel):
+            kernel = np.ones((box_kernel[0], box_kernel[1]))
+            kernel = kernel/np.sum(np.ravel(kernel))
+            for i in tqdm(range(0, np.shape(input_array)[2])):
+                output_array[:, :, i] = scipy.ndimage.convolve(input_array[:, :, i], kernel)
+
+            if bool_print:
+                plt.subplot(1, 2, 2)
+                plt.imshow(np.nanmean(output_array, axis=2))
+                plt.title('Input image')
+                plt.colorbar()
+                plt.tight_layout()
+                plt.show()
+                plt.close()
+
+            return output_array
+
+
         if(any(gaussian_kernel)):
             for i in tqdm(range(0,np.shape(input_array)[2])):
-                outsignal[:,:,i] = scipy.ndimage.gaussian_filter(input_array[:,:,i],gaussian_kernel)
+                output_array[:,:,i] = scipy.ndimage.gaussian_filter(input_array[:,:,i],gaussian_kernel)
 
             if(bool_print):
                 plt.subplot(1,2,2),
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.imshow(np.nanmean(output_array,axis=2)), plt.title('Input image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()
-            return outsignal
+            return output_array
 
     # TOF data (3D), 3D kernel
     if(len(np.shape(input_array))==3 and (len(box_kernel)==3 or len(gaussian_kernel)==3)):
@@ -310,41 +359,20 @@ def data_filtering(input_array, box_kernel=None, gaussian_kernel=None, bool_prin
         if(any(box_kernel)):
             kernel = np.ones((box_kernel[0],box_kernel[1],box_kernel[2]))
             kernel = kernel/np.sum(np.ravel(kernel))
-            outsignal = scipy.ndimage.convolve(input_array,kernel)
+            output_array = scipy.ndimage.convolve(input_array,kernel)
             if(bool_print):
                 plt.subplot(1,2,2),
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.imshow(np.nanmean(output_array,axis=2)), plt.title('Input image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()
-            return outsignal
+            return output_array
         if(any(gaussian_kernel)):
-            outsignal = scipy.ndimage.gaussian_filter(input_array,gaussian_kernel)
+            output_array = scipy.ndimage.gaussian_filter(input_array,gaussian_kernel)
             if(bool_print):
                 plt.subplot(1,2,2),
-                plt.imshow(np.nanmean(outsignal,axis=2)), plt.title('Input image')
+                plt.imshow(np.nanmean(output_array,axis=2)), plt.title('Input image')
                 plt.colorbar(), plt.tight_layout(),        plt.show(),        plt.close()
-            return outsignal
+            return output_array
 
-    # image data (2D), 2D kernel
-    if(len(np.shape(input_array))==2 and (len(box_kernel)==2 or len(gaussian_kernel)==2)):
-        print('Data and filtering kernel are 2D. Applying 2D filter convolution.')
-        if(any(box_kernel)):
-            kernel = np.ones((box_kernel[0],box_kernel[1]))
-            kernel = kernel/np.sum(np.ravel(kernel))
-            outsignal = scipy.ndimage.convolve(input_array,kernel)
-            if(bool_print):
-                plt.subplot(1,2,2),
-                plt.imshow(outsignal), plt.title('Input image')
-                plt.tight_layout(),        plt.show(),        plt.close()
-            return outsignal
-        if(any(gaussian_kernel)):
-            outsignal = scipy.ndimage.gaussian_filter(input_array,gaussian_kernel)
-            if(bool_print):
-                plt.subplot(1,2,2),
-                plt.imshow(outsignal), plt.title('Input image')
-                plt.tight_layout(),        plt.show(),        plt.close()
-            return outsignal
-
-    return
 
 
 #Rebinning/averaging tools    
