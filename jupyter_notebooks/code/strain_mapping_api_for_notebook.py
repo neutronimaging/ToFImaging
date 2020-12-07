@@ -25,6 +25,8 @@ DEBUG_PATH = "/Users/j35/IPTS/IPTS-strain-mapping/raw"
 
 class StrainMappingAPIForNotebook:
 
+    normalization_flag_ui = None
+
     working_dir = DEBUG_PATH if DEBUG else "./"
     is_working_with_raw_data_default = False
 
@@ -55,6 +57,7 @@ class StrainMappingAPIForNotebook:
                                            layout=widgets.Layout(width="400px")),
                                          ])
         vertical_box_1 = widgets.VBox([box1, box2])
+        self.normalization_flag_ui = box2.children[0]
         display(vertical_box_1)
 
         box3 = widgets.HBox([widgets.Label("distance source-detector",
@@ -71,8 +74,8 @@ class StrainMappingAPIForNotebook:
         vertical_box = widgets.VBox([box3, box4])
         display(vertical_box)
 
-        self.dsd = box2.children[1]
-        self.doff = box3.children[1]
+        self.dsd = box3.children[1]
+        self.doff = box4.children[1]
 
     def load_files(self, input_folders=None, data_type='sample'):
         if self.is_mcp_corrected_ui.value:
@@ -135,7 +138,7 @@ class StrainMappingAPIForNotebook:
     def load_spectra_file(self, spectra_file):
         # make sure the name is right
         base_file_name = str(PurePath(spectra_file).name)
-        if not "_Spectra.txt" in base_file_name:
+        if not ("_Spectra.txt" in base_file_name):
             self.locate_spectra_file(input_folder=str(Path(spectra_file).parent))
         else:
             tof_handler = TOF(filename=spectra_file)
@@ -160,10 +163,14 @@ class StrainMappingAPIForNotebook:
                                 instruction="Select sample data folder ...")
 
     def select_ob(self):
-        next_method = self.load_ob
-        self.working_dir = os.path.dirname(self.working_dir)
-        self.select_projections(next_method=next_method,
-                                instruction="Select open beam folder ...")
+        if self.normalization_flag_ui.value:
+            next_method = self.load_ob
+            self.working_dir = os.path.dirname(self.working_dir)
+            self.select_projections(next_method=next_method,
+                                    instruction="Select open beam folder ...")
+        else:
+            display(HTML('<span style="font-size: 15px; color:blue">No OB needed. Normalization process will be '
+                         'skipped!</span>'))
 
     def preview_sample(self):
         self.display_integrated_signal(self.sample_projections)
@@ -246,55 +253,62 @@ class StrainMappingAPIForNotebook:
 
     def normalize_data(self, list_roi=None):
 
-        w = widgets.IntProgress(description="Normalization")
-        w.max = len(self.lambda_array)
-        display(w)
+        if self.normalization_flag_ui.value:
+            w = widgets.IntProgress(description="Normalization")
+            w.max = len(self.lambda_array)
+            display(w)
 
-        self.message.append("Normalization ... in progress")
-        self.display_message()
+            self.message.append("Normalization ... in progress")
+            self.display_message()
 
-        sample_projections = self.sample_projections
-        ob_projections = self.ob_projections
+            sample_projections = self.sample_projections
+            ob_projections = self.ob_projections
 
-        working_sample_projections = sample_projections.transpose(2, 0, 1)
-        working_ob_projections = ob_projections.transpose(2, 0, 1)
-        normalize_projections = list()
+            working_sample_projections = sample_projections.transpose(2, 0, 1)
+            working_ob_projections = ob_projections.transpose(2, 0, 1)
+            normalize_projections = list()
 
-        total_number_of_pixels_in_rois = 0
-        for _index_roi in list_roi.keys():
-            _roi = list_roi[_index_roi]
-            _x0 = _roi['x0']
-            _y0 = _roi['y0']
-            _x1 = _roi['x1']
-            _y1 = _roi['y1']
-            total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
-
-        for _sample, _ob in zip(working_sample_projections, working_ob_projections):
-
-            mean_ob_value = 0
+            total_number_of_pixels_in_rois = 0
             for _index_roi in list_roi.keys():
                 _roi = list_roi[_index_roi]
                 _x0 = _roi['x0']
                 _y0 = _roi['y0']
                 _x1 = _roi['x1']
                 _y1 = _roi['y1']
+                total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
 
-                mean_ob_value += np.sum(_ob[_y0: _y1+1, _x0: _x1+1])
+            for _sample, _ob in zip(working_sample_projections, working_ob_projections):
 
-            w.value += 1
+                mean_ob_value = 0
+                for _index_roi in list_roi.keys():
+                    _roi = list_roi[_index_roi]
+                    _x0 = _roi['x0']
+                    _y0 = _roi['y0']
+                    _x1 = _roi['x1']
+                    _y1 = _roi['y1']
 
-            mean_ob = mean_ob_value / total_number_of_pixels_in_rois
-            _normalize = _sample / mean_ob
+                    mean_ob_value += np.sum(_ob[_y0: _y1+1, _x0: _x1+1])
 
-            normalize_projections.append(_normalize)
+                w.value += 1
 
-        normalize_projections = np.array(normalize_projections)
-        self.debug_normalize_projections = normalize_projections
+                mean_ob = mean_ob_value / total_number_of_pixels_in_rois
+                _normalize = _sample / mean_ob
 
-        self.normalize_projections = normalize_projections.transpose(1, 2, 0)
-        w.close()
-        self.message[-1] = "Normalization ... Done"
-        self.display_message()
+                normalize_projections.append(_normalize)
+
+            normalize_projections = np.array(normalize_projections)
+            self.debug_normalize_projections = normalize_projections
+
+            self.normalize_projections = normalize_projections.transpose(1, 2, 0)
+            w.close()
+            self.message[-1] = "Normalization ... Done"
+            self.display_message()
+
+        else:  # no normalization
+            self.normalize_projections = copy.deepcopy(self.sample_projections)
+            self.message.append("Normalization ... skipped!")
+            self.display_message()
+
 
     @staticmethod
     def make_or_reset_folder(folder_name):
