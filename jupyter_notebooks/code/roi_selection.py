@@ -1,6 +1,8 @@
 import os
 from qtpy.QtWidgets import QMainWindow, QVBoxLayout, QTableWidgetItem, QTableWidgetSelectionRange
 from qtpy.QtGui import QColor, QPen
+from IPython.core.display import HTML
+from IPython.display import display
 from jupyter_notebooks.code import load_ui
 import pyqtgraph as pg
 import numpy as np
@@ -403,6 +405,9 @@ class Interface(QMainWindow):
             _ui.setEnabled(state)
 
     def cancel_clicked(self):
+        if not self.list_roi:
+            display(HTML('<span style="font-size: 15px; color:Red">You need to select at least 1 ROI to run the rest '
+                         'of the notebook!</span>'))
         self.close()
 
     def apply_clicked(self):
@@ -416,3 +421,5 @@ class Interface(QMainWindow):
             mask[_y0: _y1+1, _x0: _x1+1] = 1
         self.mask = mask
         self.close()
+        display(HTML('<span style="font-size: 15px; color:green">You selected ' + str(len(self.list_roi)) +
+                     ' ROI(s)</span>'))
