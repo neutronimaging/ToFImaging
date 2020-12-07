@@ -8,11 +8,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path, PurePath
 import shutil
-from qtpy import QtGui
 
 import ipywe.fileselector
 import ipywe.fileselector
 from NeuNorm.normalization import Normalization
+from NeuNorm.roi import ROI
 from neutronbraggedge.experiment_handler import TOF, Experiment
 
 from ToFImaging import reduction_tools
@@ -243,6 +243,24 @@ class StrainMappingAPIForNotebook:
         self.display_message()
 
     def prepare_data(self, list_roi=None):
+        if self.normalization_flag_ui.value:
+            self.list_roi = list_roi
+            box1 = widgets.Label("Normalization mode:")
+            self.normalization_mode_ui = widgets.RadioButtons(options=['pixel by pixel',
+                                                               'by ROI'],
+                                                      value='pixel by pixel')
+            run_prepare_button = widgets.Button(description="Run prepare data",
+                                                icon='play')
+            vertical = widgets.VBox([box1,  self.normalization_mode_ui, run_prepare_button])
+            run_prepare_button.on_click(self.run_prepare_data_steps)
+            display(vertical)
+        else:
+            self.prepare_data_steps(list_roi=list_roi)
+
+    def run_prepare_data_steps(self, _):
+        self.prepare_data_steps(list_roi=self.list_roi)
+
+    def prepare_data_steps(self, list_roi=None):
         if list_roi:
             self.list_roi = list_roi
             self.normalize_data(list_roi=list_roi)
@@ -254,13 +272,6 @@ class StrainMappingAPIForNotebook:
     def normalize_data(self, list_roi=None):
 
         if self.normalization_flag_ui.value:
-            w = widgets.IntProgress(description="Normalization")
-            w.max = len(self.lambda_array)
-            display(w)
-
-            self.message.append("Normalization ... in progress")
-            self.display_message()
-
             sample_projections = self.sample_projections
             ob_projections = self.ob_projections
 
@@ -268,39 +279,25 @@ class StrainMappingAPIForNotebook:
             working_ob_projections = ob_projections.transpose(2, 0, 1)
             normalize_projections = list()
 
-            total_number_of_pixels_in_rois = 0
-            for _index_roi in list_roi.keys():
-                _roi = list_roi[_index_roi]
-                _x0 = _roi['x0']
-                _y0 = _roi['y0']
-                _x1 = _roi['x1']
-                _y1 = _roi['y1']
-                total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
+            if self.normalization_mode_ui.value == 'pixel by pixel':
 
-            for _sample, _ob in zip(working_sample_projections, working_ob_projections):
+                self.message.append("Normalization (pixel by pixel) ... in progress")
+                self.display_message()
 
-                mean_ob_value = 0
-                for _index_roi in list_roi.keys():
-                    _roi = list_roi[_index_roi]
-                    _x0 = _roi['x0']
-                    _y0 = _roi['y0']
-                    _x1 = _roi['x1']
-                    _y1 = _roi['y1']
+                normalize_projections = StrainMappingAPIForNotebook.normalization_pixel_by_pixel(list_roi,
+                                                                                                working_ob_projections,
+                                                                                                working_sample_projections)
 
-                    mean_ob_value += np.sum(_ob[_y0: _y1+1, _x0: _x1+1])
+            elif self.normalization_mode_ui.value == 'by ROI':
 
-                w.value += 1
+                self.message.append("Normalization (by ROI) ... in progress")
+                self.display_message()
 
-                mean_ob = mean_ob_value / total_number_of_pixels_in_rois
-                _normalize = _sample / mean_ob
-
-                normalize_projections.append(_normalize)
-
-            normalize_projections = np.array(normalize_projections)
-            self.debug_normalize_projections = normalize_projections
+                normalize_projections = StrainMappingAPIForNotebook.normalization_by_roi(list_roi,
+                                                                                         working_ob_projections,
+                                                                                         working_sample_projections)
 
             self.normalize_projections = normalize_projections.transpose(1, 2, 0)
-            w.close()
             self.message[-1] = "Normalization ... Done"
             self.display_message()
 
@@ -309,6 +306,69 @@ class StrainMappingAPIForNotebook:
             self.message.append("Normalization ... skipped!")
             self.display_message()
 
+    @staticmethod
+    def normalization_pixel_by_pixel(list_roi,
+                                     working_ob_projections,
+                                     working_sample_projections):
+
+        list_o_roi = []
+        for _roi_key in list_roi.keys():
+            _roi = list_roi[_roi_key]
+            o_roi = ROI(x0=_roi['x0'],
+                        y0=_roi['y0'],
+                        x1=_roi['x1'],
+                        y1=_roi['y1'])
+            list_o_roi.append(o_roi)
+
+        _sample = working_sample_projections
+        _ob = working_ob_projections
+
+        o_norm = Normalization()
+        o_norm.data['sample']['data'] = _sample
+        o_norm.data['ob']['data'] = _ob
+
+        # create fake list of sample and ob
+        list_filename = ['N/A' for _ in np.arange(len(_sample))]
+        o_norm.data['sample']['file_name'] = list_filename
+        o_norm.data['ob']['file_name'] = list_filename
+
+        o_norm.normalization(roi=list_o_roi)
+
+        return np.array(o_norm.data['normalized'])
+
+    @staticmethod
+    def normalization_by_roi(list_roi,
+                             working_ob_projections,
+                             working_sample_projections):
+
+        normalize_projections = list()
+
+        total_number_of_pixels_in_rois = 0
+        for _index_roi in list_roi.keys():
+            _roi = list_roi[_index_roi]
+            _x0 = _roi['x0']
+            _y0 = _roi['y0']
+            _x1 = _roi['x1']
+            _y1 = _roi['y1']
+            total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
+        for _sample, _ob in zip(working_sample_projections, working_ob_projections):
+
+            mean_ob_value = 0
+            for _index_roi in list_roi.keys():
+                _roi = list_roi[_index_roi]
+                _x0 = _roi['x0']
+                _y0 = _roi['y0']
+                _x1 = _roi['x1']
+                _y1 = _roi['y1']
+
+                mean_ob_value += np.sum(_ob[_y0: _y1 + 1, _x0: _x1 + 1])
+
+            mean_ob = mean_ob_value / total_number_of_pixels_in_rois
+            _normalize = _sample / mean_ob
+
+            normalize_projections.append(_normalize)
+        normalize_projections = np.array(normalize_projections)
+        return normalize_projections
 
     @staticmethod
     def make_or_reset_folder(folder_name):
