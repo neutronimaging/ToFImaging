@@ -242,73 +242,73 @@ class StrainMappingAPIForNotebook:
         self.message[-1] = "Calculate mask ... Done"
         self.display_message()
 
-    def prepare_data(self, list_roi=None):
-        self.list_roi = list_roi
-        if self.normalization_flag_ui.value:
-
-            display(HTML("<h3>Normalization Mode</h3>"))
-            self.normalization_mode_ui = widgets.RadioButtons(options=['pixel by pixel',
-                                                                       'by ROI'],
-                                                              value='pixel by pixel',
-                                                              layout={'width': 'max-content'})
-            display(self.normalization_mode_ui)
-
-        display(HTML("<h3>Kernel for Moving Average Algorithm</h3>"))
-
-        # dimension
-        hori1 = widgets.HBox([widgets.Label("Dimension",
-                                            layout=widgets.Layout(width="100px")),
-                              widgets.RadioButtons(options=['2D', '3D'],
-                                                   value='3D')])
-        # size
-        hori21 = widgets.HBox([widgets.Checkbox(value=True,
-                                                layout=widgets.Layout(width="20px")),
-                               widgets.Label(u"y:3, x:3, \u03BB:3",
-                                                layout=widgets.Layout(width="100px"))])
-        hori22 = widgets.HBox([widgets.Checkbox(value=False,
-                                                layout=widgets.Layout(width="20px")),
-                               widgets.Label("y:",
-                                             layout=widgets.Layout(width="12px"),
-                                             enabled=False),
-                               widgets.IntText(3,
-                                               layout=widgets.Layout(width="50px")),
-                               widgets.Label("x:",
-                                             layout=widgets.Layout(width="40px")),
-                               widgets.IntText(3,
-                                               layout=widgets.Layout(width="50px")),
-                               widgets.Label(u"\u03BB:",
-                                             layout=widgets.Layout(width="40px")),
-                               widgets.IntText(3,
-                                               layout=widgets.Layout(width="50px"))])
-
-        verti2 = widgets.VBox([hori21, hori22])
-        hori2 = widgets.HBox([widgets.Label("Size",
-                                            layout=widgets.Layout(width="50px")),
-                              verti2])
-
-        # type
-        hori3 = widgets.HBox([widgets.Label("Type",
-                                            layout=widgets.Layout(width="100px")),
-                              widgets.RadioButtons(options=['Gaussian', 'box'])])
-
-        run_prepare_button = widgets.Button(description=" Run prepare data",
-                                            layout=widgets.Layout(width="50%"),
-                                            icon='play')
-        run_prepare_button.on_click(self.run_prepare_data_steps)
-
-        vertical = widgets.VBox([hori1, hori2, hori3, widgets.Label(""), run_prepare_button])
-        display(vertical)
-
-    def run_prepare_data_steps(self, _):
-        self.prepare_data_steps(list_roi=self.list_roi)
-
-    def prepare_data_steps(self, list_roi=None):
-        if list_roi:
-            self.normalize_data(list_roi=list_roi)
-            self.calculate_moving_average()
-            self.calculate_mask()
-        else:
-            display(HTML('<span style="font-size: 15px; color:red">ERROR! Please select a ROI first!</span>'))
+    # def prepare_data(self, list_roi=None):
+    #     self.list_roi = list_roi
+    #     if self.normalization_flag_ui.value:
+    #
+    #         display(HTML("<h3>Normalization Mode</h3>"))
+    #         self.normalization_mode_ui = widgets.RadioButtons(options=['pixel by pixel',
+    #                                                                    'by ROI'],
+    #                                                           value='pixel by pixel',
+    #                                                           layout={'width': 'max-content'})
+    #         display(self.normalization_mode_ui)
+    #
+    #     display(HTML("<h3>Kernel for Moving Average Algorithm</h3>"))
+    #
+    #     # dimension
+    #     hori1 = widgets.HBox([widgets.Label("Dimension",
+    #                                         layout=widgets.Layout(width="100px")),
+    #                           widgets.RadioButtons(options=['2D', '3D'],
+    #                                                value='3D')])
+    #     # size
+    #     hori21 = widgets.HBox([widgets.Checkbox(value=True,
+    #                                             layout=widgets.Layout(width="20px")),
+    #                            widgets.Label(u"y:3, x:3, \u03BB:3",
+    #                                             layout=widgets.Layout(width="100px"))])
+    #     hori22 = widgets.HBox([widgets.Checkbox(value=False,
+    #                                             layout=widgets.Layout(width="20px")),
+    #                            widgets.Label("y:",
+    #                                          layout=widgets.Layout(width="12px"),
+    #                                          enabled=False),
+    #                            widgets.IntText(3,
+    #                                            layout=widgets.Layout(width="50px")),
+    #                            widgets.Label("x:",
+    #                                          layout=widgets.Layout(width="40px")),
+    #                            widgets.IntText(3,
+    #                                            layout=widgets.Layout(width="50px")),
+    #                            widgets.Label(u"\u03BB:",
+    #                                          layout=widgets.Layout(width="40px")),
+    #                            widgets.IntText(3,
+    #                                            layout=widgets.Layout(width="50px"))])
+    #
+    #     verti2 = widgets.VBox([hori21, hori22])
+    #     hori2 = widgets.HBox([widgets.Label("Size",
+    #                                         layout=widgets.Layout(width="50px")),
+    #                           verti2])
+    #
+    #     # type
+    #     hori3 = widgets.HBox([widgets.Label("Type",
+    #                                         layout=widgets.Layout(width="100px")),
+    #                           widgets.RadioButtons(options=['Gaussian', 'box'])])
+    #
+    #     run_prepare_button = widgets.Button(description=" Run prepare data",
+    #                                         layout=widgets.Layout(width="50%"),
+    #                                         icon='play')
+    #     run_prepare_button.on_click(self.run_prepare_data_steps)
+    #
+    #     vertical = widgets.VBox([hori1, hori2, hori3, widgets.Label(""), run_prepare_button])
+    #     display(vertical)
+    #
+    # def run_prepare_data_steps(self, _):
+    #     self.prepare_data_steps(list_roi=self.list_roi)
+    #
+    # def prepare_data_steps(self, list_roi=None):
+    #     if list_roi:
+    #         self.normalize_data(list_roi=list_roi)
+    #         self.calculate_moving_average()
+    #         self.calculate_mask()
+    #     else:
+    #         display(HTML('<span style="font-size: 15px; color:red">ERROR! Please select a ROI first!</span>'))
 
     def normalize_data(self, list_roi=None):
 

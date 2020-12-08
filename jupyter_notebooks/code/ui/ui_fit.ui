@@ -34,7 +34,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
-         <widget class="QGroupBox" name="groupBox_5">
+         <widget class="QGroupBox" name="prepare_data_normalization_groupBox">
           <property name="title">
            <string>Normalization</string>
           </property>
@@ -136,7 +136,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_5">
+                 <widget class="QLabel" name="kernel_size_default_label">
                   <property name="text">
                    <string>y:3  x:3  lambda:3</string>
                   </property>
@@ -176,33 +176,78 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="kernel_size_custom_y_lineEdit"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_4">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
+                   <widget class="QLineEdit" name="kernel_size_custom_y_lineEdit">
+                    <property name="minimumSize">
                      <size>
-                      <width>40</width>
-                      <height>20</height>
+                      <width>50</width>
+                      <height>0</height>
                      </size>
                     </property>
-                   </spacer>
+                    <property name="maximumSize">
+                     <size>
+                      <width>50</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>3</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <widget class="QLabel" name="label_7">
                     <property name="text">
-                     <string>x:</string>
+                     <string>      x:</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="kernel_size_custom_x_lineEdit"/>
+                   <widget class="QLineEdit" name="kernel_size_custom_x_lineEdit">
+                    <property name="minimumSize">
+                     <size>
+                      <width>50</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>50</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>3</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <spacer name="horizontalSpacer_5">
+                   <widget class="QLabel" name="kernel_size_custom_lambda_label">
+                    <property name="text">
+                     <string>     l:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="kernel_size_custom_lambda_lineEdit">
+                    <property name="minimumSize">
+                     <size>
+                      <width>50</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>50</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>3</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_10">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
@@ -213,16 +258,6 @@
                      </size>
                     </property>
                    </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_9">
-                    <property name="text">
-                     <string>l:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="kernel_size_custom_lambda_lineEdit"/>
                   </item>
                  </layout>
                 </item>

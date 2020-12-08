@@ -54,8 +54,9 @@ class Interface(QMainWindow):
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_fit.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Fit Interface")
-
         self.init_widgets()
+
+    def running_prepare_data(self):
         self.initialize_pixel_marker()
         self.display_image()
         self.display_profile()
@@ -95,6 +96,16 @@ class Interface(QMainWindow):
                                  'y': np.int(y)}
 
     def init_widgets(self):
+        # disable second tab
+        self.ui.toolBox.setItemEnabled(1, False)
+
+        # labels
+        self.ui.kernel_size_default_label.setText(u"y:3  x:3  \u03BB:3")
+        self.ui.kernel_size_custom_lambda_label.setText(u"\u03BB:")
+
+        # hide normalization if not needed
+        self.ui.prepare_data_normalization_groupBox.setVisible(self.o_api.normalization_flag_ui.value)
+
         # pyqtgraphs
         self.ui.image_view = pg.ImageView(view=pg.PlotItem())
         self.ui.image_view.ui.roiBtn.hide()
