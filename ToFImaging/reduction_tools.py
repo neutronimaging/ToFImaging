@@ -291,11 +291,9 @@ def data_filtering(input_array, box_kernel=None, gaussian_kernel=None, bool_prin
 
         if any(box_kernel):
             kernel = np.ones((box_kernel[0], box_kernel[1]))
-            kernel = kernel/np.sum(np.ravel(kernel))
-            print(kernel)
-            print(input_array)
-            # output_array = scipy.ndimage.convolve2d(input_array, kernel, 'same')
-            output_array = scipy.signal.convolve2d(input_array, kernel, 'same')
+            # kernel = kernel/np.sum(np.ravel(kernel))
+            output_array = scipy.ndimage.convolve(input_array, kernel, mode='constant', cval=0)
+            # output_array = scipy.signal.convolve2d(input_array, kernel, 'same')
 
         elif any(gaussian_kernel):
             output_array = scipy.ndimage.gaussian_filter(input_array, gaussian_kernel)

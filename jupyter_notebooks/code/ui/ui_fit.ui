@@ -18,7 +18,7 @@
     <item>
      <widget class="QToolBox" name="toolBox">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <property name="geometry">
@@ -760,8 +760,8 @@
    <slot>apply_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1547</x>
-     <y>810</y>
+     <x>1598</x>
+     <y>1037</y>
     </hint>
     <hint type="destinationlabel">
      <x>1034</x>
@@ -776,8 +776,8 @@
    <slot>fit_pixel_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1172</x>
-     <y>310</y>
+     <x>1190</x>
+     <y>308</y>
     </hint>
     <hint type="destinationlabel">
      <x>1156</x>
@@ -809,7 +809,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>354</x>
-     <y>723</y>
+     <y>950</y>
     </hint>
     <hint type="destinationlabel">
      <x>7</x>
@@ -824,8 +824,8 @@
    <slot>number_of_files_to_exclude_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1448</x>
-     <y>723</y>
+     <x>1489</x>
+     <y>950</y>
     </hint>
     <hint type="destinationlabel">
      <x>1158</x>
@@ -840,8 +840,8 @@
    <slot>rough_lambda_peak_position_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>891</x>
-     <y>725</y>
+     <x>912</x>
+     <y>952</y>
     </hint>
     <hint type="destinationlabel">
      <x>729</x>
@@ -857,7 +857,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>749</x>
-     <y>709</y>
+     <y>936</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -872,8 +872,8 @@
    <slot>kernel_dimension_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>74</x>
-     <y>202</y>
+     <x>128</x>
+     <y>214</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -888,12 +888,44 @@
    <slot>kernel_dimension_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>127</x>
-     <y>201</y>
+     <x>75</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>step3_fit_pixel_settings_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>step3_settings_button_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1555</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1600</x>
+     <y>310</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>step4_fit_roi_settings_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>step4_settings_button_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1562</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1602</x>
+     <y>369</y>
     </hint>
    </hints>
   </connection>
@@ -906,5 +938,7 @@
   <slot>rough_lambda_peak_position_slider_changed()</slot>
   <slot>prepare_data_button_clicked()</slot>
   <slot>kernel_dimension_changed()</slot>
+  <slot>step3_settings_button_clicked()</slot>
+  <slot>step4_settings_button_clicked()</slot>
  </slots>
 </ui>

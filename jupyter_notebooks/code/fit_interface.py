@@ -54,6 +54,9 @@ class Interface(QMainWindow):
     # integrated_image_size = {'width': -1, 'height': -1}
     # splitter_2_has_been_resized = False
 
+    step3_settings_ui = None
+    step4_settings_ui = None
+
     def __init__(self, parent=None, o_roi=None, o_api=None):
         super(Interface, self).__init__(parent)
 
@@ -65,15 +68,15 @@ class Interface(QMainWindow):
 
         if not self.debugging_mode:
             self.live_image = self.o_roi.live_image
-
-        self.sample_projections = self.o_api.sample_projections
-        self.list_roi = self.o_roi.list_roi
+            self.sample_projections = self.o_api.sample_projections
+            self.list_roi = self.o_roi.list_roi
 
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_fit.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Fit Interface")
         self.init_widgets()
-        self.display_prepare_data_raw_image()
+        if not self.debugging_mode:
+            self.display_prepare_data_raw_image()
 
     def display_prepare_data_raw_image(self):
         live_image = np.transpose(self.live_image)
@@ -120,7 +123,7 @@ class Interface(QMainWindow):
 
     def init_widgets(self):
         # disable second tab
-        self.ui.toolBox.setItemEnabled(1, False)
+        # self.ui.toolBox.setItemEnabled(1, False)
 
         # labels
         self.ui.kernel_size_custom_lambda_label.setText(u"\u03BB:")
@@ -613,5 +616,51 @@ class Interface(QMainWindow):
         self.ui.kernel_size_custom_lambda_label.setVisible(third_dimension_state)
         self.ui.kernel_size_custom_lambda_lineEdit.setVisible(third_dimension_state)
 
+    def step3_settings_button_clicked(self):
+        if self.step3_settings_ui:
+            self.step3_settings_ui.setFocus()
+            self.step3_settings_ui.activateWindow()
+        else:
+            step3_settings_ui = Step3SettingsHandler(parent=self)
+            step3_settings_ui.show()
+            self.step3_settings_ui = step3_settings_ui
+
+    def step4_settings_button_clicked(self):
+        if self.step4_settings_ui:
+            self.step4_settings_ui.setFocus()
+            self.step4_settings_ui.activateWindow()
+        else:
+            step4_settings_ui = Step4SettingsHandler(parent=self)
+            step4_settings_ui.show()
+            self.step4_settings_ui = step4_settings_ui
+
     def apply_clicked(self):
+        self.close()
+
+
+class Step3SettingsHandler(QMainWindow):
+
+    def __init__(self, parent=None):
+        super(QMainWindow, self).__init__()
+        self.parent = parent
+        ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_step3_settings.ui'))
+        self.ui = load_ui(ui_full_path, baseinstance=self)
+        self.setWindowTitle("Step3 Settings")
+
+    def closeEvent(self, event=None):
+        self.parent.step3_settings_ui = None
+        self.close()
+
+
+class Step4SettingsHandler(QMainWindow):
+
+    def __init__(self, parent=None):
+        super(QMainWindow, self).__init__()
+        self.parent = parent
+        ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_step4_settings.ui'))
+        self.ui = load_ui(ui_full_path, baseinstance=self)
+        self.setWindowTitle("Step4 Settings")
+
+    def closeEvent(self, event=None):
+        self.parent.step3_settings_ui = None
         self.close()
