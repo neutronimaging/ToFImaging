@@ -1,6 +1,7 @@
 import os
 from qtpy.QtWidgets import QMainWindow, QVBoxLayout
 from qtpy.QtGui import QIcon
+from qtpy import QtGui
 from jupyter_notebooks.code import load_ui
 import pyqtgraph as pg
 import numpy as np
@@ -9,6 +10,8 @@ import copy
 from ToFImaging import reduction_tools
 from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities import find_nearest_index
+from NeuNorm.normalization import Normalization
+from NeuNorm.roi import ROI
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -61,6 +64,9 @@ class Interface(QMainWindow):
 
         if not self.debugging_mode:
             self.live_image = self.o_roi.live_image
+
+        self.sample_projections = self.o_api.sample_projections
+        self.list_roi = self.o_roi.list_roi
 
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_fit.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
@@ -393,6 +399,8 @@ class Interface(QMainWindow):
         self.number_of_files_to_exclude_slider_changed(0)
 
     def prepare_data_button_clicked(self):
+        self.ui.setEnabled(False)
+
         # collect parameters
         is_with_normalization = self.o_api.normalization_flag_ui.value
         normalization_mode = self._get_normalization_mode()
@@ -410,20 +418,28 @@ class Interface(QMainWindow):
         self.calculate_mask()
         self.display_prepare_data_preview_image()
 
+        self.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
+        QtGui.QGuiApplication.processEvents()
+        self.ui.setEnabled(True)
+
     def display_prepare_data_preview_image(self):
         prepare_data = self.T_mavg
-        print(f"np.shape(prepare_data): {np.shape(prepare_data)}")
+        self.live_process_data = np.mean(prepare_data, axis=2)
+        live_process_image = np.transpose(self.live_process_data)
+        self.ui.process_image_view.setImage(live_process_image)
 
     def calculate_moving_average(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
+        self.ui.statusbar.showMessage("Moving Average ... IN PROGRESS")
+        QtGui.QGuiApplication.processEvents()
         custom_kernel = np.ones((5, 5))
-
         T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
                                                    custom_kernel=custom_kernel)
         self.T_mavg = T_mavg
+        QtGui.QGuiApplication.processEvents()
 
     def calculate_mask(self):
-        self.message.append("Calculate mask ... IN PROGRESS")
-        self.display_message()
+        self.ui.statusbar.showMessage("Calculate mask ... IN PROGRESS")
+        QtGui.QGuiApplication.processEvents()
 
         list_roi = self.list_roi
         [height, width, _] = np.shape(self.T_mavg)
@@ -438,7 +454,11 @@ class Interface(QMainWindow):
             mask[y0:y1 + 1, x0:x1 + 1] = 1
         self.mask = mask
 
+        QtGui.QGuiApplication.processEvents()
+
     def normalize_data(self, list_roi=None, normalization_flag=True, normalization_mode='pixel by pixel'):
+        self.ui.statusbar.showMessage("Normalization ... IN PROGRESS")
+        QtGui.QGuiApplication.processEvents()
 
         if normalization_flag:
             sample_projections = self.sample_projections
@@ -464,6 +484,8 @@ class Interface(QMainWindow):
 
         else:  # no normalization
             self.normalize_projections = copy.deepcopy(self.sample_projections)
+
+        QtGui.QGuiApplication.processEvents()
 
     @staticmethod
     def normalization_pixel_by_pixel(list_roi,
