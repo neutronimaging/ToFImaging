@@ -17,6 +17,8 @@ COLOR_ROUGH_LAMBDA = [50, 255, 50]
 
 class Interface(QMainWindow):
 
+    debugging_mode = False
+
     o_roi = None
     o_api = None
     live_image = None
@@ -50,6 +52,9 @@ class Interface(QMainWindow):
 
     def __init__(self, parent=None, o_roi=None, o_api=None):
         super(Interface, self).__init__(parent)
+
+        if o_roi is None:
+            self.debugging_mode = True
 
         self.o_roi = o_roi
         self.o_api = o_api
@@ -112,7 +117,11 @@ class Interface(QMainWindow):
         self.kernel_dimension_changed()
 
         # hide normalization if not needed
-        self.ui.prepare_data_normalization_groupBox.setVisible(self.o_api.normalization_flag_ui.value)
+        if self.debugging_mode:
+            normalization_flag_value = True
+        else:
+            normalization_flag_value = self.o_api.normalization_flag_ui.value
+        self.ui.prepare_data_normalization_groupBox.setVisible(normalization_flag_value)
 
         # pyqtgraphs
         self.ui.image_view = pg.ImageView(view=pg.PlotItem())
@@ -131,8 +140,14 @@ class Interface(QMainWindow):
         self.ui.splitter.setSizes([550, 50])
         self.ui.splitter_2.setSizes([200, 2])
 
+        self.ui.prepare_data_main_splitter.setSizes([100,500])
+        self.ui.prepare_data_preview_splitter.setSizes([200, 200])
+
         # sliders
-        half_number_of_files = np.int(len(self.o_roi.lambda_array)/2)
+        if self.debugging_mode:
+            half_number_of_files = 100
+        else:
+            half_number_of_files = np.int(len(self.o_roi.lambda_array)/2)
         self.ui.right_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
         self.ui.left_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
         self.ui.right_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['left'])

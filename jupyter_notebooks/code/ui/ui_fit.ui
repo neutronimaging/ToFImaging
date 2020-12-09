@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1560</width>
-    <height>844</height>
+    <width>1611</width>
+    <height>1071</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,284 +18,104 @@
     <item>
      <widget class="QToolBox" name="toolBox">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>1536</width>
-         <height>667</height>
+         <width>1587</width>
+         <height>894</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Prepare Data</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
+       <layout class="QVBoxLayout" name="verticalLayout_12">
         <item>
-         <widget class="QGroupBox" name="prepare_data_normalization_groupBox">
-          <property name="title">
-           <string>Normalization</string>
+         <widget class="QSplitter" name="prepare_data_main_splitter">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
-           <item>
-            <widget class="QRadioButton" name="normalization_by_roi_radioButton">
-             <property name="text">
-              <string>by ROI</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
-             <property name="text">
-              <string>Pixel by pixel</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_9">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_6">
-          <property name="title">
-           <string>Kernel of Moving Average</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_9">
-           <item>
-            <widget class="QGroupBox" name="groupBox_7">
-             <property name="title">
-              <string>Dimension</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <widget class="QRadioButton" name="kernel_dimension_3d_radioButton">
-                <property name="text">
-                 <string>3D</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="kernel_dimension_2d_radioButton">
-                <property name="text">
-                 <string>2D</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_7">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupBox_8">
-             <property name="title">
-              <string>Size</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_8">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_6">
-                <item>
-                 <widget class="QRadioButton" name="kernel_size_default_radioButton">
-                  <property name="text">
-                   <string>Default</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="kernel_size_default_label">
-                  <property name="text">
-                   <string>y:3  x:3  lambda:3</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_6">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_7">
-                <item>
-                 <widget class="QRadioButton" name="kernel_size_custom_radioButton">
-                  <property name="text">
-                   <string>Custom</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <widget class="QWidget" name="">
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <item>
+             <widget class="QGroupBox" name="prepare_data_normalization_groupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>Normalization</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QRadioButton" name="normalization_by_roi_radioButton">
+                 <property name="text">
+                  <string>by ROI</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
+                 <property name="text">
+                  <string>Pixel by pixel</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_9">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_6">
+              <property name="title">
+               <string>Kernel of Moving Average</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
+                <widget class="QGroupBox" name="groupBox_7">
+                 <property name="title">
+                  <string>Dimension</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                   <item>
-                   <widget class="QLabel" name="label_6">
-                    <property name="minimumSize">
-                     <size>
-                      <width>30</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="layoutDirection">
-                     <enum>Qt::LeftToRight</enum>
-                    </property>
+                   <widget class="QRadioButton" name="kernel_dimension_3d_radioButton">
                     <property name="text">
-                     <string>y:</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     <string>3D</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="kernel_size_custom_y_lineEdit">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
+                   <widget class="QRadioButton" name="kernel_dimension_2d_radioButton">
                     <property name="text">
-                     <string>3</string>
+                     <string>2D</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLabel" name="label_7">
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>40</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>      x:</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="kernel_size_custom_x_lineEdit">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>3</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="kernel_size_custom_lambda_label">
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>40</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>     l:</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="kernel_size_custom_lambda_lineEdit">
-                    <property name="minimumSize">
-                     <size>
-                      <width>50</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>3</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_10">
+                   <spacer name="horizontalSpacer_7">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
@@ -308,71 +128,321 @@
                    </spacer>
                   </item>
                  </layout>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupBox_9">
-             <property name="title">
-              <string>Type</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
-              <item>
-               <widget class="QRadioButton" name="kernel_type_box_radioButton">
-                <property name="text">
-                 <string>Box</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="kernel_type_gaussian_radioButton">
-                <property name="text">
-                 <string>Gaussian</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="groupBox_8">
+                 <property name="title">
+                  <string>Size</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_8">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_6">
+                    <item>
+                     <widget class="QRadioButton" name="kernel_size_default_radioButton">
+                      <property name="text">
+                       <string>Default</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="kernel_size_default_label">
+                      <property name="text">
+                       <string>y:3  x:3  lambda:3</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_6">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                    <item>
+                     <widget class="QRadioButton" name="kernel_size_custom_radioButton">
+                      <property name="text">
+                       <string>Custom</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_5">
+                      <item>
+                       <widget class="QLabel" name="label_6">
+                        <property name="minimumSize">
+                         <size>
+                          <width>30</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>30</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="layoutDirection">
+                         <enum>Qt::LeftToRight</enum>
+                        </property>
+                        <property name="text">
+                         <string>y:</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="kernel_size_custom_y_lineEdit">
+                        <property name="minimumSize">
+                         <size>
+                          <width>50</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>50</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>3</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_7">
+                        <property name="minimumSize">
+                         <size>
+                          <width>40</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>40</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>      x:</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="kernel_size_custom_x_lineEdit">
+                        <property name="minimumSize">
+                         <size>
+                          <width>50</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>50</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>3</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="kernel_size_custom_lambda_label">
+                        <property name="minimumSize">
+                         <size>
+                          <width>40</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>40</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>     l:</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="kernel_size_custom_lambda_lineEdit">
+                        <property name="minimumSize">
+                         <size>
+                          <width>50</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>50</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>3</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_10">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="groupBox_9">
+                 <property name="title">
+                  <string>Type</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                  <item>
+                   <widget class="QRadioButton" name="kernel_type_box_radioButton">
+                    <property name="text">
+                     <string>Box</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="kernel_type_gaussian_radioButton">
+                    <property name="text">
+                     <string>Gaussian</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_8">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QSplitter" name="prepare_data_preview_splitter">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <widget class="QWidget" name="">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Raw Integrated Signal</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QWidget" name="widget" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="">
+            <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item>
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>Prepared Integrated Signal</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QWidget" name="widget_3" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>246</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item>
          <widget class="QPushButton" name="prepare_data_pushButton">
           <property name="text">
-           <string>Prepare data using those parameters</string>
+           <string>Run Prepare Data</string>
           </property>
          </widget>
         </item>
@@ -383,8 +453,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>1536</width>
-         <height>667</height>
+         <width>1587</width>
+         <height>894</height>
         </rect>
        </property>
        <attribute name="label">
@@ -674,7 +744,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1560</width>
+     <width>1611</width>
      <height>22</height>
     </rect>
    </property>
