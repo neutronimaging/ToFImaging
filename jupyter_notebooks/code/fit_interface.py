@@ -1,5 +1,6 @@
 import os
 from qtpy.QtWidgets import QMainWindow, QVBoxLayout
+from qtpy.QtGui import QIcon
 from jupyter_notebooks.code import load_ui
 import pyqtgraph as pg
 import numpy as np
@@ -136,6 +137,13 @@ class Interface(QMainWindow):
         self.ui.left_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
         self.ui.right_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['left'])
         self.ui.left_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['right'])
+
+        # icons
+        _file_path = os.path.dirname(__file__)
+        settings_icon_1 = os.path.abspath(os.path.join(_file_path, 'static/settings_icon.png'))
+        self.ui.step3_fit_pixel_settings_pushButton.setIcon(QIcon(settings_icon_1))
+        settings_icon_2 = os.path.abspath(os.path.join(_file_path, 'static/settings_icon.png'))
+        self.ui.step4_fit_roi_settings_pushButton.setIcon(QIcon(settings_icon_2))
 
     def pixel_marker_changed(self):
         region = self.pixel_marker_item.getArraySlice(self.live_image,

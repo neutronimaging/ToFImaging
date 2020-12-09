@@ -304,7 +304,19 @@ class TestDataFiltering:
             reduction_tools.data_filtering(input_array,
                                            gaussian_kernel=gaussian_kernel)
 
-    
+    # def test_3d_input_array_with_2d_box_kernel(self):
+    #     input_array = np.array([[[1, 10, 11], [9, 2, 1], [1, 30, 15]],
+    #                             [[1, 10, 11], [9, 2, 1], [1, 30, 15]],
+    #                             [[1, 10, 11], [9, 2, 1], [1, 30, 15]],
+    #                             [[1, 10, 11], [9, 2, 1], [1, 30, 15]]])
+    #     # input_array = input_array.transpose(1, 2, 0)  # x, y, tof
+    #     output_array = reduction_tools.data_filtering(input_array, box_kernel=[2, 2])
+    #     print(output_array)
+    #     assert False
 
-
+    def test_2d_input_array_with_2d_box_kernel(self):
+        input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
+        output_array = reduction_tools.data_filtering(input_array, box_kernel=[3, 3])
+        print(output_array)
+        assert False
 
