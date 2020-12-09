@@ -8,6 +8,7 @@ import numpy as np
 import copy
 
 from ToFImaging import reduction_tools
+from jupyter_notebooks.code.decorators import wait_cursor
 from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities import find_nearest_index
 from NeuNorm.normalization import Normalization
@@ -135,7 +136,7 @@ class Interface(QMainWindow):
         # pyqtgraphs
 
         # prepare data tab
-        self.ui.raw_image_view = pg.ImageView(view=pg.PlotItem())
+        self.ui.raw_image_view = pg.ImageView(view=pg.PlotItem(), name='raw image')
         self.ui.raw_image_view.ui.roiBtn.hide()
         self.ui.raw_image_view.ui.menuBtn.hide()
         prepare_data_verti_layout1 = QVBoxLayout()
@@ -148,6 +149,9 @@ class Interface(QMainWindow):
         prepare_data_verti_layout2 = QVBoxLayout()
         prepare_data_verti_layout2.addWidget(self.ui.process_image_view)
         self.ui.prepare_data_process_widget.setLayout(prepare_data_verti_layout2)
+
+        self.ui.process_image_view.view.getViewBox().setXLink('raw image')
+        self.ui.process_image_view.view.getViewBox().setYLink('raw image')
 
         # fit tab
         self.ui.image_view = pg.ImageView(view=pg.PlotItem())
@@ -398,6 +402,7 @@ class Interface(QMainWindow):
 
         self.number_of_files_to_exclude_slider_changed(0)
 
+    @wait_cursor
     def prepare_data_button_clicked(self):
         self.ui.setEnabled(False)
 
