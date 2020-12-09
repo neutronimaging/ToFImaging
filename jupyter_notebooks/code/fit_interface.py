@@ -436,9 +436,17 @@ class Interface(QMainWindow):
     def calculate_moving_average(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
         self.ui.statusbar.showMessage("Moving Average ... IN PROGRESS")
         QtGui.QGuiApplication.processEvents()
-        custom_kernel = np.ones((5, 5))
+
+        x = kernel_size['x']
+        y = kernel_size['y']
+        l = kernel_size['lambda']
+        if kernel_dimension == '3d':
+            kernel = np.ones((y, x, l))
+        else:  # '2d'
+            kernel = np.ones((y, x))
+
         T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
-                                                   custom_kernel=custom_kernel)
+                                                   custom_kernel=kernel)
         self.T_mavg = T_mavg
         QtGui.QGuiApplication.processEvents()
 
