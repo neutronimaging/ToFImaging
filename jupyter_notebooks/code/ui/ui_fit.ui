@@ -170,8 +170,26 @@
                  <layout class="QHBoxLayout" name="horizontalLayout_5">
                   <item>
                    <widget class="QLabel" name="label_6">
+                    <property name="minimumSize">
+                     <size>
+                      <width>30</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>30</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="layoutDirection">
+                     <enum>Qt::LeftToRight</enum>
+                    </property>
                     <property name="text">
                      <string>y:</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                     </property>
                    </widget>
                   </item>
@@ -196,8 +214,23 @@
                   </item>
                   <item>
                    <widget class="QLabel" name="label_7">
+                    <property name="minimumSize">
+                     <size>
+                      <width>40</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>40</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
                     <property name="text">
                      <string>      x:</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                     </property>
                    </widget>
                   </item>
@@ -222,8 +255,23 @@
                   </item>
                   <item>
                    <widget class="QLabel" name="kernel_size_custom_lambda_label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>40</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>40</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
                     <property name="text">
                      <string>     l:</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                     </property>
                    </widget>
                   </item>
@@ -596,8 +644,8 @@
    <slot>apply_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1438</x>
-     <y>901</y>
+     <x>1547</x>
+     <y>810</y>
     </hint>
     <hint type="destinationlabel">
      <x>1034</x>
@@ -612,8 +660,8 @@
    <slot>fit_pixel_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>778</x>
-     <y>216</y>
+     <x>1172</x>
+     <y>310</y>
     </hint>
     <hint type="destinationlabel">
      <x>1156</x>
@@ -628,8 +676,8 @@
    <slot>fit_full_roi_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>723</x>
-     <y>247</y>
+     <x>1117</x>
+     <y>344</y>
     </hint>
     <hint type="destinationlabel">
      <x>1155</x>
@@ -644,8 +692,8 @@
    <slot>number_of_files_to_exclude_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>254</x>
-     <y>826</y>
+     <x>354</x>
+     <y>723</y>
     </hint>
     <hint type="destinationlabel">
      <x>7</x>
@@ -660,8 +708,8 @@
    <slot>number_of_files_to_exclude_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1351</x>
-     <y>826</y>
+     <x>1448</x>
+     <y>723</y>
     </hint>
     <hint type="destinationlabel">
      <x>1158</x>
@@ -676,12 +724,60 @@
    <slot>rough_lambda_peak_position_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>719</x>
-     <y>818</y>
+     <x>891</x>
+     <y>725</y>
     </hint>
     <hint type="destinationlabel">
      <x>729</x>
-     <y>890</y>
+     <y>843</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>prepare_data_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>prepare_data_button_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>749</x>
+     <y>709</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>706</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kernel_dimension_3d_radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>kernel_dimension_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>202</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>205</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kernel_dimension_2d_radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>kernel_dimension_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>201</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>274</y>
     </hint>
    </hints>
   </connection>
@@ -692,5 +788,7 @@
   <slot>fit_full_roi_clicked()</slot>
   <slot>number_of_files_to_exclude_slider_changed()</slot>
   <slot>rough_lambda_peak_position_slider_changed()</slot>
+  <slot>prepare_data_button_clicked()</slot>
+  <slot>kernel_dimension_changed()</slot>
  </slots>
 </ui>

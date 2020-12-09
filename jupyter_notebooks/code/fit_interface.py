@@ -3,7 +3,9 @@ from qtpy.QtWidgets import QMainWindow, QVBoxLayout
 from jupyter_notebooks.code import load_ui
 import pyqtgraph as pg
 import numpy as np
+import copy
 
+from ToFImaging import reduction_tools
 from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities import find_nearest_index
 
@@ -17,6 +19,11 @@ class Interface(QMainWindow):
     o_roi = None
     o_api = None
     live_image = None
+
+    default_kernel_size = {'y': 3, 'x': 3, 'lambda': 3}
+    kernel_size = copy.deepcopy(default_kernel_size)
+    default_kernel_size_label = {'3d': u"y:3  x:3  \u03BB:3",
+                                 '2d': "y:3  x:3"}
 
     pixel_marker = {'x': 0,
                     'y': 0}
@@ -100,8 +107,8 @@ class Interface(QMainWindow):
         self.ui.toolBox.setItemEnabled(1, False)
 
         # labels
-        self.ui.kernel_size_default_label.setText(u"y:3  x:3  \u03BB:3")
         self.ui.kernel_size_custom_lambda_label.setText(u"\u03BB:")
+        self.kernel_dimension_changed()
 
         # hide normalization if not needed
         self.ui.prepare_data_normalization_groupBox.setVisible(self.o_api.normalization_flag_ui.value)
@@ -342,6 +349,171 @@ class Interface(QMainWindow):
 
         self.number_of_files_to_exclude_slider_changed(0)
 
+    def prepare_data_button_clicked(self):
+        # collect parameters
+        is_with_normalization = self.o_api.normalization_flag_ui.value
+        normalization_mode = self._get_normalization_mode()
+        kernel_dimension = self._get_kernel_dimensions()
+        kernel_size = self._get_kernel_size()
+        kernel_type = self._get_kernel_type()
+
+        self.normalize_data(list_roi=self.o_roi.list_roi,
+                            normalization_flag=is_with_normalization,
+                            normalization_mode=normalization_mode)
+
+        self.calculate_moving_average(kernel_dimension=kernel_dimension,
+                                      kernel_size=kernel_size,
+                                      kernel_type=kernel_type)
+        self.calculate_mask()
+
+    def calculate_moving_average(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
+
+
+        custom_kernel = np.ones((5, 5))
+
+        T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
+                                                   custom_kernel=custom_kernel)
+        self.T_mavg = T_mavg
+
+    def calculate_mask(self):
+        self.message.append("Calculate mask ... IN PROGRESS")
+        self.display_message()
+
+        list_roi = self.list_roi
+        [height, width, _] = np.shape(self.T_mavg)
+        mask = np.zeros((height, width))
+
+        for _roi_key in list_roi.keys():
+            _roi = list_roi[_roi_key]
+            x0 = _roi['x0']
+            y0 = _roi['y0']
+            x1 = _roi['x1']
+            y1 = _roi['y1']
+            mask[y0:y1 + 1, x0:x1 + 1] = 1
+        self.mask = mask
+
+    def normalize_data(self, list_roi=None, normalization_flag=True, normalization_mode='pixel by pixel'):
+
+        if normalization_flag:
+            sample_projections = self.sample_projections
+            ob_projections = self.ob_projections
+
+            working_sample_projections = sample_projections.transpose(2, 0, 1)
+            working_ob_projections = ob_projections.transpose(2, 0, 1)
+            normalize_projections = list()
+
+            if self.normalization_mode_ui.value == 'pixel by pixel':
+
+                normalize_projections = Interface.normalization_pixel_by_pixel(list_roi,
+                                                                               working_ob_projections,
+                                                                               working_sample_projections)
+
+            elif self.normalization_mode_ui.value == 'by ROI':
+
+                normalize_projections = Interface.normalization_by_roi(list_roi,
+                                                                       working_ob_projections,
+                                                                       working_sample_projections)
+
+            self.normalize_projections = normalize_projections.transpose(1, 2, 0)
+
+        else:  # no normalization
+            self.normalize_projections = copy.deepcopy(self.sample_projections)
+
+    @staticmethod
+    def normalization_pixel_by_pixel(list_roi,
+                                     working_ob_projections,
+                                     working_sample_projections):
+
+        list_o_roi = []
+        for _roi_key in list_roi.keys():
+            _roi = list_roi[_roi_key]
+            o_roi = ROI(x0=_roi['x0'],
+                        y0=_roi['y0'],
+                        x1=_roi['x1'],
+                        y1=_roi['y1'])
+            list_o_roi.append(o_roi)
+
+        _sample = working_sample_projections
+        _ob = working_ob_projections
+
+        o_norm = Normalization()
+        o_norm.data['sample']['data'] = _sample
+        o_norm.data['ob']['data'] = _ob
+
+        # create fake list of sample and ob
+        list_filename = ['N/A' for _ in np.arange(len(_sample))]
+        o_norm.data['sample']['file_name'] = list_filename
+        o_norm.data['ob']['file_name'] = list_filename
+
+        o_norm.normalization(roi=list_o_roi)
+
+        return np.array(o_norm.data['normalized'])
+
+    @staticmethod
+    def normalization_by_roi(list_roi,
+                             working_ob_projections,
+                             working_sample_projections):
+
+        normalize_projections = list()
+
+        total_number_of_pixels_in_rois = 0
+        for _index_roi in list_roi.keys():
+            _roi = list_roi[_index_roi]
+            _x0 = _roi['x0']
+            _y0 = _roi['y0']
+            _x1 = _roi['x1']
+            _y1 = _roi['y1']
+            total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
+        for _sample, _ob in zip(working_sample_projections, working_ob_projections):
+
+            mean_ob_value = 0
+            for _index_roi in list_roi.keys():
+                _roi = list_roi[_index_roi]
+                _x0 = _roi['x0']
+                _y0 = _roi['y0']
+                _x1 = _roi['x1']
+                _y1 = _roi['y1']
+
+                mean_ob_value += np.sum(_ob[_y0: _y1 + 1, _x0: _x1 + 1])
+
+            mean_ob = mean_ob_value / total_number_of_pixels_in_rois
+            _normalize = _sample / mean_ob
+
+            normalize_projections.append(_normalize)
+        normalize_projections = np.array(normalize_projections)
+        return normalize_projections
+
+    def _get_kernel_type(self):
+        if self.ui.kernel_type_box_radioButton.isChecked():
+            return 'box'
+        elif self.ui.kernel_type_gaussian_radioButton.isChecked():
+            return 'gaussian'
+        else:
+            raise NotImplementedError("kernel type not implemented!")
+
+    def _get_kernel_size(self):
+        if self.ui.kernel_size_default_radioButton.isChecked():
+            return self.default_kernel_size
+        else:
+            y = np.int(str(self.ui.kernel_size_custom_y_lineEdit.text()))
+            x = np.int(str(self.ui.kernel_size_custom_x_lineEdit.text()))
+            l = np.int(str(self.ui.kernel_size_custom_lambda_lineEdit.text()))
+            return {'y': y, 'x': x, 'lambda': l}
+
+    def _get_kernel_dimensions(self):
+        if self.ui.kernel_dimension_3d_radioButton.isChecked():
+            return '3d'
+        else:
+            return '2d'
+
+    def _get_normalization_mode(self):
+        if self.ui.normalization_by_roi_radioButton.isChecked():
+            return 'by ROI'
+        elif self.ui.normalization_pixel_by_pixel_radioButton.isChecked():
+            return 'pixel by pixel'
+        else:
+            raise NotImplementedError("normalization mode not implemented!")
+
     def fit_pixel_clicked(self):
         o_fit = FitHandler(parent=self)
         o_fit.fit(mode='pixel')
@@ -349,6 +521,16 @@ class Interface(QMainWindow):
     def fit_full_roi_clicked(self):
         o_fit = FitHandler(parent=self)
         o_fit.fit(mode='full')
+
+    def kernel_dimension_changed(self):
+        if self.ui.kernel_dimension_3d_radioButton.isChecked():
+            third_dimension_state = True
+            self.ui.kernel_size_default_label.setText(self.default_kernel_size_label['3d'])
+        else:
+            third_dimension_state = False
+            self.ui.kernel_size_default_label.setText(self.default_kernel_size_label['2d'])
+        self.ui.kernel_size_custom_lambda_label.setVisible(third_dimension_state)
+        self.ui.kernel_size_custom_lambda_lineEdit.setVisible(third_dimension_state)
 
     def apply_clicked(self):
         self.close()
