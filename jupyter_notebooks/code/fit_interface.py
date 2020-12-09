@@ -59,17 +59,20 @@ class Interface(QMainWindow):
         self.o_roi = o_roi
         self.o_api = o_api
 
-        # self.sample_projections = main_api.sample_projections  # x, y, lambda
-        # self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
-        # self.tof_array = main_api.tof_array
-        # self.lambda_array = main_api.lambda_array
+        if not self.debugging_mode:
+            self.live_image = self.o_roi.live_image
 
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_fit.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Fit Interface")
         self.init_widgets()
+        self.display_prepare_data_raw_image()
 
-    def running_prepare_data(self):
+    def display_prepare_data_raw_image(self):
+        live_image = np.transpose(self.live_image)
+        self.ui.raw_image_view.setImage(live_image)
+
+    def display_fit_data_tab(self):
         self.initialize_pixel_marker()
         self.display_image()
         self.display_profile()
@@ -124,6 +127,23 @@ class Interface(QMainWindow):
         self.ui.prepare_data_normalization_groupBox.setVisible(normalization_flag_value)
 
         # pyqtgraphs
+
+        # prepare data tab
+        self.ui.raw_image_view = pg.ImageView(view=pg.PlotItem())
+        self.ui.raw_image_view.ui.roiBtn.hide()
+        self.ui.raw_image_view.ui.menuBtn.hide()
+        prepare_data_verti_layout1 = QVBoxLayout()
+        prepare_data_verti_layout1.addWidget(self.ui.raw_image_view)
+        self.ui.prepare_data_raw_widget.setLayout(prepare_data_verti_layout1)
+
+        self.ui.process_image_view = pg.ImageView(view=pg.PlotItem())
+        self.ui.process_image_view.ui.roiBtn.hide()
+        self.ui.process_image_view.ui.menuBtn.hide()
+        prepare_data_verti_layout2 = QVBoxLayout()
+        prepare_data_verti_layout2.addWidget(self.ui.process_image_view)
+        self.ui.prepare_data_process_widget.setLayout(prepare_data_verti_layout2)
+
+        # fit tab
         self.ui.image_view = pg.ImageView(view=pg.PlotItem())
         self.ui.image_view.ui.roiBtn.hide()
         self.ui.image_view.ui.menuBtn.hide()
@@ -388,10 +408,13 @@ class Interface(QMainWindow):
                                       kernel_size=kernel_size,
                                       kernel_type=kernel_type)
         self.calculate_mask()
+        self.display_prepare_data_preview_image()
+
+    def display_prepare_data_preview_image(self):
+        prepare_data = self.T_mavg
+        print(f"np.shape(prepare_data): {np.shape(prepare_data)}")
 
     def calculate_moving_average(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
-
-
         custom_kernel = np.ones((5, 5))
 
         T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,

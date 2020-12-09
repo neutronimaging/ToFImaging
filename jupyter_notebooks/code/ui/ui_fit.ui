@@ -53,19 +53,19 @@
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <item>
+                <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
+                 <property name="text">
+                  <string>Pixel by pixel</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QRadioButton" name="normalization_by_roi_radioButton">
                  <property name="text">
                   <string>by ROI</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
-                 <property name="text">
-                  <string>Pixel by pixel</string>
                  </property>
                 </widget>
                </item>
@@ -98,19 +98,19 @@
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_4">
                   <item>
-                   <widget class="QRadioButton" name="kernel_dimension_3d_radioButton">
-                    <property name="text">
-                     <string>3D</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <widget class="QRadioButton" name="kernel_dimension_2d_radioButton">
                     <property name="text">
                      <string>2D</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="kernel_dimension_3d_radioButton">
+                    <property name="text">
+                     <string>3D</string>
                     </property>
                    </widget>
                   </item>
@@ -404,7 +404,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QWidget" name="widget" native="true">
+              <widget class="QWidget" name="prepare_data_raw_widget" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                  <horstretch>0</horstretch>
@@ -425,7 +425,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QWidget" name="widget_3" native="true">
+              <widget class="QWidget" name="prepare_data_process_widget" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                  <horstretch>0</horstretch>
