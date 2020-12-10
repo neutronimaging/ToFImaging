@@ -645,7 +645,27 @@ class Step3SettingsHandler(QMainWindow):
         self.parent = parent
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_step3_settings.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
-        self.setWindowTitle("Step3 Settings")
+        self.setWindowTitle("Step3 - Settings")
+
+        self.init_widgets()
+
+    def init_widgets(self):
+        if self.parent.debugging_mode:
+            bragg_peak_estimated = "3.5"
+        else:
+            bragg_peak_estimated = self.parent.o_roi.lambda_array[
+                self.parent.ui.rough_lambda_peak_position_slider.value()]
+        self.ui.estimated_position_bragg_edge_label.setText(str(bragg_peak_estimated))
+        self.ui.estimated_units_label.setText(u"\u212B")
+
+    def automatic_masking_clicked(self, status):
+        self.ui.threshold_groupBox.setEnabled(status)
+
+    def perform_filtering_algorithm_clicked(self, status):
+        self.ui.perform_filtering_algorithm_groupBox.setEnabled(status)
+
+    def interpolation_factor_clicked(self, status):
+        self.ui.interpolation_factor_lineEdit.setEnabled(status)
 
     def closeEvent(self, event=None):
         self.parent.step3_settings_ui = None
@@ -659,7 +679,7 @@ class Step4SettingsHandler(QMainWindow):
         self.parent = parent
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_step4_settings.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
-        self.setWindowTitle("Step4 Settings")
+        self.setWindowTitle("Step4 - Settings")
 
     def closeEvent(self, event=None):
         self.parent.step3_settings_ui = None
