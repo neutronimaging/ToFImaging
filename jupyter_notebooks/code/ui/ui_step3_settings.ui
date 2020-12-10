@@ -18,6 +18,58 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Mode: </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QRadioButton" name="transmission_mode_radioButton">
+            <property name="text">
+             <string>Transmission</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="cross_section_mode_radioButton">
+            <property name="text">
+             <string>Cross section</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="automatic_masking_checkBox">
         <property name="text">
          <string>Automatic masking</string>
@@ -392,13 +444,20 @@
       <property name="sizeHint" stdset="0">
        <size>
         <width>20</width>
-        <height>124</height>
+        <height>73</height>
        </size>
       </property>
      </spacer>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QPushButton" name="close_pushButton">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <spacer name="horizontalSpacer_8">
         <property name="orientation">
@@ -413,9 +472,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="close_pushButton">
+       <widget class="QPushButton" name="validate_changed_pushButton">
         <property name="text">
-         <string>Close</string>
+         <string>Validate Changes</string>
         </property>
        </widget>
       </item>
@@ -492,7 +551,7 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>534</x>
+     <x>47</x>
      <y>554</y>
     </hint>
     <hint type="destinationlabel">
@@ -501,10 +560,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>validate_changed_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>validate_changes_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>489</x>
+     <y>551</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>584</x>
+     <y>515</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>automatic_masking_clicked()</slot>
   <slot>perform_filtering_algorithm_clicked()</slot>
   <slot>interpolation_factor_clicked()</slot>
+  <slot>validate_changes_clicked()</slot>
  </slots>
 </ui>

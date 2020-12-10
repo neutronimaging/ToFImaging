@@ -57,6 +57,9 @@ class Interface(QMainWindow):
     step3_settings_ui = None
     step4_settings_ui = None
 
+    step3_config = None
+    step4_config = None
+
     def __init__(self, parent=None, o_roi=None, o_api=None):
         super(Interface, self).__init__(parent)
 
@@ -667,10 +670,25 @@ class Step3SettingsHandler(QMainWindow):
     def interpolation_factor_clicked(self, status):
         self.ui.interpolation_factor_lineEdit.setEnabled(status)
 
+    def save_settings(self):
+        step3_config = {'is_automatic_masking': self.ui.automatic_masking_checkBox.isChecked(),
+                        'threshold_low': str(self.ui.low_threshold_lineEdit.text()),
+                        'threshold_high': str(self.ui.high_threshold_lineEdit.text()),
+                        'is_perform_savitzky_golay_filtering':
+                            self.ui.perform_filtering_algorithm_checkBox.isChecked(),
+                        'window_size': str(self.ui.window_size_lineEdit.text()),
+                        'order_number': str(self.ui.order_number_lineEdit.text()),
+                        'is_interpolation_factor': self.ui.interpolation_factor_checkBox.isChecked(),
+                        'interpolation_factor_value': str(self.ui.interpolation_factor_lineEdit),
+                        'cross_section_mode': self.ui.cross_section_mode_radioButton.isChecked()}
+        self.parent.step3_config = step3_config
+
+    def validate_changes(self):
+        self.save_settings()
+
     def closeEvent(self, event=None):
         self.parent.step3_settings_ui = None
         self.close()
-
 
 class Step4SettingsHandler(QMainWindow):
 

@@ -1,5 +1,6 @@
 from qtpy import QtGui, QtCore
 from qtpy.QtWidgets import QApplication
+import numpy as np
 
 from ToFImaging.edgefitting_2D import GaussianBraggEdgeFitting_2D
 
@@ -34,8 +35,13 @@ class FitHandler:
         QtGui.QGuiApplication.processEvents()
 
         if mode == 'pixel':
-            result = self.fit_pixel(algorithm_selected, T_mavg, lambda_array, lambda_range, mask,
-                                    est_position)
+            result = self.fit_pixel(algorithm_selected,
+                                    T_mavg,
+                                    lambda_array,
+                                    lambda_range,
+                                    mask,
+                                    est_position,
+                                    config=self.parent.step3_config)
             self.parent.pixel_fit_result = {'edge_width': result['edge_width'],
                                       'edge_height': result['edge_height'],
                                       'edge_position': result['edge_position']}
@@ -81,12 +87,24 @@ class FitHandler:
         else:
             raise NotImplementedError("algorithm selected has not been implemented yet")
 
-    def fit_pixel(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, est_position):
+    def fit_pixel(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, est_position, config):
 
         # get pixel coordinates
         pixel_marker = self.parent.pixel_marker
         pixel = [pixel_marker['x'],
                  pixel_marker['y']]
+
+        auto_mask = config['is_automatic_masking']
+        mask_thresh = [np.float(config['threshold_low']),
+                       np.float(config['threshold_high'])]
+        bool_smooth = config['is_perform_savitzky_golay_filtering']
+        smooth_w = np.int(config['window_size'])
+        smooth_n = np.int(config['order_number'])
+        if config['is_interpolation_factor']:
+            interp_factor = np.int(config['interpolation_factor_value'])
+        else:
+            interp_factor = 0
+        bool_log = config['cross_section_mode']
 
         if algorithm_selected == 'gaussian':
             fit_result = GaussianBraggEdgeFitting_2D(T_mavg,
@@ -97,10 +115,13 @@ class FitHandler:
                                                      pos_BC=lambda_range,
                                                      debug_idx=pixel,
                                                      bool_save=True,
-                                                     bool_log=True,
-                                                     bool_smooth=True,
-                                                     smooth_w=5,
-                                                     smooth_n=1)
+                                                     bool_smooth=bool_smooth,
+                                                     smooth_w=smooth_w,
+                                                     smooth_n=smooth_n,
+                                                     auto_mask=auto_mask,
+                                                     mask_thresh=mask_thresh,
+                                                     interp_factor=interp_factor,
+                                                     bool_log=bool_log)
             return fit_result
 
         else:
