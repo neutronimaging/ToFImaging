@@ -26,8 +26,8 @@ class FitHandler:
         # get estimated bragg peak position
         est_position = self.parent.get_rough_peak_position()
 
-        mask = self.parent.o_api.mask
-        T_mavg = self.parent.o_api.T_mavg
+        mask = self.parent.mask
+        T_mavg = self.parent.T_mavg
 
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... IN PROGRESS".format(
                 mode, algorithm_selected))

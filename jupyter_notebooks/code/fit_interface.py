@@ -126,7 +126,7 @@ class Interface(QMainWindow):
 
     def init_widgets(self):
         # disable second tab
-        # self.ui.toolBox.setItemEnabled(1, False)
+        self.ui.toolBox.setItemEnabled(1, False)
 
         # labels
         self.ui.kernel_size_custom_lambda_label.setText(u"\u03BB:")
@@ -345,13 +345,13 @@ class Interface(QMainWindow):
         pixel_marker = self.pixel_marker
         x = pixel_marker['x']
         y = pixel_marker['y']
-        normalize_projections = self.o_api.T_mavg
+        normalize_projections = self.T_mavg
 
         profile = normalize_projections[y, x, :]
         self.profile_of_pixel_selected = profile
 
     def calculate_profile_of_roi(self):
-        normalize_projections_lambda_x_y = self.o_api.normalize_projections.transpose(2, 0, 1)
+        normalize_projections_lambda_x_y = self.normalize_projections.transpose(2, 0, 1)
         list_roi = self.o_roi.list_roi
         profile_y_axis = []
         total_number_of_pixels_in_rois = 0
@@ -429,8 +429,12 @@ class Interface(QMainWindow):
         self.calculate_mask()
         self.display_prepare_data_preview_image()
 
+        self.display_fit_data_tab()
+
         self.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
         QtGui.QGuiApplication.processEvents()
+        self.ui.toolBox.setItemEnabled(1, True)
+        self.ui.toolBox.setCurrentIndex(1)
         self.ui.setEnabled(True)
 
     def display_prepare_data_preview_image(self):
@@ -601,10 +605,12 @@ class Interface(QMainWindow):
         else:
             raise NotImplementedError("normalization mode not implemented!")
 
+    @wait_cursor
     def fit_pixel_clicked(self):
         o_fit = FitHandler(parent=self)
         o_fit.fit(mode='pixel')
 
+    @wait_cursor
     def fit_full_roi_clicked(self):
         o_fit = FitHandler(parent=self)
         o_fit.fit(mode='full')

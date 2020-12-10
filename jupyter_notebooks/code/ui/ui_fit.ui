@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>739</width>
-    <height>1155</height>
+    <width>1715</width>
+    <height>1093</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,16 +17,24 @@
    <layout class="QVBoxLayout" name="verticalLayout_6">
     <item>
      <widget class="QToolBox" name="toolBox">
+      <property name="font">
+       <font>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>715</width>
-         <height>978</height>
+         <width>1689</width>
+         <height>908</height>
         </rect>
        </property>
        <attribute name="label">
@@ -453,8 +461,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>715</width>
-         <height>978</height>
+         <width>1689</width>
+         <height>908</height>
         </rect>
        </property>
        <attribute name="label">
@@ -744,7 +752,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>739</width>
+     <width>1715</width>
      <height>22</height>
     </rect>
    </property>
