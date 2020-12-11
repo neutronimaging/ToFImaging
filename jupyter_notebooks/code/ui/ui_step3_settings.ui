@@ -474,7 +474,7 @@
       <item>
        <widget class="QPushButton" name="validate_changed_pushButton">
         <property name="text">
-         <string>Validate Changes</string>
+         <string>Validate and Close</string>
         </property>
        </widget>
       </item>

@@ -581,6 +581,9 @@
                   </item>
                   <item>
                    <widget class="QPushButton" name="step4_fit_roi_settings_pushButton">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>30</width>

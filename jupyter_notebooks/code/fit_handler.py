@@ -42,12 +42,21 @@ class FitHandler:
                                     mask,
                                     est_position,
                                     config=self.parent.step3_config)
-            self.parent.pixel_fit_result = {'edge_width': result['edge_width'],
-                                      'edge_height': result['edge_height'],
-                                      'edge_position': result['edge_position']}
-
             if result:
+                self.parent.step4_config['estimated_bragg_edge_width_value'] = result['edge_width']
+                self.parent.step4_config['estimated_bragg_edge_height_value'] = result['edge_height']
+                self.parent.step4_config['estimated_bragg_edge_position_value'] = result['edge_position']
+                edge_position = result['edge_position']
+                edge_width = result['edge_width']
+                pos_bc = [edge_position - self.BRAGG_EDGE_FIT_POSITION_TOLERANCE,
+                          edge_position + self.BRAGG_EDGE_FIT_POSITION_TOLERANCE]
+                wid_bc = [edge_width - self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE,
+                          edge_width + self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE]
+                self.parent.step4_config['estimated_bragg_edge_position_range'] = pos_bc
+                self.parent.step4_config['estimated_bragg_edge_width_range'] = wid_bc
+
                 self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
+                self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
 
         if mode == 'full':
             est_width = self.parent.pixel_fit_result['edge_width']
@@ -67,20 +76,26 @@ class FitHandler:
                                              15000)
         QApplication.restoreOverrideCursor()
 
-    def fit_full_roi(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, est_position, est_width):
+    def fit_full_roi(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, config):
 
         if algorithm_selected == 'gaussian':
 
-            pos_bc = [est_position - self.BRAGG_EDGE_FIT_POSITION_TOLERANCE,
-                      est_position + self.BRAGG_EDGE_FIT_POSITION_TOLERANCE]
-            wid_bc = [est_width - self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE,
-                      est_width + self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE]
+            est_position = config['estimated_bragg_edge_position_value']
+            est_width = config['estimated_bragg_edge_width_value']
+            est_height = config['estimated_bragg_edge_height_value']
+            pos_bc = config['estimated_bragg_edge_position_range']
+            wid_bc = config['estimated_bragg_edge_width_range']
 
             fit_result = GaussianBraggEdgeFitting_2D(T_mavg,
                                                      lambda_array,
                                                      lambda_range,
                                                      mask=mask,
                                                      bool_log=False,
+                                                     est_position=est_position,
+                                                     est_wid=est_width,
+                                                     est_h=est_height,
+                                                     wid_BC=wid_bc,
+                                                     pos_BC=pos_bc,
                                                      )
             return fit_result
 
@@ -104,7 +119,7 @@ class FitHandler:
             interp_factor = np.int(config['interpolation_factor_value'])
         else:
             interp_factor = 0
-        bool_log = config['cross_section_mode']
+        bool_log = config['is_cross_section_mode']
 
         if algorithm_selected == 'gaussian':
             fit_result = GaussianBraggEdgeFitting_2D(T_mavg,

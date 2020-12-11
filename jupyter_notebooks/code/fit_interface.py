@@ -65,9 +65,26 @@ class Interface(QMainWindow):
                     'order_number': 1,
                     'is_interpolation_factor': False,
                     'interpolation_factor_value': 0,
-                    'cross_section_mode': False,
+                    'is_cross_section_mode': False,
                     }
-    step4_config = None
+
+    step4_config = {'is_cross_section_mode': False,
+                    'is_perform_savitzky_golay_filtering': False,
+                    'window_size': 5,
+                    'order_number': 1,
+                    'boundary_conditions_position': None,
+                    'boundary_conditions_width': None,
+                    'estimated_bragg_edge_position_value': np.NaN,
+                    'estimated_bragg_edge_width_value': np.NaN,
+                    'estimated_bragg_edge_height_value': np.NaN,
+                    'estimated_bragg_edge_position_range': np.NaN,
+                    'estimated_bragg_edge_width_range': np.NaN,
+                    'is_automatic_masking': False,
+                    'threshold_low': 0.05,
+                    'threshold_high': 0.95,
+                    'is_interpolation_factor': False,
+                    'interpolation_factor_value': 0,
+                    }
 
     def __init__(self, parent=None, o_roi=None, o_api=None):
         super(Interface, self).__init__(parent)
@@ -158,15 +175,15 @@ class Interface(QMainWindow):
         prepare_data_verti_layout1.addWidget(self.ui.raw_image_view)
         self.ui.prepare_data_raw_widget.setLayout(prepare_data_verti_layout1)
 
-        self.ui.process_image_view = pg.ImageView(view=pg.PlotItem())
+        self.ui.process_image_view = pg.ImageView(view=pg.PlotItem(), name='process image')
         self.ui.process_image_view.ui.roiBtn.hide()
         self.ui.process_image_view.ui.menuBtn.hide()
         prepare_data_verti_layout2 = QVBoxLayout()
         prepare_data_verti_layout2.addWidget(self.ui.process_image_view)
         self.ui.prepare_data_process_widget.setLayout(prepare_data_verti_layout2)
 
-        self.ui.process_image_view.view.getViewBox().setXLink('raw image')
-        self.ui.process_image_view.view.getViewBox().setYLink('raw image')
+        # self.ui.process_image_view.view.getViewBox().setXLink('raw image')
+        # self.ui.process_image_view.view.getViewBox().setYLink('raw image')
 
         # fit tab
         self.ui.image_view = pg.ImageView(view=pg.PlotItem())
@@ -452,6 +469,9 @@ class Interface(QMainWindow):
         live_process_image = np.transpose(self.live_process_data)
         self.ui.process_image_view.setImage(live_process_image)
 
+        self.ui.process_image_view.view.getViewBox().setXLink('raw image')
+        self.ui.process_image_view.view.getViewBox().setYLink('raw image')
+
     def calculate_moving_average(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
         self.ui.statusbar.showMessage("Moving Average ... IN PROGRESS")
         QtGui.QGuiApplication.processEvents()
@@ -664,7 +684,6 @@ class Step3SettingsHandler(QMainWindow):
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_step3_settings.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Step3 - Settings")
-
         self.init_widgets()
 
     def init_widgets(self):
@@ -677,7 +696,7 @@ class Step3SettingsHandler(QMainWindow):
         self.ui.estimated_units_label.setText(u"\u212B")
 
         config = self.parent.step3_config
-        self.ui.cross_section_mode_radioButton.setChecked(config['cross_section_mode'])
+        self.ui.cross_section_mode_radioButton.setChecked(config['is_cross_section_mode'])
         self.ui.automatic_masking_checkBox.setChecked(config['is_automatic_masking'])
         self.ui.low_threshold_lineEdit.setText(str(config['threshold_low']))
         self.ui.high_threshold_lineEdit.setText(str(config['threshold_high']))
@@ -686,6 +705,10 @@ class Step3SettingsHandler(QMainWindow):
         self.ui.order_number_lineEdit.setText(str(config['order_number']))
         self.ui.interpolation_factor_checkBox.setChecked(config['is_interpolation_factor'])
         self.ui.interpolation_factor_lineEdit.setText(str(config['interpolation_factor_value']))
+
+        self.automatic_masking_clicked(config['is_automatic_masking'])
+        self.perform_filtering_algorithm_clicked(config['is_perform_savitzky_golay_filtering'])
+        self.interpolation_factor_clicked(config['is_interpolation_factor'])
 
     def automatic_masking_clicked(self, status):
         self.ui.threshold_groupBox.setEnabled(status)
@@ -706,11 +729,12 @@ class Step3SettingsHandler(QMainWindow):
                         'order_number': str(self.ui.order_number_lineEdit.text()),
                         'is_interpolation_factor': self.ui.interpolation_factor_checkBox.isChecked(),
                         'interpolation_factor_value': str(self.ui.interpolation_factor_lineEdit),
-                        'cross_section_mode': self.ui.cross_section_mode_radioButton.isChecked()}
+                        'is_cross_section_mode': self.ui.cross_section_mode_radioButton.isChecked()}
         self.parent.step3_config = step3_config
 
     def validate_changes_clicked(self):
         self.save_settings()
+        self.close()
 
     def closeEvent(self, event=None):
         self.parent.step3_settings_ui = None
@@ -724,6 +748,53 @@ class Step4SettingsHandler(QMainWindow):
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_step4_settings.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Step4 - Settings")
+        self.init_widgets()
+
+    def init_widgets(self):
+        config = self.parent.step4_config
+
+        position_from = config['estimated_bragg_edge_position_range'][0]
+        position_to = config['estimated_bragg_edge_position_range'][1]
+        self.ui.boundary_position_from_lineEdit.setText("{:.2f}".format(position_from))
+        self.ui.boundary_position_to_lineEdit.setText("{:.2f}".format(position_to))
+
+        width_from = config['estimated_bragg_edge_width_range'][0]
+        width_to = config['estimated_bragg_edge_width_range'][1]
+        self.ui.boundary_width_from_lineEdit.setText("{:.2f}".format(width_from))
+        self.ui.boundary_width_to_lineEdit.setText("{:.2f}".format(width_to))
+
+        self.ui.cross_section_mode_radioButton.setChecked(config['is_cross_section_mode'])
+
+        self.ui.automatic_masking_checkBox.setChecked(config['is_automatic_masking'])
+        self.ui.low_threshold_lineEdit.setText(str(config['threshold_low']))
+        self.ui.high_threshold_lineEdit.setText(str(config['threshold_high']))
+
+        self.ui.perform_filtering_algorithm_checkBox.setChecked(config['is_perform_savitzky_golay_filtering'])
+        self.ui.window_size_lineEdit.setText(str(config['window_size']))
+        self.ui.order_number_lineEdit.setText(str(config['order_number']))
+
+        self.ui.interpolation_factor_checkBox.setChecked(config['is_interpolation_factor'])
+        self.ui.interpolation_factor_lineEdit.setText(str(config['interpolation_factor_value']))
+
+        self.automatic_masking_clicked(config['is_automatic_masking'])
+        self.perform_filtering_algorithm_clicked(config['is_perform_savitzky_golay_filtering'])
+        self.interpolation_factor_clicked(config['is_interpolation_factor'])
+
+    def save_settings(self):
+        pass
+
+    def validate_changes_clicked(self):
+        self.save_settings()
+        self.close()
+
+    def automatic_masking_clicked(self, status):
+        self.ui.threshold_groupBox.setEnabled(status)
+
+    def perform_filtering_algorithm_clicked(self, status):
+        self.ui.perform_filtering_algorithm_groupBox.setEnabled(status)
+
+    def interpolation_factor_clicked(self, status):
+        self.ui.interpolation_factor_lineEdit.setEnabled(status)
 
     def closeEvent(self, event=None):
         self.parent.step3_settings_ui = None
