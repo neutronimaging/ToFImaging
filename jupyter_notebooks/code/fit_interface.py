@@ -57,7 +57,16 @@ class Interface(QMainWindow):
     step3_settings_ui = None
     step4_settings_ui = None
 
-    step3_config = None
+    step3_config = {'is_automatic_masking': False,
+                    'threshold_low': 0.05,
+                    'threshold_high': 0.95,
+                    'is_perform_savitzky_golay_filtering': False,
+                    'window_size': 5,
+                    'order_number': 1,
+                    'is_interpolation_factor': False,
+                    'interpolation_factor_value': 0,
+                    'cross_section_mode': False,
+                    }
     step4_config = None
 
     def __init__(self, parent=None, o_roi=None, o_api=None):
@@ -667,6 +676,17 @@ class Step3SettingsHandler(QMainWindow):
         self.ui.estimated_position_bragg_edge_label.setText(str(bragg_peak_estimated))
         self.ui.estimated_units_label.setText(u"\u212B")
 
+        config = self.parent.step3_config
+        self.ui.cross_section_mode_radioButton.setChecked(config['cross_section_mode'])
+        self.ui.automatic_masking_checkBox.setChecked(config['is_automatic_masking'])
+        self.ui.low_threshold_lineEdit.setText(str(config['threshold_low']))
+        self.ui.high_threshold_lineEdit.setText(str(config['threshold_high']))
+        self.ui.perform_filtering_algorithm_checkBox.setChecked(config['is_perform_savitzky_golay_filtering'])
+        self.ui.window_size_lineEdit.setText(str(config['window_size']))
+        self.ui.order_number_lineEdit.setText(str(config['order_number']))
+        self.ui.interpolation_factor_checkBox.setChecked(config['is_interpolation_factor'])
+        self.ui.interpolation_factor_lineEdit.setText(str(config['interpolation_factor_value']))
+
     def automatic_masking_clicked(self, status):
         self.ui.threshold_groupBox.setEnabled(status)
 
@@ -689,7 +709,7 @@ class Step3SettingsHandler(QMainWindow):
                         'cross_section_mode': self.ui.cross_section_mode_radioButton.isChecked()}
         self.parent.step3_config = step3_config
 
-    def validate_changes(self):
+    def validate_changes_clicked(self):
         self.save_settings()
 
     def closeEvent(self, event=None):
