@@ -567,15 +567,6 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     'S': crystallite size
     """   
 
-    if(spectrum_range):
-        idx_low = find_nearest(spectrum,spectrum_range[0])
-        idx_high = find_nearest(spectrum,spectrum_range[1])
-        signal = signal[idx_low:idx_high]
-        spectrum = spectrum[idx_low:idx_high]
-
-    if(bool_smooth):
-        signal = SG_filter(signal,smooth_w,smooth_n)
-
     if(abs_window):
         idx_l = find_nearest(spectrum,abs_window[0])
         idx_h = find_nearest(spectrum,abs_window[1])
@@ -584,6 +575,15 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         idx_h = find_nearest(ref_spectrum,abs_window[1])
         abs_r = np.nanmean(ref_coh[idx_l:idx_h]+ref_rest[idx_l:idx_h])
         signal = signal*abs_r/abs_s
+
+    if(spectrum_range):
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])
+        signal = signal[idx_low:idx_high]
+        spectrum = spectrum[idx_low:idx_high]
+
+    if(bool_smooth):
+        signal = SG_filter(signal,smooth_w,smooth_n)
 
     norm_sp=np.nanmean(signal)        
     ref_coh_int = np.interp(spectrum,ref_spectrum,ref_coh,left=np.nan,right=np.nan)

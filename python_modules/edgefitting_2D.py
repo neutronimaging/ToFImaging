@@ -258,7 +258,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[4.2,7],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
+def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
