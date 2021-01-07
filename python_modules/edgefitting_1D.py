@@ -3,10 +3,11 @@ from numpy import pi, r_, math, random
 import matplotlib.pyplot as plt
 from scipy import special
 from lmfit import Model
-
+import numpy.matlib
 from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
+#------------------------------ SINGLE EDGE FITTING ------------------------#
 def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,bool_print=False): 
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
 
@@ -507,8 +508,8 @@ def MarchDollase(A,R,l,l_hkl,Nbeta=50,bool_plotPole=False):
     #A : angle between the hkl plane and preferred orientation
     theta = np.arcsin(l/l_hkl)
     beta = np.linspace(0,2*pi,Nbeta)
-    theta = np.matlib.repmat(theta, Nbeta,1)
-    beta = np.transpose(np.matlib.repmat(beta,np.shape(theta)[1],1))
+    theta = numpy.matlib.repmat(theta, Nbeta,1)
+    beta = np.transpose(numpy.matlib.repmat(beta,np.shape(theta)[1],1))
     B = np.cos(A)*np.sin(theta)+np.sin(A)*np.multiply(np.cos(theta),np.sin(beta))
     P = np.sum(np.power(R**2*B**2+(1-B**2)/R,-3/2),axis=0)/(Nbeta)
     P[np.isnan(P)]=1
@@ -534,12 +535,13 @@ def SabinePrimaryExtinction(S,l,l_hkl):
         E[i] = E_L*np.cos(theta[i])**2+E_B*np.sin(theta[i])**2
     return E
 
-def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
     """ Performs texture fitting for up to two lattice planes 
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
     spectrum = spectrum, length of this ndarray must correspond to size of Tspectrum(lambda)
-    ref = reference spectrum for untextured cross sections
+    ref_coh = reference spectrum for untextured coherent elastic cross sections
+    ref_rest = reference spectrum for untextured cross sections
     ref_specturm = specturm of the reference
     spectrum_range = range corresponding to lambda where to perform the fitting
     l_hkl1 = wavelength of the first bragg edge
@@ -565,6 +567,15 @@ def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l
     'S': crystallite size
     """   
 
+    if(abs_window):
+        idx_l = find_nearest(spectrum,abs_window[0])
+        idx_h = find_nearest(spectrum,abs_window[1])
+        abs_s = np.nanmean(signal[idx_l:idx_h])
+        idx_l = find_nearest(ref_spectrum,abs_window[0])
+        idx_h = find_nearest(ref_spectrum,abs_window[1])
+        abs_r = np.nanmean(ref_coh[idx_l:idx_h]+ref_rest[idx_l:idx_h])
+        signal = signal*abs_r/abs_s
+
     if(spectrum_range):
         idx_low = find_nearest(spectrum,spectrum_range[0])
         idx_high = find_nearest(spectrum,spectrum_range[1])
@@ -575,10 +586,11 @@ def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l
         signal = SG_filter(signal,smooth_w,smooth_n)
 
     norm_sp=np.nanmean(signal)        
-    ref_int = np.interp(spectrum,ref_spectrum,ref,left=np.nan,right=np.nan)
+    ref_coh_int = np.interp(spectrum,ref_spectrum,ref_coh,left=np.nan,right=np.nan)
+    ref_rest_int = np.interp(spectrum,ref_spectrum,ref_rest,left=np.nan,right=np.nan)
     
-    def TexturedReference(ref_int,A1,R1,A2,R2,S):
-        f = ref_int
+    def TexturedReference(ref_coh_int,ref_rest_int,A1,R1,A2,R2,S):
+        f = ref_coh_int
         if(bool_MD): #if MarchDollase is set on apply it
             P1 = MarchDollase(A1,R1,spectrum,l_hkl1,Nbeta = Nbeta)
             P1[np.isnan(P1)]=1
@@ -587,23 +599,27 @@ def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l
                 P2 = MarchDollase(A2,R2,spectrum,l_hkl2,Nbeta = Nbeta)            
                 P2[np.isnan(P2)]=1
                 P=(P1+P2)/2
-            f = np.multiply(f,P)                
+            f = np.multiply(f,P)         
         
         if(est_S): #if Crystallite size is set on apply it
             E1 = SabinePrimaryExtinction(S,spectrum,l_hkl1)
             E1[np.isnan(E1)]=1
             E=E1
-            if(l_hkl2):
-                E2 = SabinePrimaryExtinction(S,spectrum,l_hkl2)
-                E2[np.isnan(E2)]=1
-                E=(E1+E2)/2
+            # 11/12/2020 this seems to be overkill. Maybe grains of hkl2 can actually have different size than hkl1
+            # if(l_hkl2): 
+            #     E2 = SabinePrimaryExtinction(S,spectrum,l_hkl2)
+            #     E2[np.isnan(E2)]=1
+            #     E=(E1+E2)/2
+
             f = np.multiply(f,E)
+            f = f + ref_rest_int
         else: #When Crystallite size is not included data has to be rescaled
+            f = f + ref_rest_int
             f = f*norm_sp/np.nanmean(f)
 
         return f
         
-    gmodel = Model(TexturedReference,independent_vars=['ref_int'])
+    gmodel = Model(TexturedReference,independent_vars=['ref_coh_int','ref_rest_int'])
 
     # if(bool_MD):
     #     params = gmodel.make_params(A1=est_A1,R1=est_R1)   
@@ -629,7 +645,7 @@ def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l
         params['S'].max = 1000.0
 
     method = 'least_squares'
-    result = gmodel.fit(signal, params, ref_int = ref_int, method=method, nan_policy='propagate')
+    result = gmodel.fit(signal, params, ref_coh_int = ref_coh_int, ref_rest_int = ref_rest_int, method=method, nan_policy='propagate')
 
     #untextured default
     A1_fit=0
@@ -649,9 +665,9 @@ def TextureFitting(signal,spectrum,ref,ref_spectrum,spectrum_range=[],l_hkl1=1,l
 
     if(bool_print):
         plt.plot(spectrum,signal,label='data')
-        plt.plot(spectrum,ref_int,label='reference')
-        plt.plot(spectrum,TexturedReference(ref_int,est_A1,est_R1,est_A2,est_R2,est_S),'--',label='Initial guess')
-        plt.plot(spectrum,TexturedReference(ref_int,A1_fit,R1_fit,A2_fit,R2_fit,S_fit),'--',label='Fit')
+        plt.plot(spectrum,ref_coh_int+ref_rest_int,label='reference')
+        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,est_A1,est_R1,est_A2,est_R2,est_S),'--',label='Initial guess')
+        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,A1_fit,R1_fit,A2_fit,R2_fit,S_fit),'--',label='Fit')
         plt.legend(),plt.show(),plt.close()
 
     return {'A1': A1_fit, 'R1': R1_fit, 'A2': A2_fit, 'R2': R2_fit, 'S': S_fit}        
