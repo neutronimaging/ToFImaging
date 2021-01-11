@@ -433,6 +433,37 @@ def fullspectrum_im (path_data, cut_last=0):
     T = I.sum(axis=2)
     return(T)    
 
+#Segmentation tools
+def SpectralSegmentation(T_tof,clusters,spectrum_range=[],spectrum=0,bool_print=1):
+    from sklearn.cluster import KMeans
+    
+    if(spectrum_range):
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])
+        T_tof = T_tof[:,:,idx_low:idx_high]
+        spectrum = spectrum[idx_low:idx_high]
+
+    Tarray = np.reshape(T_tof,[np.shape(T_tof)[0]*np.shape(T_tof)[1],np.shape(T_tof)[2]])
+    Tarray[np.isnan(Tarray)]=0
+    Tarray[np.isinf(Tarray)]=0
+    kmeans = KMeans(n_clusters=clusters, random_state=0).fit(Tarray)
+
+    T_segmented = np.reshape(kmeans.labels_,[np.shape(T_tof)[0],np.shape(T_tof)[1]])
+    spectra = kmeans.cluster_centers_
+
+    if(bool_print):
+        plt.imshow(T_segmented)
+        plt.title('Segmented image')
+        plt.colorbar()
+        plt.show()
+        plt.close()
+        plt.plot(spectrum,np.transpose(spectra))
+        plt.title('Segmented spectra')
+        plt.show()
+        plt.close()
+
+    return{'T_segmented':T_segmented, 'spectra':spectra}
+
 #Loading routines
 def load_fits (pathdata, cut_last=0, bool_wavg = False):
     # Load stacks of TOF into 3D matrix (x,y,TOF). Requires subfolders in the pathdata with a subfolder for each repetition that is merged.
@@ -497,3 +528,4 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np
     T = transmission_normalization(I,I0,dose_mask)
         
     return{'T':T, 'spectrum':spectrum}
+
