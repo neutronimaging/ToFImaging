@@ -434,7 +434,7 @@ def fullspectrum_im (path_data, cut_last=0):
     return(T)    
 
 #Segmentation tools
-def SpectralSegmentation(T_tof,clusters,spectrum_range=[],spectrum=0,bool_print=1):
+def SpectralSegmentation(T_tof,clusters,spectrum=0,spectrum_range=[],bool_print=1):
     from sklearn.cluster import KMeans
     
     if(spectrum_range):
@@ -457,7 +457,10 @@ def SpectralSegmentation(T_tof,clusters,spectrum_range=[],spectrum=0,bool_print=
         plt.colorbar()
         plt.show()
         plt.close()
-        plt.plot(spectrum,np.transpose(spectra))
+        if(spectrum):
+            plt.plot(spectrum,np.transpose(spectra))
+        else:
+            plt.plot(np.transpose(spectra))
         plt.title('Segmented spectra')
         plt.show()
         plt.close()
