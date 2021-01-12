@@ -36,7 +36,7 @@ __OUTPUTS__: dictionary with the following
 | 'T_segmented' | Segmented image |
 | 'spectra' | Corresponding segmented spectra |
 
-<img width="400" alt="Edge sample" src="Figures/edgefitting_2D-BraggEdgeFitting_2D_example.png"><br />
+<img width="400" alt="Edge sample" src="Figures/reduction_tools-SpectralSegmentation_example.png"><br />
 
 ## savitzky_golay
 Advance smoothing of a signal. For documentation see [here](https://scipy-cookbook.readthedocs.io/items/SavitzkyGolay.html).
