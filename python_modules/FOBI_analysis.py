@@ -197,7 +197,7 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0):
     for i in range(0,nrep):
         y_overlap[:,i] = y_int[replen*i:replen*(i+1)]
 
-    y_merged = np.nanmean(y_overlap,axis=1)
+    y_merged = np.nanmedian(y_overlap,axis=1)
     y_extended = y_merged
     for i in range(0,nrep-1):
         y_extended = np.concatenate((y_extended, y_merged))
