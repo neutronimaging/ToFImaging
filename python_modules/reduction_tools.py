@@ -5,6 +5,13 @@ import matplotlib.pyplot as plt
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
 
+#Unit Conversions
+def Ang2MeV(Angstrom)
+    return 81.82/(Angstrom**2)
+    
+def MeV2Ang(MeV)
+    return np.sqrt(81.82/MeV)
+    
 #Calibration functions
 def tof2l(tof, L, lambda_0 = 0, tof_0 = 0):
     if(lambda_0):
