@@ -12,7 +12,7 @@ CONFIG += c++11
 
 DEFINES += TOF_IMAGINGALGORITHM_LIBRARY
 
-CONFIG(release, debug|release): DESTDIR    = $$PWD/../../lib
+CONFIG(release, debug|release):    DESTDIR = $$PWD/../../lib
 else:CONFIG(debug, debug|release): DESTDIR = $$PWD/../../lib/debug
 
 
@@ -33,18 +33,18 @@ unix:!mac{
 }
 
 SOURCES += \
-    edgefunction.cpp \
-    edgefitting.cpp \
-    tof2lambda.cpp \
-    auxiliary_functions.cpp
+        edgefunction.cpp \
+        edgefitting.cpp \
+        tof2lambda.cpp \
+        auxiliary_functions.cpp
 
 HEADERS += \
         tof_imagingalgorithm_global.h \
-    edgefunction.h \
-    edgefitting.h \
-    tof2lambda.h \
-    findclosest.h \
-    auxiliary_functions.h
+        edgefunction.h \
+        edgefitting.h \
+        tof2lambda.h \
+        findclosest.h \
+        auxiliary_functions.h
 
 unix {
     target.path = /usr/lib
@@ -57,7 +57,7 @@ unix {
 
     unix:!macx {
         QMAKE_CXXFLAGS += -fopenmp
-        QMAKE_LFLAGS += -lgomp
+        QMAKE_LFLAGS   += -lgomp
         LIBS += -lgomp
 #        LIBS += -L$$PWD/../../lib -llmfit
     }
@@ -66,9 +66,9 @@ unix {
     DEPENDPATH += $$PWD/../../imagingsuite/external/src/lmfit/lmfit_install/include
 
     unix:macx {
-        INCLUDEPATH += /opt/local/include
-        INCLUDEPATH += /usr/local/lib
-        INCLUDEPATH += /usr/local/include
+        INCLUDEPATH  += /opt/local/include
+        INCLUDEPATH  += /usr/local/lib
+        INCLUDEPATH  += /usr/local/include
         QMAKE_LIBDIR += /opt/local/lib
     }
 
@@ -76,15 +76,19 @@ unix {
 }
 
 win32 {
-    INCLUDEPATH +=  $$PWD/../../imagingsuite/external/include/lmfit $$PWD/../../imagingsuite/external/include
+    INCLUDEPATH  += $$PWD/../../imagingsuite/external/include/lmfit $$PWD/../../imagingsuite/external/include
+    QMAKE_LIBDIR += $$PWD/../../../../../ExternalDependencies/windows/lib
     QMAKE_LIBDIR += $$PWD/../../imagingsuite/external/lib64/lmfit $$PWD/../../external/lib64
+
+    LIBS         += -llibopenblas
 #    LIBS +=  -llmfit
 }
 
 
-CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib -lkipl -lImagingAlgorithms -llmfit
-else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/ -lkipl -lImagingAlgorithms -llmfit
+CONFIG(release, debug|release)           LIBS += -L$$PWD/../../lib
+else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../lib/debug/
 
+LIBS += -lkipl -lImagingAlgorithms -llmfit
 INCLUDEPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 DEPENDPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 
