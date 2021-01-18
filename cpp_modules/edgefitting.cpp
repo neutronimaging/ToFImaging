@@ -280,18 +280,6 @@ void TOF_IMAGINGALGORITHMSHARED_EXPORT edgefitting::initialize_params(std::vecto
 }
 
 
-/// call the fitting routine, switching betweeen the different lineshape options, only on selected parameters
-/// \param x x-axis for the edge signal
-/// \param y edge signal
-/// \param N number of points in the signal
-/// \param pars fitting parameters
-void iterative_fit(std::vector<double> &x, std::vector<double> &y, int N, std::vector<double> &pars)
-{
-    // do the iterative fitting
-
-}
-
-
 /// apply sav-gol filter to smooth the signal
 /// inputs:
 /// \param x x axis for the edge (currently not used)

@@ -101,7 +101,7 @@ double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionAExponential(
 /// m_pars[4] = b_{0} second linear parameter for the function after the edge
 /// m_pars[5] = a_{hkl} first linear parameter for the function before the edge
 /// m_pars[6] = b_{hkl} second linear parameter for the function after the edge
-///
+///m_MapPars
 double TOF_IMAGINGALGORITHMSHARED_EXPORT EdgeFunction::EdgeFunctionALinear(double x, const double *m_pars)
 {
     double term3,term4,term5,edge,line_after,line_before;
