@@ -93,5 +93,3 @@ LIBS += -lkipl -lImagingAlgorithms -llmfit
 INCLUDEPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 DEPENDPATH += $$PWD/../../imagingsuite/core/kipl/kipl/include $$PWD/../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 
-INCLUDEPATH += $$PWD/../../imagingsuite/external/src/linalg
-

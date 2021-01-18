@@ -47,4 +47,3 @@ INCLUDEPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/inc
 DEPENDPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 LIBS += -lImagingAlgorithms -llmfit
 
-INCLUDEPATH += $$PWD/../../../imagingsuite/external/src/linalg
