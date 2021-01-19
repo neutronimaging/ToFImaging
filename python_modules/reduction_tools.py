@@ -6,10 +6,10 @@ h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
 
 #Unit Conversions
-def Ang2MeV(Angstrom)
+def Ang2MeV(Angstrom):
     return 81.82/(Angstrom**2)
     
-def MeV2Ang(MeV)
+def MeV2Ang(MeV):
     return np.sqrt(81.82/MeV)
     
 #Calibration functions
@@ -441,7 +441,7 @@ def fullspectrum_im (path_data, cut_last=0):
     return(T)    
 
 #Segmentation tools
-def SpectralSegmentation(T_tof,clusters,spectrum=0,spectrum_range=[],bool_print=1):
+def SpectralSegmentation(T_tof,clusters,spectrum=[],spectrum_range=[],bool_print=1):
     from sklearn.cluster import KMeans
     
     if(spectrum_range):
@@ -464,10 +464,10 @@ def SpectralSegmentation(T_tof,clusters,spectrum=0,spectrum_range=[],bool_print=
         plt.colorbar()
         plt.show()
         plt.close()
-        if(spectrum):
-            plt.plot(spectrum,np.transpose(spectra))
-        else:
+        if(len(spectrum)==0):
             plt.plot(np.transpose(spectra))
+        else:
+            plt.plot(spectrum,np.transpose(spectra))
         plt.title('Segmented spectra')
         plt.show()
         plt.close()
@@ -538,4 +538,3 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np
     T = transmission_normalization(I,I0,dose_mask)
         
     return{'T':T, 'spectrum':spectrum}
-
