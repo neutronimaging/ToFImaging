@@ -118,7 +118,7 @@ def time_delays_5x8(time):
     angles = np.array([4.81, 17.09, 24.47, 31.35, 36.48, 48.21, 59.64, 66.64])
     angles =  angles-angles[0]
 
-    angles = np.concatenate((angles, angles+1.0*72.0, angles+2.0*72.0, angles+3.0*72.0, angles+3.0*72.0))/360.0
+    angles = np.concatenate((angles, angles+1.0*72.0, angles+2.0*72.0, angles+3.0*72.0, angles+4.0*72.0))/360.0
     shifts = Nt*angles
     D = np.zeros((Nt,1))
     for i in range(0,np.shape(shifts)[0]):
@@ -197,7 +197,7 @@ def interp_noreadoutgaps(y,t,tmax,nrep=0):
     for i in range(0,nrep):
         y_overlap[:,i] = y_int[replen*i:replen*(i+1)]
 
-    y_merged = np.nanmean(y_overlap,axis=1)
+    y_merged = np.nanmedian(y_overlap,axis=1)
     y_extended = y_merged
     for i in range(0,nrep-1):
         y_extended = np.concatenate((y_extended, y_merged))

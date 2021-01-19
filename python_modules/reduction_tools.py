@@ -5,6 +5,13 @@ import matplotlib.pyplot as plt
 h=6.62607004e-34 #Planck constant [m^2 kg / s]
 m=1.674927471e-27 #Neutron mass [kg]
 
+#Unit Conversions
+def Ang2MeV(Angstrom):
+    return 81.82/(Angstrom**2)
+    
+def MeV2Ang(MeV):
+    return np.sqrt(81.82/MeV)
+    
 #Calibration functions
 def tof2l(tof, L, lambda_0 = 0, tof_0 = 0):
     if(lambda_0):
@@ -432,6 +439,40 @@ def fullspectrum_im (path_data, cut_last=0):
     I = load_fits(path_data,cut_last)
     T = I.sum(axis=2)
     return(T)    
+
+#Segmentation tools
+def SpectralSegmentation(T_tof,clusters,spectrum=[],spectrum_range=[],bool_print=1):
+    from sklearn.cluster import KMeans
+    
+    if(spectrum_range):
+        idx_low = find_nearest(spectrum,spectrum_range[0])
+        idx_high = find_nearest(spectrum,spectrum_range[1])
+        T_tof = T_tof[:,:,idx_low:idx_high]
+        spectrum = spectrum[idx_low:idx_high]
+
+    Tarray = np.reshape(T_tof,[np.shape(T_tof)[0]*np.shape(T_tof)[1],np.shape(T_tof)[2]])
+    Tarray[np.isnan(Tarray)]=0
+    Tarray[np.isinf(Tarray)]=0
+    kmeans = KMeans(n_clusters=clusters, random_state=0).fit(Tarray)
+
+    T_segmented = np.reshape(kmeans.labels_,[np.shape(T_tof)[0],np.shape(T_tof)[1]])
+    spectra = kmeans.cluster_centers_
+
+    if(bool_print):
+        plt.imshow(T_segmented)
+        plt.title('Segmented image')
+        plt.colorbar()
+        plt.show()
+        plt.close()
+        if(len(spectrum)==0):
+            plt.plot(np.transpose(spectra))
+        else:
+            plt.plot(spectrum,np.transpose(spectra))
+        plt.title('Segmented spectra')
+        plt.show()
+        plt.close()
+
+    return{'T_segmented':T_segmented, 'spectra':spectra}
 
 #Loading routines
 def load_fits (pathdata, cut_last=0, bool_wavg = False):

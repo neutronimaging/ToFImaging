@@ -27,16 +27,16 @@ win32 {
 
     INCLUDEPATH +=  $$PWD/../../../imagingsuite/external/include/lmfit $$PWD/../../../imagingsuite/external/include
     QMAKE_LIBDIR += $$PWD/../../../imagingsuite/external/lib64/lmfit $$PWD/../../../imagingsuite/external/lib64
+    QMAKE_LIBDIR += $$PWD/../../ExternalDependencies/windows/lib
 
-    LIBS += -lliblapack
-
+    LIBS         += -llibopenblas
 }
 
 CONFIG(release, debug|release)           LIBS += -L$$PWD/../../../lib
 else:CONFIG(debug, debug|release)        LIBS += -L$$PWD/../../../lib/debug/
 
-INCLUDEPATH += $$PWD/../../TOF_ImagingAlgorithm
-DEPENDPATH += $$PWD/../../TOF_ImagingAlgorithm
+INCLUDEPATH += $$PWD/../../cpp_modules
+DEPENDPATH += $$PWD/../../cpp_modules
 LIBS += -lTOF_ImagingAlgorithm
 
 INCLUDEPATH += $$PWD/../../../imagingsuite/core/kipl/kipl/include
@@ -47,6 +47,3 @@ INCLUDEPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/inc
 DEPENDPATH += $$PWD/../../../imagingsuite/core/algorithms/ImagingAlgorithms/include
 LIBS += -lImagingAlgorithms -llmfit
 
-
-
-INCLUDEPATH += $$PWD/../../../imagingsuite/external/src/linalg

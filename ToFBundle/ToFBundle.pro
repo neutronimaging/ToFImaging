@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    ../TOF_ImagingAlgorithm \
+    ../cpp_modules/TOF_ImagingAlgorithm.pro \
     ../UnitTests/tToFImagingAlgorithm

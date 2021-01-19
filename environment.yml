@@ -1,0 +1,23 @@
+name: base
+channels:
+  - defaults
+dependencies:
+  - conda
+  - python=3.7
+  - conda-env
+  - conda-build
+  - conda-verify
+  - _ipyw_jlab_nb_ext_conf
+  - anaconda
+  - anaconda-navigator
+  - navigator-updater
+  - graphviz
+  - rise
+  - python-graphviz
+  - pydot
+  - plotly
+  - ffmpeg
+  - keras
+  - tifffile
+  - pip
+prefix: /Users/kaestner/opt/anaconda3
