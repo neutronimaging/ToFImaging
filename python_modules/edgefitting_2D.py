@@ -258,7 +258,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
+def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -342,7 +342,7 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         else:
             lambd = spectrum
 
-        edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,bool_MD,est_A1,est_R1,est_A2,est_R2,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,True)
+        edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
@@ -364,11 +364,13 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
                     lambd = spectrum
 
                 try:
-                    fit = edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,bool_MD,est_A1,est_R1,est_A2,est_R2,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,False)
+                    fit = edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,False)
                     A1_map[i,j] = fit['A1']
                     R1_map[i,j] = fit['R1']
                     A2_map[i,j] = fit['A2']
                     R2_map[i,j] = fit['R2']
+                    A3_map[i,j] = fit['A3']
+                    R3_map[i,j] = fit['R3']
                     S_map[i,j] = fit['S']
                 except:
                     print("Unexpected error at :", i, j)
@@ -376,6 +378,8 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
                     R1_map[i,j] = -2.0
                     A2_map[i,j] = -2.0
                     R2_map[i,j] = -2.0
+                    A3_map[i,j] = -2.0
+                    R3_map[i,j] = -2.0
                     S_map[i,j] = -2.0
     print("--- %s seconds ---" % (time.time() - start_time))
 

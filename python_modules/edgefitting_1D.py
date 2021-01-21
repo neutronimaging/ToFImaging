@@ -535,7 +535,7 @@ def SabinePrimaryExtinction(S,l,l_hkl):
         E[i] = E_L*np.cos(theta[i])**2+E_B*np.sin(theta[i])**2
     return E
 
-def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S1=0,est_S2=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,est_A3=0,est_R3=1,Nbeta=50,est_S=0,S_fix=0,bool_smooth=False,smooth_w=5,smooth_n=1,method = 'leastsq',bool_print=False):
     """ Performs texture fitting for up to two lattice planes 
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
@@ -589,7 +589,7 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     ref_coh_int = np.interp(spectrum,ref_spectrum,ref_coh,left=np.nan,right=np.nan)
     ref_rest_int = np.interp(spectrum,ref_spectrum,ref_rest,left=np.nan,right=np.nan)
     
-    def TexturedReference(ref_coh_int,ref_rest_int,A1,R1,A2,R2,S1,S2):
+    def TexturedReference(ref_coh_int,ref_rest_int,A1,R1,A2,R2,A3,R3,S):
         f = ref_coh_int
         if(bool_MD): #if MarchDollase is set on apply it
             P1 = MarchDollase(A1,R1,spectrum,l_hkl1,Nbeta = Nbeta)
@@ -599,17 +599,21 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
                 P2 = MarchDollase(A2,R2,spectrum,l_hkl2,Nbeta = Nbeta)            
                 P2[np.isnan(P2)]=1
                 P=(P1+P2)/2
+                if(l_hkl3):
+                    P3 = MarchDollase(A3,R3,spectrum,l_hkl3,Nbeta = Nbeta)            
+                    P3[np.isnan(P3)]=1
+                    P=(P1+P2+P3)/3
             f = np.multiply(f,P)         
         
-        if(est_S1): #if Crystallite size is set on apply it
-            E1 = SabinePrimaryExtinction(S1,spectrum,l_hkl1)
+        if(est_S): #if Crystallite size is set on apply it
+            E1 = SabinePrimaryExtinction(S,spectrum,l_hkl1)
             E1[np.isnan(E1)]=1
             E=E1
             # 11/12/2020 this seems to be overkill. Maybe grains of hkl2 can actually have different size than hkl1
-            if(est_S2): 
-                E2 = SabinePrimaryExtinction(S2,spectrum,l_hkl2)
-                E2[np.isnan(E2)]=1
-                E=(E1+E2)/2
+            # if(l_hkl2): 
+            #     E2 = SabinePrimaryExtinction(S,spectrum,l_hkl2)
+            #     E2[np.isnan(E2)]=1
+            #     E=(E1+E2)/2
 
             f = np.multiply(f,E)
             f = f + ref_rest_int
@@ -621,13 +625,7 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         
     gmodel = Model(TexturedReference,independent_vars=['ref_coh_int','ref_rest_int'])
 
-    # if(bool_MD):
-    #     params = gmodel.make_params(A1=est_A1,R1=est_R1)   
-    #     if(l_hkl2):
-    #         params = gmodel.make_params(A2=est_A2,R2=est_R2) 
-    # if(est_S):
-    #     params = gmodel.make_params(S=est_S)
-    params = gmodel.make_params(A1=est_A1,R1=est_R1,A2=est_A2,R2=est_R2,S1=est_S1,S2=est_S2)
+    params = gmodel.make_params(A1=est_A1,R1=est_R1,A2=est_A2,R2=est_R2,A3=est_A3,R3=est_R3,S=est_S)
 
     if(bool_MD):
         params['A1'].min = 0.0
@@ -639,14 +637,21 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
             params['A2'].max = np.pi/2
             params['R2'].min = 0.0
             params['R2'].max = 10.0
+            if(l_hkl3):
+                params['A3'].min = 0.0
+                params['A3'].max = np.pi/2
+                params['R3'].min = 0.0
+                params['R3'].max = 10.0
 
-    if(est_S1):
-        params['S1'].min = 0.0
-        params['S1'].max = 1000.0
-        params['S2'].min = 0.0
-        params['S2'].max = 1000.0
+    if(est_S):        
+        if(S_fix):
+            params['S'].min = est_S - est_S*S_fix
+            params['S'].max = est_S + est_S*S_fix
+        else:
+            params['S'].min = 0.0
+            params['S'].max = 1000.0
 
-    method = 'least_squares'
+    method = method
     result = gmodel.fit(signal, params, ref_coh_int = ref_coh_int, ref_rest_int = ref_rest_int, method=method, nan_policy='propagate')
 
     #untextured default
@@ -654,24 +659,27 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     R1_fit=1
     A2_fit=0
     R2_fit=1
-    S1_fit=0
-    S2_fit=0
+    A3_fit=0
+    R3_fit=1
+    S_fit=0
     if(bool_MD):
         A1_fit=result.best_values.get('A1')    
         R1_fit=result.best_values.get('R1')         
         if(l_hkl2):
             A2_fit=result.best_values.get('A2')    
             R2_fit=result.best_values.get('R2')     
+            if(l_hkl3):
+                A3_fit=result.best_values.get('A3')    
+                R3_fit=result.best_values.get('R3')     
 
-    if(est_S1):
-        S1_fit=result.best_values.get('S1')    
-        S2_fit=result.best_values.get('S2')   
+    if(est_S):
+        S_fit=result.best_values.get('S')     
 
     if(bool_print):
         plt.plot(spectrum,signal,label='data')
         plt.plot(spectrum,ref_coh_int+ref_rest_int,label='reference')
-        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,est_A1,est_R1,est_A2,est_R2,est_S1,est_S2),'--',label='Initial guess')
-        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,A1_fit,R1_fit,A2_fit,R2_fit,S1_fit,S2_fit),'--',label='Fit')
+        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,est_S),'--',label='Initial guess')
+        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,A1_fit,R1_fit,A2_fit,R2_fit,A3_fit,R3_fit,S_fit),'--',label='Fit')
         plt.legend(),plt.show(),plt.close()
 
-    return {'A1': A1_fit, 'R1': R1_fit, 'A2': A2_fit, 'R2': R2_fit, 'S1': S1_fit, 'S2': S2_fit}        
+    return {'A1': A1_fit, 'R1': R1_fit, 'A2': A2_fit, 'R2': R2_fit, 'A3': A3_fit, 'R3': R3_fit, 'S': S_fit}        
