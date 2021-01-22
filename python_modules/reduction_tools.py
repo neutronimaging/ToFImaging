@@ -293,16 +293,19 @@ def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
         outsignal = rebin(image,f_dim,operation)
     return outsignal    
 
-def tof_image_rebinning(image, rebinning_order, operation='mean'):
+def tof_image_rebinning(image, spectrum, rebinning_order, operation='mean'):
     tof_n = np.shape(image)[2]
     tof_n_new = np.round(tof_n/rebinning_order)
     image_out = np.zeros((np.shape(image)[0],np.shape(image)[1],tof_n_new))
+    spectrum_out = np.zeros(np.shape(I)[2])
     for i in tqdm(range(0,tof_n_new)):
         if(operation=='sum'):
             image_out[:,:,i] = np.nansum(image[:,:,rebinning_order*i:rebinning_order*i+rebinning_order],axis=2)
+            spectrum_out[i] = np.nansum(spectrum[rebinning_order*i:rebinning_order*i+rebinning_order])
         elif(operation=='mean'):
             image_out[:,:,i] = np.nanmean(image[:,:,rebinning_order*i:rebinning_order*i+rebinning_order],axis=2)
-    return image_out
+            spectrum_out[i] = np.nanmean(spectrum[rebinning_order*i:rebinning_order*i+rebinning_order])
+    return (binned_signal, new_spectrum)
 
 def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
