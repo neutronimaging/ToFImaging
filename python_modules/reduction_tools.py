@@ -295,9 +295,9 @@ def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
 
 def tof_image_rebinning(image, spectrum, rebinning_order, operation='mean'):
     tof_n = np.shape(image)[2]
-    tof_n_new = np.round(tof_n/rebinning_order)
+    tof_n_new = np.int(np.round(tof_n/rebinning_order))
     image_out = np.zeros((np.shape(image)[0],np.shape(image)[1],tof_n_new))
-    spectrum_out = np.zeros(np.shape(I)[2])
+    spectrum_out = np.zeros((tof_n_new))
     for i in tqdm(range(0,tof_n_new)):
         if(operation=='sum'):
             image_out[:,:,i] = np.nansum(image[:,:,rebinning_order*i:rebinning_order*i+rebinning_order],axis=2)
@@ -305,7 +305,7 @@ def tof_image_rebinning(image, spectrum, rebinning_order, operation='mean'):
         elif(operation=='mean'):
             image_out[:,:,i] = np.nanmean(image[:,:,rebinning_order*i:rebinning_order*i+rebinning_order],axis=2)
             spectrum_out[i] = np.nanmean(spectrum[rebinning_order*i:rebinning_order*i+rebinning_order])
-    return (binned_signal, new_spectrum)
+    return (image_out, spectrum_out)
 
 def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
@@ -531,8 +531,8 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np
     #rebinning
     if(tofrebin_order):
         sp = spectrum
-        I = tof_image_rebinning(I,tofrebin_order)
-        I0 = tof_image_rebinning(I0,tofrebin_order)
+        I = tof_image_rebinning(I,sp,tofrebin_order)
+        I0 = tof_image_rebinning(I0,sp,tofrebin_order)
         spectrum = np.zeros((np.shape(I)[2]))
         for i in range(0,np.shape(I)[2]):
             spectrum[i] = sp[i*tofrebin_order]
