@@ -8,7 +8,8 @@ from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
 #------------------------------ SINGLE EDGE FITTING ------------------------#
-def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,bool_print=False): 
+def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,
+                bool_linear=False,bool_print=False): 
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
 
     INPUTS:
@@ -385,7 +386,9 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
-def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,interp_factor=0,bool_print=False):
+def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
+                est_off=1e-5,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
+                interp_factor=0,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
@@ -412,10 +415,10 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """     
-    def gaussian(x, amp, cen, wid):
-        """1-d gaussian: gaussian(x, amp, cen, wid)"""
-        return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
-        
+
+    def gaussian(x, amp, cen, wid, off):
+        return amp*np.exp(-((x-cen)/wid)**2) + off
+
     if(spectrum_range):
         idx_low = find_nearest(spectrum,spectrum_range[0])
         idx_high = find_nearest(spectrum,spectrum_range[1])        
@@ -439,7 +442,6 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         d_signal = np.interp(spectrum_n,d_spectrum,d_signal)
         d_spectrum = spectrum_n
 
-    ## 2nd Appoach
     method ='least_squares' # default and it implements the Levenberg-Marquardt
     gmodel = Model(gaussian)
     if(est_pos==0):
@@ -449,7 +451,8 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     if(est_h==0):
         est_h = signal[-2]-signal[2]
 
-    params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
+    params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid, off=est_off)
+
     if(pos_BC):
         params['cen'].min = pos_BC[0]
         params['cen'].max = pos_BC[1]
@@ -474,8 +477,8 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     edge_width = result.best_values.get('wid')
     fitted_data = result.best_fit       
     
-    id_low = find_nearest(d_spectrum, t0-edge_width) # 3.7
-    id_high = find_nearest(d_spectrum, t0+edge_width) # 3.7
+    id_low = find_nearest(d_spectrum, t0-edge_width)
+    id_high = find_nearest(d_spectrum, t0+edge_width)
     edge_height = np.sum(fitted_data[id_low:id_high])
     edge_slope = result.best_values.get('amp')
     
@@ -483,6 +486,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         print('Edge position = ',t0)
         print('Edge height = ',edge_height)
         print('Edge width = ',edge_width)
+        print('Offset = ',result.best_values.get('off'))
         print('idx_low = ',id_low,'idx_high = ',id_high)
 
         plt.figure()
@@ -535,7 +539,9 @@ def SabinePrimaryExtinction(S,l,l_hkl):
         E[i] = E_L*np.cos(theta[i])**2+E_B*np.sin(theta[i])**2
     return E
 
-def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],l_hkl1=1,l_hkl2=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_print=False):
+def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,
+                est_A1=0,est_R1=1,est_A2=0,est_R2=1,est_A3=0,est_R3=1,Nbeta=50,est_S=0,S_fix=0,bool_smooth=False,smooth_w=5,smooth_n=1,
+                method='leastsq',bool_print=False):
     """ Performs texture fitting for up to two lattice planes 
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
@@ -589,7 +595,7 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     ref_coh_int = np.interp(spectrum,ref_spectrum,ref_coh,left=np.nan,right=np.nan)
     ref_rest_int = np.interp(spectrum,ref_spectrum,ref_rest,left=np.nan,right=np.nan)
     
-    def TexturedReference(ref_coh_int,ref_rest_int,A1,R1,A2,R2,S):
+    def TexturedReference(ref_coh_int,ref_rest_int,A1,R1,A2,R2,A3,R3,S):
         f = ref_coh_int
         if(bool_MD): #if MarchDollase is set on apply it
             P1 = MarchDollase(A1,R1,spectrum,l_hkl1,Nbeta = Nbeta)
@@ -599,6 +605,10 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
                 P2 = MarchDollase(A2,R2,spectrum,l_hkl2,Nbeta = Nbeta)            
                 P2[np.isnan(P2)]=1
                 P=(P1+P2)/2
+                if(l_hkl3):
+                    P3 = MarchDollase(A3,R3,spectrum,l_hkl3,Nbeta = Nbeta)            
+                    P3[np.isnan(P3)]=1
+                    P=(P1+P2+P3)/3
             f = np.multiply(f,P)         
         
         if(est_S): #if Crystallite size is set on apply it
@@ -610,7 +620,6 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
             #     E2 = SabinePrimaryExtinction(S,spectrum,l_hkl2)
             #     E2[np.isnan(E2)]=1
             #     E=(E1+E2)/2
-
             f = np.multiply(f,E)
             f = f + ref_rest_int
         else: #When Crystallite size is not included data has to be rescaled
@@ -621,13 +630,7 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         
     gmodel = Model(TexturedReference,independent_vars=['ref_coh_int','ref_rest_int'])
 
-    # if(bool_MD):
-    #     params = gmodel.make_params(A1=est_A1,R1=est_R1)   
-    #     if(l_hkl2):
-    #         params = gmodel.make_params(A2=est_A2,R2=est_R2) 
-    # if(est_S):
-    #     params = gmodel.make_params(S=est_S)
-    params = gmodel.make_params(A1=est_A1,R1=est_R1,A2=est_A2,R2=est_R2,S=est_S)
+    params = gmodel.make_params(A1=est_A1,R1=est_R1,A2=est_A2,R2=est_R2,A3=est_A3,R3=est_R3,S=est_S)
 
     if(bool_MD):
         params['A1'].min = 0.0
@@ -639,12 +642,21 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
             params['A2'].max = np.pi/2
             params['R2'].min = 0.0
             params['R2'].max = 10.0
+            if(l_hkl3):
+                params['A3'].min = 0.0
+                params['A3'].max = np.pi/2
+                params['R3'].min = 0.0
+                params['R3'].max = 10.0
 
-    if(est_S):
-        params['S'].min = 0.0
-        params['S'].max = 1000.0
+    if(est_S):        
+        if(S_fix):
+            params['S'].min = est_S - est_S*S_fix
+            params['S'].max = est_S + est_S*S_fix
+        else:
+            params['S'].min = 0.0
+            params['S'].max = 1000.0
 
-    method = 'least_squares'
+    method = method
     result = gmodel.fit(signal, params, ref_coh_int = ref_coh_int, ref_rest_int = ref_rest_int, method=method, nan_policy='propagate')
 
     #untextured default
@@ -652,6 +664,8 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     R1_fit=1
     A2_fit=0
     R2_fit=1
+    A3_fit=0
+    R3_fit=1
     S_fit=0
     if(bool_MD):
         A1_fit=result.best_values.get('A1')    
@@ -659,6 +673,9 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         if(l_hkl2):
             A2_fit=result.best_values.get('A2')    
             R2_fit=result.best_values.get('R2')     
+            if(l_hkl3):
+                A3_fit=result.best_values.get('A3')    
+                R3_fit=result.best_values.get('R3')     
 
     if(est_S):
         S_fit=result.best_values.get('S')     
@@ -666,8 +683,8 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     if(bool_print):
         plt.plot(spectrum,signal,label='data')
         plt.plot(spectrum,ref_coh_int+ref_rest_int,label='reference')
-        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,est_A1,est_R1,est_A2,est_R2,est_S),'--',label='Initial guess')
-        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,A1_fit,R1_fit,A2_fit,R2_fit,S_fit),'--',label='Fit')
+        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,est_S),'--',label='Initial guess')
+        plt.plot(spectrum,TexturedReference(ref_coh_int,ref_rest_int,A1_fit,R1_fit,A2_fit,R2_fit,A3_fit,R3_fit,S_fit),'--',label='Fit')
         plt.legend(),plt.show(),plt.close()
 
-    return {'A1': A1_fit, 'R1': R1_fit, 'A2': A2_fit, 'R2': R2_fit, 'S': S_fit}        
+    return {'A1': A1_fit, 'R1': R1_fit, 'A2': A2_fit, 'R2': R2_fit, 'A3': A3_fit, 'R3': R3_fit, 'S': S_fit}        
