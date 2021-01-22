@@ -538,4 +538,3 @@ def load_routine (path_sample, path_ob, path_spectrum, cut_last=0, dose_mask =np
     T = transmission_normalization(I,I0,dose_mask)
         
     return{'T':T, 'spectrum':spectrum}
-
