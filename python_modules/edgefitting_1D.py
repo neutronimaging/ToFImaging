@@ -8,7 +8,8 @@ from reduction_tools import find_nearest
 from reduction_tools import savitzky_golay as SG_filter
 
 #------------------------------ SINGLE EDGE FITTING ------------------------#
-def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,bool_print=False): 
+def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,
+                bool_linear=False,bool_print=False): 
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
 
     INPUTS:
@@ -386,7 +387,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
 def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
-                Gmodel='lmfit',est_pos2=0,est_wid2=0,est_h2=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
+                est_off=1e-5,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
                 interp_factor=0,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     INPUTS:
@@ -414,17 +415,9 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """     
-    def gaussian(x, amp, cen, wid):
-        return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
 
-    def gaussian2(x, amp, cen, wid, amp2, cen2, wid2):
-        return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2)) + (amp2 / (np.sqrt(2*pi) * wid2)) * np.exp(-(x-cen2)**2 / (2*wid2**2))
-
-    def gaussian1M(x, amp, cen, wid):
-        return amp*np.exp(-((x-cen)/wid)**2)
-
-    def gaussian2M(x, amp, cen, wid, amp2, cen2, wid2):
-        return amp*np.exp(-((x-cen)/wid)**2) + amp2*np.exp(-((x-cen2)/wid2)**2)
+    def gaussian(x, amp, cen, wid, off):
+        return amp*np.exp(-((x-cen)/wid)**2) + off
 
     if(spectrum_range):
         idx_low = find_nearest(spectrum,spectrum_range[0])
@@ -450,12 +443,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         d_spectrum = spectrum_n
 
     method ='least_squares' # default and it implements the Levenberg-Marquardt
-    if(Gmodel=='lmfit'):
-        gmodel = Model(gaussian)
-    if(Gmodel=='M1'):
-        gmodel = Model(gaussian1M)
-    if(Gmodel=='M2'):
-        gmodel = Model(gaussian2M)
+    gmodel = Model(gaussian)
     if(est_pos==0):
         est_pos = d_spectrum[np.int(len(d_spectrum)/2)]
     if(est_wid==0):
@@ -463,10 +451,7 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     if(est_h==0):
         est_h = signal[-2]-signal[2]
 
-    if((Gmodel=='lmfit') or (Gmodel=='M1')):
-        params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
-    if(Gmodel=='M2'):
-        params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid, cen2=est_pos2, amp2=est_h2, wid2=est_wid2)
+    params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid, off=est_off)
 
     if(pos_BC):
         params['cen'].min = pos_BC[0]
@@ -501,11 +486,8 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         print('Edge position = ',t0)
         print('Edge height = ',edge_height)
         print('Edge width = ',edge_width)
-        if(Gmodel=='M2'):
-            print('Edge position 2 = ',result.best_values.get('cen2'))
-            print('Edge height 2 = ',result.best_values.get('amp2'))
-            print('Edge width 2 = ',result.best_values.get('wid2'))
-            print('idx_low = ',id_low,'idx_high = ',id_high)
+        print('Offset = ',result.best_values.get('off'))
+        print('idx_low = ',id_low,'idx_high = ',id_high)
 
         plt.figure()
         plt.subplot(2,1,1), 
@@ -557,7 +539,9 @@ def SabinePrimaryExtinction(S,l,l_hkl):
         E[i] = E_L*np.cos(theta[i])**2+E_B*np.sin(theta[i])**2
     return E
 
-def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,est_A3=0,est_R3=1,Nbeta=50,est_S=0,S_fix=0,bool_smooth=False,smooth_w=5,smooth_n=1,method = 'leastsq',bool_print=False):
+def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,
+                est_A1=0,est_R1=1,est_A2=0,est_R2=1,est_A3=0,est_R3=1,Nbeta=50,est_S=0,S_fix=0,bool_smooth=False,smooth_w=5,smooth_n=1,
+                method='leastsq',bool_print=False):
     """ Performs texture fitting for up to two lattice planes 
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
@@ -636,7 +620,6 @@ def TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
             #     E2 = SabinePrimaryExtinction(S,spectrum,l_hkl2)
             #     E2[np.isnan(E2)]=1
             #     E=(E1+E2)/2
-
             f = np.multiply(f,E)
             f = f + ref_rest_int
         else: #When Crystallite size is not included data has to be rescaled

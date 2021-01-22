@@ -14,7 +14,9 @@ from reduction_tools import find_nearest
 from tqdm import tqdm
 import time
    
-def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,bool_save=False,bool_print=False,debug_idx=[]):            
+def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,
+            mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,
+            bool_save=False,bool_print=False,debug_idx=[]):            
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -130,7 +132,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
 
 def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,
             mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
-            Gmodel='lmfit',est_pos2=0,est_wid2=0,est_h2=0,bool_log=False,bool_smooth=False,smooth_w=5,
+            est_off=1e-5,bool_log=False,bool_smooth=False,smooth_w=5,
             smooth_n=1,interp_factor=0,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
@@ -212,7 +214,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
             lambd = spectrum
 
         edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,
-            est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,Gmodel=Gmodel,est_pos2=est_pos2,est_wid2=est_wid2,est_h2=est_h2,
+            est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,est_off=est_off,
             interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=True)
         return
 
@@ -235,7 +237,7 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
 
                 try:
                     edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,
-                        est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,Gmodel=Gmodel,est_pos2=est_pos2,est_wid2=est_wid2,est_h2=est_h2,
+                        est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,est_off=est_off,
                         interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['edge_height']
