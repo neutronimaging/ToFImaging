@@ -297,7 +297,7 @@ def tof_image_rebinning(image, spectrum, rebinning_order, operation='mean'):
     tof_n = np.shape(image)[2]
     tof_n_new = np.int(np.round(tof_n/rebinning_order))
     image_out = np.zeros((np.shape(image)[0],np.shape(image)[1],tof_n_new))
-    spectrum_out = np.zeros(np.shape(I)[2])
+    spectrum_out = np.zeros((tof_n_new))
     for i in tqdm(range(0,tof_n_new)):
         if(operation=='sum'):
             image_out[:,:,i] = np.nansum(image[:,:,rebinning_order*i:rebinning_order*i+rebinning_order],axis=2)
