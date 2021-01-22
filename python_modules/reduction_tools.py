@@ -295,7 +295,7 @@ def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
 
 def tof_image_rebinning(image, spectrum, rebinning_order, operation='mean'):
     tof_n = np.shape(image)[2]
-    tof_n_new = np.round(tof_n/rebinning_order)
+    tof_n_new = np.int(np.round(tof_n/rebinning_order))
     image_out = np.zeros((np.shape(image)[0],np.shape(image)[1],tof_n_new))
     spectrum_out = np.zeros(np.shape(I)[2])
     for i in tqdm(range(0,tof_n_new)):
