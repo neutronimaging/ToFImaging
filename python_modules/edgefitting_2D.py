@@ -128,7 +128,10 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}    
 
-def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,interp_factor=0,bool_save=False,bool_print=False,debug_idx=[]):        
+def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,
+            mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
+            Gmodel='lmfit',est_pos2=0,est_wid2=0,est_h2=0,bool_log=False,bool_smooth=False,smooth_w=5,
+            smooth_n=1,interp_factor=0,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -208,7 +211,9 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
         else:
             lambd = spectrum
 
-        edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=True)
+        edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,
+            est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,Gmodel=Gmodel,est_pos2=est_pos2,est_wid2=est_wid2,est_h2=est_h2,
+            interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
@@ -229,7 +234,9 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
                     lambd = spectrum
 
                 try:
-                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
+                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,
+                        est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,Gmodel=Gmodel,est_pos2=est_pos2,est_wid2=est_wid2,est_h2=est_h2,
+                        interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
                     edge_position[i,j] = edge_fit['t0']
                     edge_height[i,j] = edge_fit['edge_height']
                     edge_width[i,j] = edge_fit['edge_width']
@@ -258,7 +265,10 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
    
     return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,est_A1=0,est_R1=1,est_A2=0,est_R2=1,est_A2=0,est_R2=1,Nbeta=50,est_S=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,bool_save=False,bool_print=False,debug_idx=[]):        
+def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],calibration_matrix=np.ndarray([0]),
+            mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,est_A1=0,est_R1=1,
+            est_A2=0,est_R2=1,est_A3=0,est_R3=1,Nbeta=50,est_S=0,S_fix=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
+            bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -342,7 +352,8 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         else:
             lambd = spectrum
 
-        edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,True)
+        edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
+        est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
@@ -350,6 +361,8 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     R1_map = np.zeros(np.shape(mymask))
     A2_map = np.zeros(np.shape(mymask))
     R2_map = np.zeros(np.shape(mymask))
+    A3_map = np.zeros(np.shape(mymask))
+    R3_map = np.zeros(np.shape(mymask))
     S_map = np.zeros(np.shape(mymask))
     
     start_time = time.time()
@@ -364,7 +377,8 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
                     lambd = spectrum
 
                 try:
-                    fit = edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,False)
+                    fit = edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,
+                    l_hkl3,bool_MD,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,False)
                     A1_map[i,j] = fit['A1']
                     R1_map[i,j] = fit['R1']
                     A2_map[i,j] = fit['A2']

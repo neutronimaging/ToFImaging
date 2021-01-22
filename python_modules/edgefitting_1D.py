@@ -385,7 +385,9 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
-def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,interp_factor=0,bool_print=False):
+def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
+                Gmodel='lmfit',est_pos2=0,est_wid2=0,est_h2=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
+                interp_factor=0,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     INPUTS:
     signal = ndarray of the spectrum containing the Bragg edge(s)
@@ -413,9 +415,17 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     'median_image': median Transmission image in the selected lambda range
     """     
     def gaussian(x, amp, cen, wid):
-        """1-d gaussian: gaussian(x, amp, cen, wid)"""
         return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2))
-        
+
+    def gaussian2(x, amp, cen, wid, amp2, cen2, wid2):
+        return (amp / (np.sqrt(2*pi) * wid)) * np.exp(-(x-cen)**2 / (2*wid**2)) + (amp2 / (np.sqrt(2*pi) * wid2)) * np.exp(-(x-cen2)**2 / (2*wid2**2))
+
+    def gaussian1M(x, amp, cen, wid):
+        return amp*np.exp(-((x-cen)/wid)**2)
+
+    def gaussian2M(x, amp, cen, wid, amp2, cen2, wid2):
+        return amp*np.exp(-((x-cen)/wid)**2) + amp2*np.exp(-((x-cen2)/wid2)**2)
+
     if(spectrum_range):
         idx_low = find_nearest(spectrum,spectrum_range[0])
         idx_high = find_nearest(spectrum,spectrum_range[1])        
@@ -439,9 +449,13 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         d_signal = np.interp(spectrum_n,d_spectrum,d_signal)
         d_spectrum = spectrum_n
 
-    ## 2nd Appoach
     method ='least_squares' # default and it implements the Levenberg-Marquardt
-    gmodel = Model(gaussian)
+    if(Gmodel=='lmfit'):
+        gmodel = Model(gaussian)
+    if(Gmodel=='M1'):
+        gmodel = Model(gaussian1M)
+    if(Gmodel=='M2'):
+        gmodel = Model(gaussian2M)
     if(est_pos==0):
         est_pos = d_spectrum[np.int(len(d_spectrum)/2)]
     if(est_wid==0):
@@ -449,7 +463,11 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     if(est_h==0):
         est_h = signal[-2]-signal[2]
 
-    params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
+    if((Gmodel=='lmfit') or (Gmodel=='M1')):
+        params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid)
+    if(Gmodel=='M2'):
+        params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid, cen2=est_pos2, amp2=est_h2, wid2=est_wid2)
+
     if(pos_BC):
         params['cen'].min = pos_BC[0]
         params['cen'].max = pos_BC[1]
@@ -474,8 +492,8 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     edge_width = result.best_values.get('wid')
     fitted_data = result.best_fit       
     
-    id_low = find_nearest(d_spectrum, t0-edge_width) # 3.7
-    id_high = find_nearest(d_spectrum, t0+edge_width) # 3.7
+    id_low = find_nearest(d_spectrum, t0-edge_width)
+    id_high = find_nearest(d_spectrum, t0+edge_width)
     edge_height = np.sum(fitted_data[id_low:id_high])
     edge_slope = result.best_values.get('amp')
     
@@ -483,7 +501,11 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
         print('Edge position = ',t0)
         print('Edge height = ',edge_height)
         print('Edge width = ',edge_width)
-        print('idx_low = ',id_low,'idx_high = ',id_high)
+        if(Gmodel=='M2'):
+            print('Edge position 2 = ',result.best_values.get('cen2'))
+            print('Edge height 2 = ',result.best_values.get('amp2'))
+            print('Edge width 2 = ',result.best_values.get('wid2'))
+            print('idx_low = ',id_low,'idx_high = ',id_high)
 
         plt.figure()
         plt.subplot(2,1,1), 
