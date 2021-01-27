@@ -132,7 +132,7 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
 
 def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,
             mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
-            est_off=1e-5,bool_log=False,bool_smooth=False,smooth_w=5,
+            est_off=0,bool_log=False,bool_smooth=False,smooth_w=5,
             smooth_n=1,interp_factor=0,bool_save=False,bool_print=False,debug_idx=[]):        
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:

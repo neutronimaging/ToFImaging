@@ -387,7 +387,7 @@ def AdvancedBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_sig
     return {'t0':t0_f, 'sigma':sigma_f, 'alpha':alpha_f, 'a1':a1_f, 'a2':a2_f,'a5':a5_f, 'a6':a6_f, 'final_result':result7, 'fitted_data':fitted_data, 'pos_extrema':pos_extrema, 'height':height}
 
 def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
-                est_off=1e-5,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
+                est_off=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
                 interp_factor=0,bool_print=False):
     """ Performs Bragg edge fitting with gaussian model to an ndarray containing the signal with the length of the spectrum (could be lambda, tof or bin index)
     INPUTS:
@@ -447,9 +447,9 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     if(est_pos==0):
         est_pos = d_spectrum[np.int(len(d_spectrum)/2)]
     if(est_wid==0):
-        est_wid = 0.01
+        est_wid = 3*(d_signal[1]-d_signal[0])
     if(est_h==0):
-        est_h = signal[-2]-signal[2]
+        est_h = np.max(d_signal)-np.min(d_signal)
 
     params = gmodel.make_params(cen=est_pos, amp=est_h, wid=est_wid, off=est_off)
 
@@ -483,28 +483,29 @@ def GaussianBraggEdgeFitting(signal,spectrum,spectrum_range=[],est_pos=0,est_wid
     edge_slope = result.best_values.get('amp')
     
     if (bool_print):
-        print('Edge position = ',t0)
-        print('Edge height = ',edge_height)
-        print('Edge width = ',edge_width)
-        print('Offset = ',result.best_values.get('off'))
+        print('pos fit = ',t0)
+        print('h fit = ',edge_slope)
+        print('wid fit = ',edge_width)
+        print('off fit = ',result.best_values.get('off'))
         print('idx_low = ',id_low,'idx_high = ',id_high)
 
         plt.figure()
         plt.subplot(2,1,1), 
         plt.plot(spectrum, signal)
         plt.plot(t0, signal[find_nearest(spectrum, t0)],'x', markeredgewidth=3, c='orange')
-        plt.plot(t0-edge_width, signal[find_nearest(spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.plot(t0+edge_width, signal[find_nearest(spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
+        # plt.plot(t0-edge_width, signal[find_nearest(spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
+        # plt.plot(t0+edge_width, signal[find_nearest(spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
         plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
         plt.subplot(2,1,2), 
-        plt.plot(d_spectrum, d_signal), plt.plot(d_spectrum, fitted_data)
+        plt.plot(d_spectrum, d_signal,label='data'),
+        plt.plot(d_spectrum,gaussian(d_spectrum,est_h,est_pos,est_wid,est_off),'--',label='Initial guess')
+        plt.plot(d_spectrum, fitted_data,label='Fit')
         plt.plot(t0, d_signal[find_nearest(d_spectrum, t0)],'x', markeredgewidth=3, c='orange')
         plt.plot(t0-edge_width, d_signal[find_nearest(d_spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
         plt.plot(t0+edge_width, d_signal[find_nearest(d_spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
         plt.title('Bragg pattern derivative'), plt.xlabel('Wavelenght [Å]')
         plt.tight_layout()
-        plt.show()
-        plt.close()
+        plt.legend(),plt.show(),plt.close()
     return {'fitted_data':fitted_data, 't0':t0, 'edge_width':edge_width, 'edge_height':edge_height, 'edge_slope':edge_slope}
 
 #------------------------------ MICROSTRUCTURE FITTING ------------------------#
