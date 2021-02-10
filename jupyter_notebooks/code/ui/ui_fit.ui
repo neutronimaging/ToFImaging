@@ -34,7 +34,7 @@
          <x>0</x>
          <y>0</y>
          <width>1689</width>
-         <height>908</height>
+         <height>902</height>
         </rect>
        </property>
        <attribute name="label">
@@ -46,7 +46,7 @@
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
              <widget class="QGroupBox" name="prepare_data_normalization_groupBox">
@@ -57,20 +57,13 @@
                </sizepolicy>
               </property>
               <property name="title">
-               <string>Normalization</string>
+               <string/>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <item>
-                <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
+                <widget class="QCheckBox" name="normalization_checkBox">
                  <property name="text">
-                  <string>Pixel by pixel</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="normalization_by_roi_radioButton">
-                 <property name="text">
-                  <string>by ROI</string>
+                  <string>Normalization</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -78,17 +71,50 @@
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_9">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                <widget class="QGroupBox" name="normalization_groupBox">
+                 <property name="title">
+                  <string/>
                  </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
+                 <layout class="QHBoxLayout" name="horizontalLayout_12">
+                  <item>
+                   <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
+                    <property name="text">
+                     <string>Pixel by pixel</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="normalization_by_roi_radioButton">
+                    <property name="text">
+                     <string>by ROI</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="select_background_roi_pushButton">
+                    <property name="text">
+                     <string>Select ROI of background ...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_9">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -402,7 +428,7 @@
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
               <widget class="QLabel" name="label_5">
@@ -423,7 +449,7 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <layout class="QVBoxLayout" name="verticalLayout_10">
              <item>
               <widget class="QLabel" name="label_8">
@@ -462,7 +488,7 @@
          <x>0</x>
          <y>0</y>
          <width>1689</width>
-         <height>908</height>
+         <height>902</height>
         </rect>
        </property>
        <attribute name="label">
@@ -771,8 +797,8 @@
    <slot>apply_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1598</x>
-     <y>1037</y>
+     <x>1702</x>
+     <y>1053</y>
     </hint>
     <hint type="destinationlabel">
      <x>1034</x>
@@ -883,8 +909,8 @@
    <slot>kernel_dimension_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>128</x>
-     <y>214</y>
+     <x>149</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -899,8 +925,8 @@
    <slot>kernel_dimension_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>75</x>
-     <y>213</y>
+     <x>96</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
@@ -915,8 +941,8 @@
    <slot>step3_settings_button_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1555</x>
-     <y>291</y>
+     <x>1673</x>
+     <y>309</y>
     </hint>
     <hint type="destinationlabel">
      <x>1600</x>
@@ -931,12 +957,44 @@
    <slot>step4_settings_button_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1562</x>
-     <y>331</y>
+     <x>1673</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>1602</x>
      <y>369</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>normalization_checkBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>normalization_mode_checkBox_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>11</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>select_background_roi_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>select_background_roi_button_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>121</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>382</x>
+     <y>25</y>
     </hint>
    </hints>
   </connection>
@@ -951,5 +1009,7 @@
   <slot>kernel_dimension_changed()</slot>
   <slot>step3_settings_button_clicked()</slot>
   <slot>step4_settings_button_clicked()</slot>
+  <slot>normalization_mode_checkBox_clicked()</slot>
+  <slot>select_background_roi_button_clicked()</slot>
  </slots>
 </ui>

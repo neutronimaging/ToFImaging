@@ -438,6 +438,13 @@ class Interface(QMainWindow):
 
         self.number_of_files_to_exclude_slider_changed(0)
 
+    def normalization_mode_checkBox_clicked(self):
+        is_with_normalization = self.ui.normalization_checkBox.isChecked()
+        self.ui.normalization_groupBox.setEnabled(is_with_normalization)
+
+    def select_background_roi_button_clicked(self):
+        print("hdfdf")
+
     @wait_cursor
     def prepare_data_button_clicked(self):
         self.ui.setEnabled(False)
