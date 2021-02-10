@@ -27,6 +27,9 @@ class Interface(QMainWindow):
     o_api = None
     live_image = None
 
+    sample_projections = None
+    ob_projections = None
+
     default_kernel_size = {'y': 3, 'x': 3, 'lambda': 3}
     kernel_size = copy.deepcopy(default_kernel_size)
     default_kernel_size_label = {'3d': u"y:3  x:3  \u03BB:3",
@@ -98,6 +101,7 @@ class Interface(QMainWindow):
         if not self.debugging_mode:
             self.live_image = self.o_roi.live_image
             self.sample_projections = self.o_api.sample_projections
+            self.ob_projections = self.o_api.ob_projections
             self.list_roi = self.o_roi.list_roi
 
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_fit.ui'))
@@ -520,13 +524,13 @@ class Interface(QMainWindow):
             working_ob_projections = ob_projections.transpose(2, 0, 1)
             normalize_projections = list()
 
-            if self.normalization_mode_ui.value == 'pixel by pixel':
+            if self.ui.normalization_pixel_by_pixel_radioButton.isChecked():
 
                 normalize_projections = Interface.normalization_pixel_by_pixel(list_roi,
                                                                                working_ob_projections,
                                                                                working_sample_projections)
 
-            elif self.normalization_mode_ui.value == 'by ROI':
+            elif self.ui.normalization_by_roi_radioButton.isChecked():
 
                 normalize_projections = Interface.normalization_by_roi(list_roi,
                                                                        working_ob_projections,
@@ -692,7 +696,7 @@ class Step3SettingsHandler(QMainWindow):
         else:
             bragg_peak_estimated = self.parent.o_roi.lambda_array[
                 self.parent.ui.rough_lambda_peak_position_slider.value()]
-        self.ui.estimated_position_bragg_edge_label.setText(str(bragg_peak_estimated))
+        self.ui.estimated_position_bragg_edge_label.setText("{:.3f}".format(bragg_peak_estimated))
         self.ui.estimated_units_label.setText(u"\u212B")
 
         config = self.parent.step3_config
