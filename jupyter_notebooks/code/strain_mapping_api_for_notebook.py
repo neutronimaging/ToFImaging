@@ -120,6 +120,7 @@ class StrainMappingAPIForNotebook:
     def load_sample(self, input_folders=None):
         self.load_files(input_folders=input_folders, data_type='sample')
         display(HTML('<span style="font-size: 15px; color:blue">Sample loaded successfully!</span>'))
+        self.select_ob()
 
     def load_ob(self, input_folders=None):
         if self.normalization_flag_ui.value:
@@ -166,7 +167,6 @@ class StrainMappingAPIForNotebook:
 
     def select_data(self):
         self.select_sample()
-        self.select_ob()
 
     def select_sample(self):
         next_method = self.load_sample
@@ -187,6 +187,7 @@ class StrainMappingAPIForNotebook:
         self.display_integrated_signal(self.sample_projections)
 
     def display_integrated_signal(self, projections):
+        plt.figure(figsize=[15, 15])
         plt.imshow(np.nanmean(projections, axis=2))
         plt.title('Integrated sample image'), plt.colorbar()
         plt.show()
@@ -206,12 +207,6 @@ class StrainMappingAPIForNotebook:
         print(message)
 
     def calculate_moving_average(self, plot=False):
-
-#        display(HTML('<span style="font-size: 15px; color:blue">FOR DEBUGGING ONLY</span>'))
-#        self.T_mavg = copy.deepcopy(self.normalize_projections)
-#
-#        return
-
         # moving average with custom kernel to increase neutron statistics
         # custom_kernel = np.zeros((10,10))
         # custom_kernel[:,3:7] = 1
@@ -252,166 +247,6 @@ class StrainMappingAPIForNotebook:
 
         self.message[-1] = "Calculate mask ... Done"
         self.display_message()
-
-    # def prepare_data(self, list_roi=None):
-    #     self.list_roi = list_roi
-    #     if self.normalization_flag_ui.value:
-    #
-    #         display(HTML("<h3>Normalization Mode</h3>"))
-    #         self.normalization_mode_ui = widgets.RadioButtons(options=['pixel by pixel',
-    #                                                                    'by ROI'],
-    #                                                           value='pixel by pixel',
-    #                                                           layout={'width': 'max-content'})
-    #         display(self.normalization_mode_ui)
-    #
-    #     display(HTML("<h3>Kernel for Moving Average Algorithm</h3>"))
-    #
-    #     # dimension
-    #     hori1 = widgets.HBox([widgets.Label("Dimension",
-    #                                         layout=widgets.Layout(width="100px")),
-    #                           widgets.RadioButtons(options=['2D', '3D'],
-    #                                                value='3D')])
-    #     # size
-    #     hori21 = widgets.HBox([widgets.Checkbox(value=True,
-    #                                             layout=widgets.Layout(width="20px")),
-    #                            widgets.Label(u"y:3, x:3, \u03BB:3",
-    #                                             layout=widgets.Layout(width="100px"))])
-    #     hori22 = widgets.HBox([widgets.Checkbox(value=False,
-    #                                             layout=widgets.Layout(width="20px")),
-    #                            widgets.Label("y:",
-    #                                          layout=widgets.Layout(width="12px"),
-    #                                          enabled=False),
-    #                            widgets.IntText(3,
-    #                                            layout=widgets.Layout(width="50px")),
-    #                            widgets.Label("x:",
-    #                                          layout=widgets.Layout(width="40px")),
-    #                            widgets.IntText(3,
-    #                                            layout=widgets.Layout(width="50px")),
-    #                            widgets.Label(u"\u03BB:",
-    #                                          layout=widgets.Layout(width="40px")),
-    #                            widgets.IntText(3,
-    #                                            layout=widgets.Layout(width="50px"))])
-    #
-    #     verti2 = widgets.VBox([hori21, hori22])
-    #     hori2 = widgets.HBox([widgets.Label("Size",
-    #                                         layout=widgets.Layout(width="50px")),
-    #                           verti2])
-    #
-    #     # type
-    #     hori3 = widgets.HBox([widgets.Label("Type",
-    #                                         layout=widgets.Layout(width="100px")),
-    #                           widgets.RadioButtons(options=['Gaussian', 'box'])])
-    #
-    #     run_prepare_button = widgets.Button(description=" Run prepare data",
-    #                                         layout=widgets.Layout(width="50%"),
-    #                                         icon='play')
-    #     run_prepare_button.on_click(self.run_prepare_data_steps)
-    #
-    #     vertical = widgets.VBox([hori1, hori2, hori3, widgets.Label(""), run_prepare_button])
-    #     display(vertical)
-    #
-    # def run_prepare_data_steps(self, _):
-    #     self.prepare_data_steps(list_roi=self.list_roi)
-    #
-    # def prepare_data_steps(self, list_roi=None):
-    #     if list_roi:
-    #         self.normalize_data(list_roi=list_roi)
-    #         self.calculate_moving_average()
-    #         self.calculate_mask()
-    #     else:
-    #         display(HTML('<span style="font-size: 15px; color:red">ERROR! Please select a ROI first!</span>'))
-
-    # def normalize_data(self, list_roi=None, normalization_flag=True, normalization_mode='pixel by pixel'):
-    #
-    #     if normalization_flag:
-    #         sample_projections = self.sample_projections
-    #         ob_projections = self.ob_projections
-    #
-    #         working_sample_projections = sample_projections.transpose(2, 0, 1)
-    #         working_ob_projections = ob_projections.transpose(2, 0, 1)
-    #         normalize_projections = list()
-    #
-    #         if self.normalization_mode_ui.value == 'pixel by pixel':
-    #
-    #
-    #             normalize_projections = StrainMappingAPIForNotebook.normalization_pixel_by_pixel(list_roi,
-    #                                                                                             working_ob_projections,
-    #                                                                                             working_sample_projections)
-    #
-    #         elif self.normalization_mode_ui.value == 'by ROI':
-    #
-    #             normalize_projections = StrainMappingAPIForNotebook.normalization_by_roi(list_roi,
-    #                                                                                      working_ob_projections,
-    #                                                                                      working_sample_projections)
-    #
-    #         self.normalize_projections = normalize_projections.transpose(1, 2, 0)
-    #
-    #     else:  # no normalization
-    #         self.normalize_projections = copy.deepcopy(self.sample_projections)
-
-    # @staticmethod
-    # def normalization_pixel_by_pixel(list_roi,
-    #                                  working_ob_projections,
-    #                                  working_sample_projections):
-    #
-    #     list_o_roi = []
-    #     for _roi_key in list_roi.keys():
-    #         _roi = list_roi[_roi_key]
-    #         o_roi = ROI(x0=_roi['x0'],
-    #                     y0=_roi['y0'],
-    #                     x1=_roi['x1'],
-    #                     y1=_roi['y1'])
-    #         list_o_roi.append(o_roi)
-    #
-    #     _sample = working_sample_projections
-    #     _ob = working_ob_projections
-    #
-    #     o_norm = Normalization()
-    #     o_norm.data['sample']['data'] = _sample
-    #     o_norm.data['ob']['data'] = _ob
-    #
-    #     # create fake list of sample and ob
-    #     list_filename = ['N/A' for _ in np.arange(len(_sample))]
-    #     o_norm.data['sample']['file_name'] = list_filename
-    #     o_norm.data['ob']['file_name'] = list_filename
-    #
-    #     o_norm.normalization(roi=list_o_roi)
-    #
-    #     return np.array(o_norm.data['normalized'])
-    #
-    # @staticmethod
-    # def normalization_by_roi(list_roi,
-    #                          working_ob_projections,
-    #                          working_sample_projections):
-    #
-    #     normalize_projections = list()
-    #
-    #     total_number_of_pixels_in_rois = 0
-    #     for _index_roi in list_roi.keys():
-    #         _roi = list_roi[_index_roi]
-    #         _x0 = _roi['x0']
-    #         _y0 = _roi['y0']
-    #         _x1 = _roi['x1']
-    #         _y1 = _roi['y1']
-    #         total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
-    #     for _sample, _ob in zip(working_sample_projections, working_ob_projections):
-    #
-    #         mean_ob_value = 0
-    #         for _index_roi in list_roi.keys():
-    #             _roi = list_roi[_index_roi]
-    #             _x0 = _roi['x0']
-    #             _y0 = _roi['y0']
-    #             _x1 = _roi['x1']
-    #             _y1 = _roi['y1']
-    #
-    #             mean_ob_value += np.sum(_ob[_y0: _y1 + 1, _x0: _x1 + 1])
-    #
-    #         mean_ob = mean_ob_value / total_number_of_pixels_in_rois
-    #         _normalize = _sample / mean_ob
-    #
-    #         normalize_projections.append(_normalize)
-    #     normalize_projections = np.array(normalize_projections)
-    #     return normalize_projections
 
     @staticmethod
     def make_or_reset_folder(folder_name):
