@@ -265,7 +265,7 @@ class Interface(QMainWindow):
                                              lambda_array[np.int(nbr_lambda/2) + 10]]
 
         self.bragg_peak_range_ui = pg.LinearRegionItem(values=self.default_bragg_peak_range,
-                                                       orientation=None,
+                                                       orientation='vertical',
                                                        movable=True)
         self.bragg_peak_range_ui.sigRegionChanged.connect(self.lambda_range_changed)
 

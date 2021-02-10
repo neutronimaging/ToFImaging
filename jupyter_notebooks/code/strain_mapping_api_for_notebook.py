@@ -113,13 +113,20 @@ class StrainMappingAPIForNotebook:
         else:
             raise NotImplementedError("Data type not implemented!")
 
-    def load_sample(self, input_folders):
+    def load_data(self, input_folders):
+        self.load_sample(input_folders=input_folders)
+        self.load_ob(input_folders=input_folders)
+
+    def load_sample(self, input_folders=None):
         self.load_files(input_folders=input_folders, data_type='sample')
         display(HTML('<span style="font-size: 15px; color:blue">Sample loaded successfully!</span>'))
 
-    def load_ob(self, input_folders):
-        self.load_files(input_folders=input_folders, data_type='ob')
-        display(HTML('<span style="font-size: 15px; color:blue">OB loaded successfully!</span>'))
+    def load_ob(self, input_folders=None):
+        if self.normalization_flag_ui.value:
+            self.load_files(input_folders=input_folders, data_type='ob')
+            display(HTML('<span style="font-size: 15px; color:blue">OB loaded successfully!</span>'))
+        else:
+            display(HTML('<span style="font-size: 15px; color:blue">Normalizaton: OFF!</span>'))
 
     def locate_and_load_spectra_file(self, input_folder=None):
         spectra_file_name = glob.glob(input_folder + "/*_Spectra.txt")
@@ -156,6 +163,10 @@ class StrainMappingAPIForNotebook:
                                                        next=next_method,
                                                        multiple=True)
         fsel_ui.show()
+
+    def select_data(self):
+        self.select_sample()
+        self.select_ob()
 
     def select_sample(self):
         next_method = self.load_sample
