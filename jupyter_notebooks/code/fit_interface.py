@@ -6,6 +6,7 @@ from jupyter_notebooks.code import load_ui
 import pyqtgraph as pg
 import numpy as np
 import copy
+import inflect
 
 from ToFImaging import reduction_tools
 from jupyter_notebooks.code.decorators import wait_cursor
@@ -13,6 +14,7 @@ from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities import find_nearest_index
 from NeuNorm.normalization import Normalization
 from NeuNorm.roi import ROI
+from jupyter_notebooks.code.roi_selection import Interface as RoiInterface
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -443,7 +445,14 @@ class Interface(QMainWindow):
         self.ui.normalization_groupBox.setEnabled(is_with_normalization)
 
     def select_background_roi_button_clicked(self):
-        print("hdfdf")
+        self.o_normalization_roi_gui = NormRoiSelection(parent=self,
+                                                        main_api=self.o_api)
+        self.o_normalization_roi_gui.show()
+
+    def update_number_of_normalization_roi(self, nbr_of_roi=0):
+        p = inflect.engine()
+        message = "{} ".format(nbr_of_roi) + p.plural("ROI", nbr_of_roi) + " selected!"
+        self.ui.normalization_message_label.setText(message)
 
     @wait_cursor
     def prepare_data_button_clicked(self):
@@ -815,4 +824,38 @@ class Step4SettingsHandler(QMainWindow):
 
     def closeEvent(self, event=None):
         self.parent.step3_settings_ui = None
+        self.close()
+
+
+class NormRoiSelection(RoiInterface):
+
+    def __init__(self, parent=None, main_api=None):
+        super(RoiInterface, self).__init__(parent)
+        self.parent = parent
+
+        self.sample_projections = main_api.sample_projections  # x, y, lambda
+        self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
+        self.tof_array = main_api.tof_array
+        self.lambda_array = main_api.lambda_array
+
+        ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_roi_selection.ui'))
+        self.ui = load_ui(ui_full_path, baseinstance=self)
+        self.setWindowTitle("Select region to fit!")
+
+        self.init_widgets()
+        self.display_image()
+
+    def apply_clicked(self):
+        mask = np.zeros(np.shape(self.live_image))
+        for _index_roi in self.list_roi.keys():
+            _roi = self.list_roi[_index_roi]
+            _x0 = _roi['x0']
+            _y0 = _roi['y0']
+            _x1 = _roi['x1']
+            _y1 = _roi['y1']
+            mask[_y0: _y1 + 1, _x0: _x1 + 1] = 1
+        self.mask = mask
+
+        self.parent.update_number_of_normalization_roi(nbr_of_roi=len(self.list_roi))
+
         self.close()
