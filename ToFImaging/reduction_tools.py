@@ -185,6 +185,9 @@ def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0]
     array of the same size as input array
 
     """
+
+    # input_array = input_array.transpose(1, 2, 0)
+
     if not len(np.shape(input_array)) in [2, 3]:
         raise ValueError("Input array must be a 2 or 3D array!")
 

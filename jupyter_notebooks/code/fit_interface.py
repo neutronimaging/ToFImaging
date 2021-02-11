@@ -29,6 +29,9 @@ class Interface(QMainWindow):
     o_api = None
     live_image = None
 
+    list_roi = None
+    ob_list_roi = None
+
     sample_projections = None
     ob_projections = None
 
@@ -377,7 +380,7 @@ class Interface(QMainWindow):
         pixel_marker = self.pixel_marker
         x = pixel_marker['x']
         y = pixel_marker['y']
-        normalize_projections = self.T_mavg
+        normalize_projections = self.normalize_projections
 
         profile = normalize_projections[y, x, :]
         self.profile_of_pixel_selected = profile
@@ -465,13 +468,11 @@ class Interface(QMainWindow):
         kernel_size = self._get_kernel_size()
         kernel_type = self._get_kernel_type()
 
-        self.normalize_data(list_roi=self.o_roi.list_roi,
-                            normalization_flag=is_with_normalization,
-                            normalization_mode=normalization_mode)
-
         self.calculate_moving_average(kernel_dimension=kernel_dimension,
                                       kernel_size=kernel_size,
                                       kernel_type=kernel_type)
+        self.normalize_data(normalization_flag=is_with_normalization,
+                            normalization_mode=normalization_mode)
         self.calculate_mask()
         self.display_prepare_data_preview_image()
 
@@ -484,7 +485,7 @@ class Interface(QMainWindow):
         self.ui.setEnabled(True)
 
     def display_prepare_data_preview_image(self):
-        prepare_data = self.T_mavg
+        prepare_data = self.normalize_projections
         self.live_process_data = np.mean(prepare_data, axis=2)
         live_process_image = np.transpose(self.live_process_data)
         self.ui.process_image_view.setImage(live_process_image)
@@ -493,7 +494,8 @@ class Interface(QMainWindow):
         self.ui.process_image_view.view.getViewBox().setYLink('raw image')
 
     def calculate_moving_average(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
-        self.ui.statusbar.showMessage("Moving Average ... IN PROGRESS")
+
+        self.ui.statusbar.showMessage("Moving Average of Sample ... IN PROGRESS")
         QtGui.QGuiApplication.processEvents()
 
         x = kernel_size['x']
@@ -504,9 +506,24 @@ class Interface(QMainWindow):
         else:  # '2d'
             kernel = np.ones((y, x))
 
-        T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
-                                                   custom_kernel=kernel)
-        self.T_mavg = T_mavg
+        print("in calculate moving average")
+        print(f"np.shape(self.sample_projections: {np.shape(self.sample_projections)}")
+        self.sample_projections = reduction_tools.moving_average_2D(self.sample_projections,
+                                                                    custom_kernel=kernel)
+        print(f"np.shape(self.sample_projections: {np.shape(self.sample_projections)}")
+
+        self.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
+        QtGui.QGuiApplication.processEvents()
+
+        print(f"np.shape(self.ob_projections: {np.shape(self.ob_projections)}")
+        self.ob_projections = reduction_tools.moving_average_2D(self.ob_projections,
+                                                                custom_kernel=kernel)
+        print(f"np.shape(self.ob_projections: {np.shape(self.ob_projections)}")
+
+        # T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
+        #                                            custom_kernel=kernel)
+        # self.T_mavg = T_mavg
+
         QtGui.QGuiApplication.processEvents()
 
     def calculate_mask(self):
@@ -514,7 +531,7 @@ class Interface(QMainWindow):
         QtGui.QGuiApplication.processEvents()
 
         list_roi = self.list_roi
-        [height, width, _] = np.shape(self.T_mavg)
+        [height, width, _] = np.shape(self.normalize_projections)
         mask = np.zeros((height, width))
 
         for _roi_key in list_roi.keys():
@@ -528,7 +545,7 @@ class Interface(QMainWindow):
 
         QtGui.QGuiApplication.processEvents()
 
-    def normalize_data(self, list_roi=None, normalization_flag=True, normalization_mode='pixel by pixel'):
+    def normalize_data(self, normalization_flag=True, normalization_mode='pixel by pixel'):
         self.ui.statusbar.showMessage("Normalization ... IN PROGRESS")
         QtGui.QGuiApplication.processEvents()
 
@@ -536,28 +553,34 @@ class Interface(QMainWindow):
             sample_projections = self.sample_projections
             ob_projections = self.ob_projections
 
-            working_sample_projections = sample_projections.transpose(2, 0, 1)
-            working_ob_projections = ob_projections.transpose(2, 0, 1)
-            normalize_projections = list()
+            # working_sample_projections = sample_projections.transpose(2, 0, 1)
+            # working_ob_projections = ob_projections.transpose(2, 0, 1)
+
+            working_sample_projections = sample_projections
+            working_ob_projections = ob_projections
+
+            # normalize_projections = list()
 
             if self.ui.normalization_pixel_by_pixel_radioButton.isChecked():
 
-                normalize_projections = Interface.normalization_pixel_by_pixel(working_ob_projections,
+                self.normalize_projections = Interface.normalization_pixel_by_pixel(working_ob_projections,
                                                                                working_sample_projections)
 
             elif self.ui.normalization_by_roi_radioButton.isChecked():
 
-                normalize_projections = Interface.normalization_by_roi(list_roi,
+                list_roi = self.o_roi.list_roi
+                self.normalize_projections = Interface.normalization_by_roi(list_roi,
                                                                        working_ob_projections,
                                                                        working_sample_projections)
 
             elif self.ui.normal_normalization_radioButton.isChecked():
 
-                normalize_projections = Interface.normalization_by_roi_of_ob(list_roi,
+                list_roi = self.ob_list_roi
+                self.normalize_projections = Interface.normalization_by_roi_of_ob(list_roi,
                                                                              working_ob_projections,
                                                                              working_sample_projections)
 
-            self.normalize_projections = normalize_projections.transpose(1, 2, 0)
+            # self.normalize_projections = normalize_projections.transpose(1, 2, 0)
 
         else:  # no normalization
             self.normalize_projections = copy.deepcopy(self.sample_projections)
@@ -624,12 +647,24 @@ class Interface(QMainWindow):
         return normalize_projections
 
     @staticmethod
-    def normalization_by_roi_of_ob(list_roi,
+    def normalization_by_roi_of_ob(ob_list_roi,
                                    working_ob_projections,
                                    working_sample_projections):
 
-        normalize_projections = []
-        return normalize_projections
+        _sample = working_sample_projections
+        _ob = working_ob_projections
+
+        o_norm = Normalization()
+        o_norm.data['sample']['data'] = _sample
+        o_norm.data['ob']['data'] = _ob
+
+        # create fake list of sample and ob
+        list_filename = ['N/A' for _ in np.arange(len(_sample))]
+        o_norm.data['sample']['file_name'] = list_filename
+        o_norm.data['ob']['file_name'] = list_filename
+
+        o_norm.normalization(roi=ob_list_roi)
+        return np.array(o_norm.data['normalized'])
 
     def _get_kernel_type(self):
         if self.ui.kernel_type_box_radioButton.isChecked():
@@ -865,5 +900,6 @@ class NormRoiSelection(RoiInterface):
         self.mask = mask
 
         self.parent.update_number_of_normalization_roi(nbr_of_roi=len(self.list_roi))
+        self.parent.ob_list_roi = self.list_roi
 
         self.close()
