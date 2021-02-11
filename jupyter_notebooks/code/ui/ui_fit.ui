@@ -79,14 +79,14 @@
                   <item>
                    <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
                     <property name="text">
-                     <string>Pixel by pixel</string>
+                     <string>Sample pixel/OB pixel</string>
                     </property>
                    </widget>
                   </item>
                   <item>
                    <widget class="QRadioButton" name="normalization_by_roi_radioButton">
                     <property name="text">
-                     <string>by ROI</string>
+                     <string>Sample pixel/OB ROI average</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
@@ -94,7 +94,17 @@
                    </widget>
                   </item>
                   <item>
+                   <widget class="QRadioButton" name="normal_normalization_radioButton">
+                    <property name="text">
+                     <string>(Sample pixel / OB pixel) * Coeff_OB_Sample</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QPushButton" name="select_background_roi_pushButton">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="text">
                      <string>Select ROI of background ...</string>
                     </property>
@@ -102,6 +112,9 @@
                   </item>
                   <item>
                    <widget class="QLabel" name="normalization_message_label">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="text">
                      <string>0 ROI selected</string>
                     </property>
@@ -996,12 +1009,60 @@
    <slot>select_background_roi_button_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>440</x>
+     <x>934</x>
      <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>
      <y>25</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>normalization_pixel_by_pixel_radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>normalization_radioButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>218</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>-4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>normalization_by_roi_radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>normalization_radioButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>434</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>459</x>
+     <y>-18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>normal_normalization_radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>normalization_radioButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>648</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>736</x>
+     <y>-9</y>
     </hint>
    </hints>
   </connection>
@@ -1018,5 +1079,6 @@
   <slot>step4_settings_button_clicked()</slot>
   <slot>normalization_mode_checkBox_clicked()</slot>
   <slot>select_background_roi_button_clicked()</slot>
+  <slot>normalization_radioButton_clicked()</slot>
  </slots>
 </ui>

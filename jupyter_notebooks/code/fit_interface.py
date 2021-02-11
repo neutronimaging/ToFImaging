@@ -559,19 +559,24 @@ class Interface(QMainWindow):
 
         QtGui.QGuiApplication.processEvents()
 
+    def normalization_radioButton_clicked(self):
+        state = self.ui.normal_normalization_radioButton.isChecked()
+        self.ui.select_background_roi_pushButton.setEnabled(state)
+        self.ui.normalization_message_label.setEnabled(state)
+
     @staticmethod
     def normalization_pixel_by_pixel(list_roi,
                                      working_ob_projections,
                                      working_sample_projections):
 
-        list_o_roi = []
-        for _roi_key in list_roi.keys():
-            _roi = list_roi[_roi_key]
-            o_roi = ROI(x0=_roi['x0'],
-                        y0=_roi['y0'],
-                        x1=_roi['x1'],
-                        y1=_roi['y1'])
-            list_o_roi.append(o_roi)
+        # list_o_roi = []
+        # for _roi_key in list_roi.keys():
+        #     _roi = list_roi[_roi_key]
+        #     o_roi = ROI(x0=_roi['x0'],
+        #                 y0=_roi['y0'],
+        #                 x1=_roi['x1'],
+        #                 y1=_roi['y1'])
+        #     list_o_roi.append(o_roi)
 
         _sample = working_sample_projections
         _ob = working_ob_projections
@@ -585,7 +590,8 @@ class Interface(QMainWindow):
         o_norm.data['sample']['file_name'] = list_filename
         o_norm.data['ob']['file_name'] = list_filename
 
-        o_norm.normalization(roi=list_o_roi)
+        # o_norm.normalization(roi=list_o_roi)
+        o_norm.normalization()
 
         return np.array(o_norm.data['normalized'])
 
