@@ -542,8 +542,7 @@ class Interface(QMainWindow):
 
             if self.ui.normalization_pixel_by_pixel_radioButton.isChecked():
 
-                normalize_projections = Interface.normalization_pixel_by_pixel(list_roi,
-                                                                               working_ob_projections,
+                normalize_projections = Interface.normalization_pixel_by_pixel(working_ob_projections,
                                                                                working_sample_projections)
 
             elif self.ui.normalization_by_roi_radioButton.isChecked():
@@ -551,6 +550,12 @@ class Interface(QMainWindow):
                 normalize_projections = Interface.normalization_by_roi(list_roi,
                                                                        working_ob_projections,
                                                                        working_sample_projections)
+
+            elif self.ui.normal_normalization_radioButton.isChecked():
+
+                normalize_projections = Interface.normalization_by_roi_of_ob(list_roi,
+                                                                             working_ob_projections,
+                                                                             working_sample_projections)
 
             self.normalize_projections = normalize_projections.transpose(1, 2, 0)
 
@@ -565,18 +570,8 @@ class Interface(QMainWindow):
         self.ui.normalization_message_label.setEnabled(state)
 
     @staticmethod
-    def normalization_pixel_by_pixel(list_roi,
-                                     working_ob_projections,
+    def normalization_pixel_by_pixel(working_ob_projections,
                                      working_sample_projections):
-
-        # list_o_roi = []
-        # for _roi_key in list_roi.keys():
-        #     _roi = list_roi[_roi_key]
-        #     o_roi = ROI(x0=_roi['x0'],
-        #                 y0=_roi['y0'],
-        #                 x1=_roi['x1'],
-        #                 y1=_roi['y1'])
-        #     list_o_roi.append(o_roi)
 
         _sample = working_sample_projections
         _ob = working_ob_projections
@@ -590,7 +585,6 @@ class Interface(QMainWindow):
         o_norm.data['sample']['file_name'] = list_filename
         o_norm.data['ob']['file_name'] = list_filename
 
-        # o_norm.normalization(roi=list_o_roi)
         o_norm.normalization()
 
         return np.array(o_norm.data['normalized'])
@@ -627,6 +621,14 @@ class Interface(QMainWindow):
 
             normalize_projections.append(_normalize)
         normalize_projections = np.array(normalize_projections)
+        return normalize_projections
+
+    @staticmethod
+    def normalization_by_roi_of_ob(list_roi,
+                                   working_ob_projections,
+                                   working_sample_projections):
+
+        normalize_projections = []
         return normalize_projections
 
     def _get_kernel_type(self):
