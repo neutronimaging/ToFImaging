@@ -22,7 +22,9 @@ class Interface(QMainWindow):
         super(Interface, self).__init__(parent)
 
         self.sample_projections = main_api.sample_projections  # x, y, lambda
-        self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
+        # self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
+        self.sample_projections_lambda_x_y = self.sample_projections
+
         self.tof_array = main_api.tof_array
         self.lambda_array = main_api.lambda_array
 
@@ -61,7 +63,7 @@ class Interface(QMainWindow):
 
     def display_image(self):
         sample_projections = self.sample_projections
-        self.live_image = np.mean(sample_projections, axis=2)
+        self.live_image = np.mean(sample_projections, axis=0)
         live_image = np.transpose(self.live_image)
         self.ui.image_view.setImage(live_image)
         self.integrated_image_size['height'], self.integrated_image_size['width'] = np.shape(live_image)

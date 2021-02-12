@@ -106,10 +106,12 @@ class StrainMappingAPIForNotebook:
             projections = reduction_tools.mean_of_tof_arrays(list_array_3d=list_projections)
 
         if data_type == 'sample':
-            self.sample_projections = projections.transpose(1, 2, 0)  # x, y, lambda
+            # self.sample_projections = projections.transpose(1, 2, 0)  # x, y, lambda
+            self.sample_projections = projections
             self.locate_and_load_spectra_file(input_folder=input_folders[0])
         elif data_type == 'ob':
-            self.ob_projections = projections.transpose(1, 2, 0)  # x, y, lambda
+            self.ob_projections = projections
+            # self.ob_projections = projections.transpose(1, 2, 0)  # x, y, lambda
         else:
             raise NotImplementedError("Data type not implemented!")
 

@@ -474,7 +474,6 @@ class Interface(QMainWindow):
                                              kernel_size=kernel_size,
                                              kernel_type=kernel_type):
 
-            print("in buffered data!")
             self.calculate_moving_average(kernel_dimension=kernel_dimension,
                                           kernel_size=kernel_size,
                                           kernel_type=kernel_type)
@@ -489,7 +488,7 @@ class Interface(QMainWindow):
         self.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
         QtGui.QGuiApplication.processEvents()
         self.ui.toolBox.setItemEnabled(1, True)
-        self.ui.toolBox.setCurrentIndex(1)
+        # self.ui.toolBox.setCurrentIndex(1)  # switch to next tab
         self.ui.setEnabled(True)
 
     def can_we_use_buffered_data(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
