@@ -186,7 +186,7 @@ def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0]
 
     """
 
-    # input_array = input_array.transpose(1, 2, 0)
+    input_array = input_array.transpose(1, 2, 0)
 
     if not len(np.shape(input_array)) in [2, 3]:
         raise ValueError("Input array must be a 2 or 3D array!")
@@ -231,6 +231,9 @@ def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0]
             output_array[:, :, i] = scipy.signal.convolve2d(input_array[:, :, i], kernel, 'same')
     else:
         output_array = scipy.signal.convolve2d(input_array, kernel, 'same')
+
+    output_array = output_array.transpose(2, 0, 1)
+
     return output_array
 
 

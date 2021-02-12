@@ -384,11 +384,12 @@ class Interface(QMainWindow):
         y = pixel_marker['y']
         normalize_projections = self.normalize_projections
 
-        profile = normalize_projections[y, x, :]
+        profile = normalize_projections[:, y, x]
         self.profile_of_pixel_selected = profile
 
     def calculate_profile_of_roi(self):
-        normalize_projections_lambda_x_y = self.normalize_projections.transpose(2, 0, 1)
+        # normalize_projections_lambda_x_y = self.normalize_projections.transpose(2, 0, 1)
+        normalize_projections_lambda_x_y = self.normalize_projections
         list_roi = self.o_roi.list_roi
         profile_y_axis = []
         total_number_of_pixels_in_rois = 0
@@ -523,7 +524,7 @@ class Interface(QMainWindow):
 
     def display_prepare_data_preview_image(self):
         prepare_data = self.normalize_projections
-        self.live_process_data = np.mean(prepare_data, axis=2)
+        self.live_process_data = np.mean(prepare_data, axis=0)
         live_process_image = np.transpose(self.live_process_data)
         self.ui.process_image_view.setImage(live_process_image)
 
@@ -574,7 +575,7 @@ class Interface(QMainWindow):
         QtGui.QGuiApplication.processEvents()
 
         list_roi = self.list_roi
-        [height, width, _] = np.shape(self.normalize_projections)
+        [_, height, width] = np.shape(self.normalize_projections)
         mask = np.zeros((height, width))
 
         for _roi_key in list_roi.keys():
