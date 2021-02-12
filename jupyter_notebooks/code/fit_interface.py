@@ -32,6 +32,8 @@ class Interface(QMainWindow):
     list_roi = None
     ob_list_roi = None
 
+    moving_average_config = None
+
     sample_projections = None
     ob_projections = None
 
@@ -468,9 +470,15 @@ class Interface(QMainWindow):
         kernel_size = self._get_kernel_size()
         kernel_type = self._get_kernel_type()
 
-        self.calculate_moving_average(kernel_dimension=kernel_dimension,
-                                      kernel_size=kernel_size,
-                                      kernel_type=kernel_type)
+        if not self.can_we_use_buffered_data(kernel_dimension=kernel_dimension,
+                                             kernel_size=kernel_size,
+                                             kernel_type=kernel_type):
+
+            print("in buffered data!")
+            self.calculate_moving_average(kernel_dimension=kernel_dimension,
+                                          kernel_size=kernel_size,
+                                          kernel_type=kernel_type)
+
         self.normalize_data(normalization_flag=is_with_normalization,
                             normalization_mode=normalization_mode)
         self.calculate_mask()
@@ -483,6 +491,36 @@ class Interface(QMainWindow):
         self.ui.toolBox.setItemEnabled(1, True)
         self.ui.toolBox.setCurrentIndex(1)
         self.ui.setEnabled(True)
+
+    def can_we_use_buffered_data(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
+
+        if self.moving_average_config is None:
+            return False
+
+        buffered_kernel_dimension = self.moving_average_config.get('kernel_dimension', None)
+        if buffered_kernel_dimension is None:
+            return False
+        if not (kernel_dimension == buffered_kernel_dimension):
+            return False
+
+        buffered_kernel_size = self.moving_average_config.get('kernel_size', None)
+        if buffered_kernel_size is None:
+            return False
+        if not (buffered_kernel_size['x'] == kernel_size['x']):
+            return False
+        if not (buffered_kernel_size['y'] == kernel_size['y']):
+            return False
+        if kernel_dimension == '3d':
+            if not (buffered_kernel_size['lambda'] == kernel_size['lambda']):
+                return False
+
+        buffered_kernel_type = self.moving_average_config.get('kernel_type', None)
+        if buffered_kernel_type is None:
+            return False
+        if not (buffered_kernel_type == kernel_type):
+            return False
+
+        return True
 
     def display_prepare_data_preview_image(self):
         prepare_data = self.normalize_projections
@@ -500,29 +538,35 @@ class Interface(QMainWindow):
 
         x = kernel_size['x']
         y = kernel_size['y']
-        l = kernel_size['lambda']
-        if kernel_dimension == '3d':
-            kernel = np.ones((y, x, l))
-        else:  # '2d'
+
+        if kernel_dimension == '2d':
             kernel = np.ones((y, x))
+            self.sample_projections = reduction_tools.moving_average_2D(self.sample_projections,
+                                                                        custom_kernel=kernel)
 
-        print("in calculate moving average")
-        print(f"np.shape(self.sample_projections: {np.shape(self.sample_projections)}")
-        self.sample_projections = reduction_tools.moving_average_2D(self.sample_projections,
+            self.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
+            QtGui.QGuiApplication.processEvents()
+
+            self.ob_projections = reduction_tools.moving_average_2D(self.ob_projections,
                                                                     custom_kernel=kernel)
-        print(f"np.shape(self.sample_projections: {np.shape(self.sample_projections)}")
 
-        self.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
-        QtGui.QGuiApplication.processEvents()
+        elif kernel_dimension == '3d':
+            l = kernel_size['lambda']
+            kernel = np.ones((y, x, l))
 
-        print(f"np.shape(self.ob_projections: {np.shape(self.ob_projections)}")
-        self.ob_projections = reduction_tools.moving_average_2D(self.ob_projections,
-                                                                custom_kernel=kernel)
-        print(f"np.shape(self.ob_projections: {np.shape(self.ob_projections)}")
+            raise NotImplementedError("kernel dimension not implemented yet!")
+
+        else:
+            raise NotImplementedError("kernel dimension does not exist!")
 
         # T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
         #                                            custom_kernel=kernel)
         # self.T_mavg = T_mavg
+
+        moving_average_config = {'kernel_type': kernel_type,
+                                 'kernel_size': kernel_size,
+                                 'kernel_dimension': kernel_dimension}
+        self.moving_average_config = moving_average_config
 
         QtGui.QGuiApplication.processEvents()
 
