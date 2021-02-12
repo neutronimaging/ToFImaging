@@ -363,14 +363,14 @@
                   <item>
                    <widget class="QRadioButton" name="normalization_pixel_by_pixel_radioButton">
                     <property name="text">
-                     <string>Sample pixel / OB pixel</string>
+                     <string>Sample/OB</string>
                     </property>
                    </widget>
                   </item>
                   <item>
                    <widget class="QRadioButton" name="normalization_by_roi_radioButton">
                     <property name="text">
-                     <string>Sample pixel / OB pixel with ROI average</string>
+                     <string>Sample/ ROI average of OB</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
@@ -380,7 +380,7 @@
                   <item>
                    <widget class="QRadioButton" name="normal_normalization_radioButton">
                     <property name="text">
-                     <string>(Sample pixel / OB pixel) * Coeff_OB_Sample</string>
+                     <string>(Sample/OB) * Coeff_OB_Sample</string>
                     </property>
                    </widget>
                   </item>

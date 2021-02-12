@@ -1,5 +1,5 @@
 import os
-from qtpy.QtWidgets import QMainWindow, QVBoxLayout
+from qtpy.QtWidgets import QMainWindow
 from qtpy.QtGui import QIcon
 from qtpy import QtGui
 from jupyter_notebooks.code import load_ui
@@ -8,12 +8,14 @@ import numpy as np
 import copy
 import inflect
 
+from NeuNorm.normalization import Normalization
+from NeuNorm.roi import ROI
+
 from ToFImaging import reduction_tools
 from jupyter_notebooks.code.decorators import wait_cursor
 from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities import find_nearest_index
-from NeuNorm.normalization import Normalization
-from NeuNorm.roi import ROI
+from jupyter_notebooks.code.initialization import Initialization
 from jupyter_notebooks.code.roi_selection import Interface as RoiInterface
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
@@ -114,9 +116,43 @@ class Interface(QMainWindow):
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_fit.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Fit Interface")
-        self.init_widgets()
+
+        o_init = Initialization(parent=self)
+        o_init.widgets()
         if not self.debugging_mode:
             self.display_prepare_data_raw_image()
+
+    @wait_cursor
+    def prepare_data_button_clicked(self):
+        self.ui.setEnabled(False)
+
+        # collect parameters
+        is_with_normalization = self.o_api.normalization_flag_ui.value
+        normalization_mode = self._get_normalization_mode()
+        kernel_dimension = self._get_kernel_dimensions()
+        kernel_size = self._get_kernel_size()
+        kernel_type = self._get_kernel_type()
+
+        if not self.can_we_use_buffered_data(kernel_dimension=kernel_dimension,
+                                             kernel_size=kernel_size,
+                                             kernel_type=kernel_type):
+
+            self.calculate_moving_average(kernel_dimension=kernel_dimension,
+                                          kernel_size=kernel_size,
+                                          kernel_type=kernel_type)
+
+        self.normalize_data(normalization_flag=is_with_normalization,
+                            normalization_mode=normalization_mode)
+        self.calculate_mask()
+        self.display_prepare_data_preview_image()
+
+        self.display_fit_data_tab()
+
+        self.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
+        QtGui.QGuiApplication.processEvents()
+        self.ui.toolBox.setItemEnabled(1, True)
+        # self.ui.toolBox.setCurrentIndex(1)  # switch to next tab
+        self.ui.setEnabled(True)
 
     def display_prepare_data_raw_image(self):
         live_image = np.transpose(self.live_image)
@@ -161,77 +197,7 @@ class Interface(QMainWindow):
             self.pixel_marker = {'x': np.int(x),
                                  'y': np.int(y)}
 
-    def init_widgets(self):
-        # disable second tab
-        self.ui.toolBox.setItemEnabled(1, False)
 
-        # labels
-        self.ui.kernel_size_custom_lambda_label.setText(u"\u03BB:")
-        self.kernel_dimension_changed()
-
-        # hide normalization if not needed
-        if self.debugging_mode:
-            normalization_flag_value = True
-        else:
-            normalization_flag_value = self.o_api.normalization_flag_ui.value
-        self.ui.prepare_data_normalization_groupBox.setVisible(normalization_flag_value)
-
-        # pyqtgraphs
-
-        # prepare data tab
-        self.ui.raw_image_view = pg.ImageView(view=pg.PlotItem(), name='raw image')
-        self.ui.raw_image_view.ui.roiBtn.hide()
-        self.ui.raw_image_view.ui.menuBtn.hide()
-        prepare_data_verti_layout1 = QVBoxLayout()
-        prepare_data_verti_layout1.addWidget(self.ui.raw_image_view)
-        self.ui.prepare_data_raw_widget.setLayout(prepare_data_verti_layout1)
-
-        self.ui.process_image_view = pg.ImageView(view=pg.PlotItem(), name='process image')
-        self.ui.process_image_view.ui.roiBtn.hide()
-        self.ui.process_image_view.ui.menuBtn.hide()
-        prepare_data_verti_layout2 = QVBoxLayout()
-        prepare_data_verti_layout2.addWidget(self.ui.process_image_view)
-        self.ui.prepare_data_process_widget.setLayout(prepare_data_verti_layout2)
-
-        # self.ui.process_image_view.view.getViewBox().setXLink('raw image')
-        # self.ui.process_image_view.view.getViewBox().setYLink('raw image')
-
-        # fit tab
-        self.ui.image_view = pg.ImageView(view=pg.PlotItem())
-        self.ui.image_view.ui.roiBtn.hide()
-        self.ui.image_view.ui.menuBtn.hide()
-        verti_layout1 = QVBoxLayout()
-        verti_layout1.addWidget(self.ui.image_view)
-        self.ui.widget_image.setLayout(verti_layout1)
-
-        self.ui.plot_view = pg.PlotWidget()
-        verti_layout2 = QVBoxLayout()
-        verti_layout2.addWidget(self.ui.plot_view)
-        self.ui.widget_plot.setLayout(verti_layout2)
-
-        # splitters
-        self.ui.splitter.setSizes([550, 50])
-        self.ui.splitter_2.setSizes([200, 2])
-
-        self.ui.prepare_data_main_splitter.setSizes([100,500])
-        self.ui.prepare_data_preview_splitter.setSizes([200, 200])
-
-        # sliders
-        if self.debugging_mode:
-            half_number_of_files = 100
-        else:
-            half_number_of_files = np.int(len(self.o_roi.lambda_array)/2)
-        self.ui.right_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
-        self.ui.left_number_of_files_to_exclude_slider.setMaximum(half_number_of_files)
-        self.ui.right_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['left'])
-        self.ui.left_number_of_files_to_exclude_slider.setValue(self.nbr_files_to_exclude_from_plot['right'])
-
-        # icons
-        _file_path = os.path.dirname(__file__)
-        settings_icon_1 = os.path.abspath(os.path.join(_file_path, 'static/settings_icon.png'))
-        self.ui.step3_fit_pixel_settings_pushButton.setIcon(QIcon(settings_icon_1))
-        settings_icon_2 = os.path.abspath(os.path.join(_file_path, 'static/settings_icon.png'))
-        self.ui.step4_fit_roi_settings_pushButton.setIcon(QIcon(settings_icon_2))
 
     def pixel_marker_changed(self):
         region = self.pixel_marker_item.getArraySlice(self.live_image,
@@ -459,38 +425,6 @@ class Interface(QMainWindow):
         p = inflect.engine()
         message = "{} ".format(nbr_of_roi) + p.plural("ROI", nbr_of_roi) + " selected!"
         self.ui.normalization_message_label.setText(message)
-
-    @wait_cursor
-    def prepare_data_button_clicked(self):
-        self.ui.setEnabled(False)
-
-        # collect parameters
-        is_with_normalization = self.o_api.normalization_flag_ui.value
-        normalization_mode = self._get_normalization_mode()
-        kernel_dimension = self._get_kernel_dimensions()
-        kernel_size = self._get_kernel_size()
-        kernel_type = self._get_kernel_type()
-
-        if not self.can_we_use_buffered_data(kernel_dimension=kernel_dimension,
-                                             kernel_size=kernel_size,
-                                             kernel_type=kernel_type):
-
-            self.calculate_moving_average(kernel_dimension=kernel_dimension,
-                                          kernel_size=kernel_size,
-                                          kernel_type=kernel_type)
-
-        self.normalize_data(normalization_flag=is_with_normalization,
-                            normalization_mode=normalization_mode)
-        self.calculate_mask()
-        self.display_prepare_data_preview_image()
-
-        self.display_fit_data_tab()
-
-        self.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
-        QtGui.QGuiApplication.processEvents()
-        self.ui.toolBox.setItemEnabled(1, True)
-        # self.ui.toolBox.setCurrentIndex(1)  # switch to next tab
-        self.ui.setEnabled(True)
 
     def can_we_use_buffered_data(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
 

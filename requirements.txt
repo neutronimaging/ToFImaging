@@ -10,3 +10,5 @@ tqdm==4.36.1
 ipywe
 NeuNorm==1.4.5
 neutronbraggedge==2.0.3
+qtpy
+pyqtgraph
