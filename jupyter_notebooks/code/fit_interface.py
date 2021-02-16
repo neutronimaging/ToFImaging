@@ -115,6 +115,8 @@ class Interface(QMainWindow):
             self.ob_projections = self.o_api.ob_projections
             self.list_roi = self.o_roi.list_roi
 
+        self.is_mcp_correction_requested = o_api.is_mcp_corrected_ui.value
+
         ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_fit.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Fit Interface")
@@ -135,6 +137,8 @@ class Interface(QMainWindow):
         kernel_dimension = self._get_kernel_dimensions()
         kernel_size = self._get_kernel_size()
         kernel_type = self._get_kernel_type()
+
+        self.mcp_correction()
 
         if self.ui.activate_moving_average_checkBox.isChecked():
 
@@ -161,6 +165,14 @@ class Interface(QMainWindow):
         # self.ui.toolBox.setCurrentIndex(1)  # switch to next tab
         self.ui.export_prepared_data_pushButton.setEnabled(True)
         self.ui.setEnabled(True)
+
+    def mcp_correction(self):
+        if self.is_mcp_correction_requested:
+            self.ui.statusbar.showMessage("MCP correction ... processing!")
+
+
+
+
 
     def activate_moving_average_clicked(self):
         status = self.ui.activate_moving_average_checkBox.isChecked()
