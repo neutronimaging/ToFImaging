@@ -219,10 +219,10 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
         return
 
     median_image = reduction_tools.medianimage(Ttof)
-    edge_position = np.zeros(np.shape(mymask))
-    edge_width = np.zeros(np.shape(mymask))
-    edge_height = np.zeros(np.shape(mymask))
-    edge_slope = np.zeros(np.shape(mymask))
+    edge_position = np.nan*np.zeros(np.shape(mymask))
+    edge_width = np.nan*np.zeros(np.shape(mymask))
+    edge_height = np.nan*np.zeros(np.shape(mymask))
+    edge_slope = np.nan*np.zeros(np.shape(mymask))
     
     start_time = time.time()
     for i in tqdm(range(0, np.shape(mymask)[0])): #loop for all pixel position, where the mask is equal to one
@@ -244,11 +244,11 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
                     edge_width[i,j] = edge_fit['edge_width']
                     edge_slope[i,j] = edge_fit['edge_slope']
                 except:
-                    print("Unexpected error at :", i, j)
-                    edge_position[i,j] = -2.0
-                    edge_width[i,j] = -2.0
-                    edge_height[i,j] = -2.0
-                    edge_slope[i,j] = -2.0
+                    # print("Unexpected error at :", i, j)
+                    edge_position[i,j] = np.nan
+                    edge_width[i,j] = np.nan
+                    edge_height[i,j] = np.nan
+                    edge_slope[i,j] = np.nan
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if(bool_print):
