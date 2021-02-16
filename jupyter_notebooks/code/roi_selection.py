@@ -21,7 +21,7 @@ class Interface(QMainWindow):
     def __init__(self, parent=None, main_api=None):
         super(Interface, self).__init__(parent)
 
-        self.sample_projections = main_api.sample_projections  # x, y, lambda
+        self.sample_projections = main_api.sample_projections  # lambda, y, x
         # self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
         self.sample_projections_lambda_x_y = self.sample_projections
 

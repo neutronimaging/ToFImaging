@@ -15,7 +15,8 @@ from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities import find_nearest_index
 from jupyter_notebooks.code.initialization import Initialization
 from jupyter_notebooks.code.roi_selection import Interface as RoiInterface
-from jupyter_notebooks.code.normalization import Normalization
+from jupyter_notebooks.code.normalization import Normalization as LocalNormalization
+from jupyter_notebooks.code.export import Export
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -34,6 +35,8 @@ class Interface(QMainWindow):
     ob_list_roi = None
 
     moving_average_config = None
+
+    is_with_normalization = False
 
     sample_projections = None
     ob_projections = None
@@ -127,6 +130,7 @@ class Interface(QMainWindow):
 
         # collect parameters
         is_with_normalization = self.o_api.normalization_flag_ui.value
+        self.is_with_normalization = is_with_normalization
         normalization_mode = self._get_normalization_mode()
         kernel_dimension = self._get_kernel_dimensions()
         kernel_size = self._get_kernel_size()
@@ -142,9 +146,10 @@ class Interface(QMainWindow):
                                               kernel_size=kernel_size,
                                               kernel_type=kernel_type)
 
-        o_norm = Normalization(parent=self)
+        o_norm = LocalNormalization(parent=self)
         o_norm.run(flag=is_with_normalization,
                    mode=normalization_mode)
+
         self.calculate_mask()
         self.display_prepare_data_preview_image()
 
@@ -162,7 +167,8 @@ class Interface(QMainWindow):
         self.ui.moving_average_groupBox.setEnabled(status)
 
     def export_prepared_data_clicked(self):
-        print('export prepared data clicked')
+        o_export = Export(parent=self)
+        o_export.run()
 
     def display_prepare_data_raw_image(self):
         live_image = np.transpose(self.live_image)
@@ -488,11 +494,15 @@ class Interface(QMainWindow):
             self.sample_projections = reduction_tools.moving_average_2D(self.sample_projections,
                                                                         custom_kernel=kernel)
 
-            self.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
-            QtGui.QGuiApplication.processEvents()
+            if self.is_with_normalization:
+                self.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
+                QtGui.QGuiApplication.processEvents()
 
-            self.ob_projections = reduction_tools.moving_average_2D(self.ob_projections,
-                                                                    custom_kernel=kernel)
+                self.ob_projections = reduction_tools.moving_average_2D(self.ob_projections,
+                                                                        custom_kernel=kernel)
+
+            self.ui.statusbar.showMessage("Moving Average ... DONE!")
+            QtGui.QGuiApplication.processEvents()
 
         elif kernel_dimension == '3d':
             l = kernel_size['lambda']
@@ -748,8 +758,8 @@ class NormRoiSelection(RoiInterface):
         super(RoiInterface, self).__init__(parent)
         self.parent = parent
 
-        self.sample_projections = main_api.sample_projections  # x, y, lambda
-        self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
+        self.sample_projections_lambda_x_y = main_api.sample_projections  # lambda, y, x
+        # self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
         self.tof_array = main_api.tof_array
         self.lambda_array = main_api.lambda_array
 

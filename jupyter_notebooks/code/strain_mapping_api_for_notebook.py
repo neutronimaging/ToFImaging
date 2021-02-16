@@ -34,6 +34,9 @@ class StrainMappingAPIForNotebook:
     ob_projections = None         # x, y, lambda
     normalize_projections = None  # x, y, lambda
 
+    list_sample_projections_filename = None
+    list_ob_projections_filename = None
+
     tof_array = None
     lambda_array = None
     list_roi = None
@@ -92,8 +95,14 @@ class StrainMappingAPIForNotebook:
             self.working_dir = input_folders[0]
             list_files, ext = utilities.retrieve_list_of_most_dominant_extension_from_folder(folder=input_folders[0])
             o_norm = Normalization()
-            o_norm.load(file=list_files, notebook=True)
-            projections = np.array(o_norm.data['sample']['data'])
+            if data_type == 'sample':
+                o_norm.load(file=list_files, notebook=True)
+                projections = np.array(o_norm.data['sample']['data'])
+                self.list_sample_projections_filename = o_norm.data['sample']['file_name']
+            elif data_type == 'ob':
+                o_norm.load(file=list_files, notebook=True, data_type='ob')
+                projections = np.array(o_norm.data['ob']['data'])
+                self.list_ob_projections_filename = o_norm.data['ob']['file_name']
         else:
             # calculate mean of projections of the input folders
             list_projections = []
