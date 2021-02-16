@@ -354,8 +354,8 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         else:
             lambd = spectrum
 
-        edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
-        est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,True)
+        edgefitting_1D.TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
+            est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,S_fix,bool_smooth,smooth_w,smooth_n,bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
@@ -379,8 +379,8 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
                     lambd = spectrum
 
                 try:
-                    fit = edgefitting_1D.TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,
-                    l_hkl3,bool_MD,est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,bool_smooth,smooth_w,smooth_n,False)
+                    fit = edgefitting_1D.TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
+                        est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,S_fix,bool_smooth,smooth_w,smooth_n,bool_print=False)
                     A1_map[i,j] = fit['A1']
                     R1_map[i,j] = fit['R1']
                     A2_map[i,j] = fit['A2']
@@ -402,14 +402,19 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     if(bool_print):
         plt.figure()
         plt.subplot(2,3,1), plt.imshow(A1_map), plt.title('Orientation 1')
-        plt.subplot(2,3,2), plt.imshow(R1_map), plt.title('Anisotropy 1')
-        plt.subplot(2,3,3), plt.imshow(median_image), plt.title('Median TOF image')
-        plt.subplot(2,3,4), plt.imshow(A2_map), plt.title('Orientation 2')
+        plt.subplot(2,3,2), plt.imshow(A2_map), plt.title('Orientation 2')
+        plt.subplot(2,3,3), plt.imshow(A3_map), plt.title('Orientation 3')
+        plt.subplot(2,3,4), plt.imshow(R1_map), plt.title('Anisotropy 1')
         plt.subplot(2,3,5), plt.imshow(R2_map), plt.title('Anisotropy 2')
-        plt.subplot(2,3,6), plt.imshow(S_map), plt.title('Crystallite size')
+        plt.subplot(2,3,6), plt.imshow(R3_map), plt.title('Anisotropy 3')
         plt.tight_layout()
         plt.show()
-        plt.close()       
+        plt.close()             
+        plt.figure()
+        plt.subplot(2,3,1), plt.imshow(S_map), plt.title('Crystallite size')
+        plt.tight_layout()
+        plt.show()
+        plt.close()     
     if(bool_save):
         np.save('A1_map.npy', A1_map)
         np.save('A2_map.npy', A2_map)
@@ -418,4 +423,4 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         np.save('S_map.npy', S_map)
         np.save('median_image.npy', median_image)
    
-    return {'A1_map' : A1_map, 'A2_map': A2_map, 'R1_map': R1_map, 'R2_map': R2_map, 'median_image': median_image, 'S_map': S_map}
+    return {'A1_map' : A1_map, 'A2_map': A2_map, 'R1_map': R1_map, 'R2_map': R2_map, 'A3_map' : A3_map, 'R3_map': R3_map, 'median_image': median_image, 'S_map': S_map}
