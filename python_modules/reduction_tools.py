@@ -524,8 +524,13 @@ def SpectralSegmentation(T_tof,
                          clusters,
                          spectrum=[],
                          spectrum_range=[],
+                         mask=np.ndarray([0]),
                          bool_print=1):
     from sklearn.cluster import KMeans
+
+    if (mask.any()):
+        for i in range(0,np.shape(T_tof)[2]):
+            T_tof[:,:,i] = T_tof[:,:,i]*mask
 
     if (spectrum_range):
         idx_low = find_nearest(spectrum, spectrum_range[0])
