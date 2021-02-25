@@ -13,10 +13,29 @@ from reduction_tools import find_nearest
 
 from tqdm import tqdm
 import time
-   
-def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,
-            mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,pos_BC=0,sigma_BC=0,alpha_BC=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,
-            bool_save=False,bool_print=False,debug_idx=[]):            
+
+
+def AdvancedBraggEdgeFitting_2D(Ttof,
+                                spectrum,
+                                spectrum_range=[],
+                                calibration_matrix=np.ndarray([0]),
+                                mask=np.ndarray([0]),
+                                auto_mask=True,
+                                mask_thresh=[0.05, 0.95],
+                                est_pos=0,
+                                est_sigma=1,
+                                est_alpha=1,
+                                pos_BC=0,
+                                sigma_BC=0,
+                                alpha_BC=0,
+                                est_w=0,
+                                bool_smooth=False,
+                                smooth_w=5,
+                                smooth_n=1,
+                                bool_linear=False,
+                                bool_save=False,
+                                bool_print=False,
+                                debug_idx=[]):
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -43,96 +62,163 @@ def AdvancedBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
     'edge_height': edge height 
     'edge_width': edge width  
     'median_image': median Transmission image in the selected lambda range
-    """ 
+    """
 
-    if(mask.any()):
+    if (mask.any()):
         mymask = mask
         plt.figure()
-        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
-        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
-        plt.show(), plt.close()        
-        if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+        plt.subplot(1, 2, 1), plt.imshow(np.median(
+            Ttof, axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
+        plt.show(), plt.close()
+        if ([np.shape(Ttof)[0], np.shape(Ttof)[1]] !=
+            [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
-    elif(auto_mask):
+    elif (auto_mask):
         import skimage.filters
         mymask = reduction_tools.medianimage(Ttof)
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
-        mymask[mymask>mask_thresh[1]] = 0.0
-        mymask[mymask<mask_thresh[0]] = 0.0
-        mymask[mymask>0] = 1.0
+        plt.subplot(1, 3,
+                    1), plt.imshow(mymask), plt.title('Full-spectrum Image')
+        mymask[mymask > mask_thresh[1]] = 0.0
+        mymask[mymask < mask_thresh[0]] = 0.0
+        mymask[mymask > 0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
-        mymask = skimage.filters.gaussian(mymask,sigma=2)
-        mymask[mymask>0] = 1.0
-        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
-        plt.show(), plt.close()               
+        plt.subplot(1, 3, 2), plt.imshow(mymask), plt.title('Mask')
+        mymask = skimage.filters.gaussian(mymask, sigma=2)
+        mymask[mymask > 0] = 1.0
+        plt.subplot(1, 3, 3), plt.imshow(mymask), plt.title('Mask - gauss')
+        plt.show(), plt.close()
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
-    if(calibration_matrix.any()):
-        if ((np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1])):
-            print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
+    if (calibration_matrix.any()):
+        if ((np.shape(Ttof)[0] != np.shape(calibration_matrix)[0]) |
+            (np.shape(Ttof)[1] != np.shape(calibration_matrix)[1])):
+            print(
+                '!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!'
+            )
 
-    if(any(debug_idx)): #testing on a single pixel  
-        signal = Ttof[debug_idx[0],debug_idx[1],:]
+    if (any(debug_idx)):  #testing on a single pixel
+        signal = Ttof[debug_idx[0], debug_idx[1], :]
 
-        if(calibration_matrix.any()):
-            lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
+        if (calibration_matrix.any()):
+            lambd = reduction_tools.tof2l_t0k(
+                spectrum, calibration_matrix[debug_idx[0], debug_idx[1], 1],
+                calibration_matrix[debug_idx[0], debug_idx[1], 0])
         else:
             lambd = spectrum
 
-        edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,pos_BC=pos_BC,sigma_BC=sigma_BC,alpha_BC=alpha_BC,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
+        edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,
+                                                spectrum=lambd,
+                                                spectrum_range=spectrum_range,
+                                                est_pos=est_pos,
+                                                est_sigma=est_sigma,
+                                                est_alpha=est_alpha,
+                                                pos_BC=pos_BC,
+                                                sigma_BC=sigma_BC,
+                                                alpha_BC=alpha_BC,
+                                                est_w=est_w,
+                                                bool_smooth=bool_smooth,
+                                                smooth_w=smooth_w,
+                                                smooth_n=smooth_n,
+                                                bool_linear=bool_linear,
+                                                bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
-    edge_position = np.nan*np.zeros(np.shape(mymask))
-    edge_width = np.nan*np.zeros(np.shape(mymask))
-    edge_height = np.nan*np.zeros(np.shape(mymask))
-    
-    start_time = time.time()
-    for i in tqdm(range(0, np.shape(mymask)[0])): #loop for all pixel position, where the mask is equal to one
-        for j in range(0, np.shape(mymask)[1]):
-            if (mymask[i,j]):
-                signal = Ttof[i,j,:]
+    edge_position = np.nan * np.zeros(np.shape(mymask))
+    edge_width = np.nan * np.zeros(np.shape(mymask))
+    edge_height = np.nan * np.zeros(np.shape(mymask))
 
-                if(calibration_matrix.any()):
-                    lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
+    start_time = time.time()
+    for i in tqdm(range(
+            0,
+            np.shape(mymask)
+        [0])):  #loop for all pixel position, where the mask is equal to one
+        for j in range(0, np.shape(mymask)[1]):
+            if (mymask[i, j]):
+                signal = Ttof[i, j, :]
+
+                if (calibration_matrix.any()):
+                    lambd = reduction_tools.tof2l_t0k(
+                        spectrum, calibration_matrix[i, j, 1],
+                        calibration_matrix[i, j, 0])
                 else:
                     lambd = spectrum
 
                 try:
-                    edge_fit = edgefitting_1D.AdvancedBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,pos_BC=pos_BC,sigma_BC=sigma_BC,alpha_BC=alpha_BC,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=False)
-                    edge_position[i,j] = edge_fit['t0']
-                    edge_height[i,j] = edge_fit['height']
-                    if (len(edge_fit['pos_extrema'])==2):
-                        edge_width[i,j] = spectrum[edge_fit['pos_extrema'][1]]-spectrum [edge_fit['pos_extrema'][0]]
+                    edge_fit = edgefitting_1D.AdvancedBraggEdgeFitting(
+                        signal=signal,
+                        spectrum=lambd,
+                        spectrum_range=spectrum_range,
+                        est_pos=est_pos,
+                        est_sigma=est_sigma,
+                        est_alpha=est_alpha,
+                        pos_BC=pos_BC,
+                        sigma_BC=sigma_BC,
+                        alpha_BC=alpha_BC,
+                        bool_smooth=bool_smooth,
+                        smooth_w=smooth_w,
+                        smooth_n=smooth_n,
+                        bool_linear=bool_linear,
+                        bool_print=False)
+                    edge_position[i, j] = edge_fit['t0']
+                    edge_height[i, j] = edge_fit['height']
+                    if (len(edge_fit['pos_extrema']) == 2):
+                        edge_width[i, j] = spectrum[edge_fit['pos_extrema'][
+                            1]] - spectrum[edge_fit['pos_extrema'][0]]
                     else:
-                        edge_width[i,j] = -2.0
+                        edge_width[i, j] = -2.0
                 except:
                     # print("Unexpected error at :", i, j)
-                    edge_position[i,j] = np.nan
-                    edge_width[i,j] = np.nan
-                    edge_height[i,j] = np.nan
+                    edge_position[i, j] = np.nan
+                    edge_width[i, j] = np.nan
+                    edge_height[i, j] = np.nan
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    if(bool_print):
+    if (bool_print):
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(edge_position), plt.title('Edge position')
-        plt.subplot(1,3,2), plt.imshow(edge_width), plt.title('Edge width')
-        plt.subplot(1,3,3), plt.imshow(edge_height), plt.title('Edge height')
-        plt.show(), plt.close()        
-    if(bool_save):
+        plt.subplot(1, 3,
+                    1), plt.imshow(edge_position), plt.title('Edge position')
+        plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
+        plt.subplot(1, 3, 3), plt.imshow(edge_height), plt.title('Edge height')
+        plt.show(), plt.close()
+    if (bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
-   
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}    
-    
-def AdvancedDirectBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,
-            mask_thresh=[0.05, 0.95],est_pos=0,est_sigma=1,est_alpha=1,pos_BC=0,sigma_BC=0,alpha_BC=0,bool_smooth=False,smooth_w=5,smooth_n=1,bool_linear=False,
-            bool_save=False,bool_print=False,debug_idx=[]):            
+
+    return {
+        'edge_position': edge_position,
+        'edge_height': edge_height,
+        'edge_width': edge_width,
+        'median_image': median_image
+    }
+
+
+def AdvancedDirectBraggEdgeFitting_2D(Ttof,
+                                      spectrum,
+                                      spectrum_range=[],
+                                      calibration_matrix=np.ndarray([0]),
+                                      mask=np.ndarray([0]),
+                                      auto_mask=True,
+                                      mask_thresh=[0.05, 0.95],
+                                      est_pos=0,
+                                      est_sigma=1,
+                                      est_alpha=1,
+                                      pos_BC=0,
+                                      sigma_BC=0,
+                                      alpha_BC=0,
+                                      est_w=0,
+                                      bool_smooth=False,
+                                      smooth_w=5,
+                                      smooth_n=1,
+                                      bool_linear=False,
+                                      bool_save=False,
+                                      bool_print=False,
+                                      debug_idx=[]):
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -159,97 +245,166 @@ def AdvancedDirectBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibratio
     'edge_height': edge height 
     'edge_width': edge width  
     'median_image': median Transmission image in the selected lambda range
-    """ 
+    """
 
-    if(mask.any()):
+    if (mask.any()):
         mymask = mask
         plt.figure()
-        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
-        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
-        plt.show(), plt.close()        
-        if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+        plt.subplot(1, 2, 1), plt.imshow(np.median(
+            Ttof, axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
+        plt.show(), plt.close()
+        if ([np.shape(Ttof)[0], np.shape(Ttof)[1]] !=
+            [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
-    elif(auto_mask):
+    elif (auto_mask):
         import skimage.filters
         mymask = reduction_tools.medianimage(Ttof)
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
-        mymask[mymask>mask_thresh[1]] = 0.0
-        mymask[mymask<mask_thresh[0]] = 0.0
-        mymask[mymask>0] = 1.0
+        plt.subplot(1, 3,
+                    1), plt.imshow(mymask), plt.title('Full-spectrum Image')
+        mymask[mymask > mask_thresh[1]] = 0.0
+        mymask[mymask < mask_thresh[0]] = 0.0
+        mymask[mymask > 0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
-        mymask = skimage.filters.gaussian(mymask,sigma=2)
-        mymask[mymask>0] = 1.0
-        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
-        plt.show(), plt.close()               
+        plt.subplot(1, 3, 2), plt.imshow(mymask), plt.title('Mask')
+        mymask = skimage.filters.gaussian(mymask, sigma=2)
+        mymask[mymask > 0] = 1.0
+        plt.subplot(1, 3, 3), plt.imshow(mymask), plt.title('Mask - gauss')
+        plt.show(), plt.close()
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
-    if(calibration_matrix.any()):
-        if ((np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1])):
-            print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
+    if (calibration_matrix.any()):
+        if ((np.shape(Ttof)[0] != np.shape(calibration_matrix)[0]) |
+            (np.shape(Ttof)[1] != np.shape(calibration_matrix)[1])):
+            print(
+                '!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!'
+            )
 
-    if(any(debug_idx)): #testing on a single pixel  
-        signal = Ttof[debug_idx[0],debug_idx[1],:]
+    if (any(debug_idx)):  #testing on a single pixel
+        signal = Ttof[debug_idx[0], debug_idx[1], :]
 
-        if(calibration_matrix.any()):
-            lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
+        if (calibration_matrix.any()):
+            lambd = reduction_tools.tof2l_t0k(
+                spectrum, calibration_matrix[debug_idx[0], debug_idx[1], 1],
+                calibration_matrix[debug_idx[0], debug_idx[1], 0])
         else:
             lambd = spectrum
 
-        edgefitting_1D.AdvancedDirectBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,pos_BC=pos_BC,sigma_BC=sigma_BC,alpha_BC=alpha_BC,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=True)
+        edgefitting_1D.AdvancedDirectBraggEdgeFitting(
+            signal=signal,
+            spectrum=lambd,
+            spectrum_range=spectrum_range,
+            est_pos=est_pos,
+            est_sigma=est_sigma,
+            est_alpha=est_alpha,
+            pos_BC=pos_BC,
+            sigma_BC=sigma_BC,
+            alpha_BC=alpha_BC,
+            est_w=est_w,
+            bool_smooth=bool_smooth,
+            smooth_w=smooth_w,
+            smooth_n=smooth_n,
+            bool_linear=bool_linear,
+            bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
-    edge_position = np.nan*np.zeros(np.shape(mymask))
-    edge_width = np.nan*np.zeros(np.shape(mymask))
-    edge_height = np.nan*np.zeros(np.shape(mymask))
-    
-    start_time = time.time()
-    for i in tqdm(range(0, np.shape(mymask)[0])): #loop for all pixel position, where the mask is equal to one
-        for j in range(0, np.shape(mymask)[1]):
-            if (mymask[i,j]):
-                signal = Ttof[i,j,:]
+    edge_position = np.nan * np.zeros(np.shape(mymask))
+    edge_width = np.nan * np.zeros(np.shape(mymask))
+    edge_height = np.nan * np.zeros(np.shape(mymask))
 
-                if(calibration_matrix.any()):
-                    lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
+    start_time = time.time()
+    for i in tqdm(range(
+            0,
+            np.shape(mymask)
+        [0])):  #loop for all pixel position, where the mask is equal to one
+        for j in range(0, np.shape(mymask)[1]):
+            if (mymask[i, j]):
+                signal = Ttof[i, j, :]
+
+                if (calibration_matrix.any()):
+                    lambd = reduction_tools.tof2l_t0k(
+                        spectrum, calibration_matrix[i, j, 1],
+                        calibration_matrix[i, j, 0])
                 else:
                     lambd = spectrum
 
                 try:
-                    edge_fit = edgefitting_1D.AdvancedDirectBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_sigma=est_sigma,est_alpha=est_alpha,pos_BC=pos_BC,sigma_BC=sigma_BC,alpha_BC=alpha_BC,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_linear=bool_linear,bool_print=False)
-                    edge_position[i,j] = edge_fit['t0']
-                    edge_height[i,j] = edge_fit['height']
-                    if (len(edge_fit['pos_extrema'])==2):
-                        edge_width[i,j] = spectrum[edge_fit['pos_extrema'][1]]-spectrum [edge_fit['pos_extrema'][0]]
+                    edge_fit = edgefitting_1D.AdvancedDirectBraggEdgeFitting(
+                        signal=signal,
+                        spectrum=lambd,
+                        spectrum_range=spectrum_range,
+                        est_pos=est_pos,
+                        est_sigma=est_sigma,
+                        est_alpha=est_alpha,
+                        pos_BC=pos_BC,
+                        sigma_BC=sigma_BC,
+                        alpha_BC=alpha_BC,
+                        est_w=est_w,
+                        bool_smooth=bool_smooth,
+                        smooth_w=smooth_w,
+                        smooth_n=smooth_n,
+                        bool_linear=bool_linear,
+                        bool_print=False)
+                    edge_position[i, j] = edge_fit['t0']
+                    edge_height[i, j] = edge_fit['height']
+                    if (len(edge_fit['pos_extrema']) == 2):
+                        edge_width[i, j] = spectrum[edge_fit['pos_extrema'][
+                            1]] - spectrum[edge_fit['pos_extrema'][0]]
                     else:
-                        edge_width[i,j] = np.nan
+                        edge_width[i, j] = np.nan
                 except:
                     # print("Unexpected error at :", i, j)
-                    edge_position[i,j] = np.nan
-                    edge_width[i,j] = np.nan
-                    edge_height[i,j] = np.nan
+                    edge_position[i, j] = np.nan
+                    edge_width[i, j] = np.nan
+                    edge_height[i, j] = np.nan
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    if(bool_print):
+    if (bool_print):
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(edge_position), plt.title('Edge position')
-        plt.subplot(1,3,2), plt.imshow(edge_width), plt.title('Edge width')
-        plt.subplot(1,3,3), plt.imshow(edge_height), plt.title('Edge height')
-        plt.show(), plt.close()        
-    if(bool_save):
+        plt.subplot(1, 3,
+                    1), plt.imshow(edge_position), plt.title('Edge position')
+        plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
+        plt.subplot(1, 3, 3), plt.imshow(edge_height), plt.title('Edge height')
+        plt.show(), plt.close()
+    if (bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
-   
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'median_image': median_image}    
 
-def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,
-            mask_thresh=[0.05, 0.95],est_pos=0,est_wid=0,est_h=0,pos_BC=0,wid_BC=0,h_BC=0,
-            est_off=0,bool_log=False,bool_smooth=False,smooth_w=5,
-            smooth_n=1,interp_factor=0,bool_save=False,bool_print=False,debug_idx=[]):        
+    return {
+        'edge_position': edge_position,
+        'edge_height': edge_height,
+        'edge_width': edge_width,
+        'median_image': median_image
+    }
+
+
+def GaussianBraggEdgeFitting_2D(Ttof,
+                                spectrum,
+                                spectrum_range=[],
+                                calibration_matrix=np.ndarray([0]),
+                                mask=np.ndarray([0]),
+                                auto_mask=True,
+                                mask_thresh=[0.05, 0.95],
+                                est_pos=0,
+                                est_wid=0,
+                                est_h=0,
+                                pos_BC=0,
+                                wid_BC=0,
+                                h_BC=0,
+                                est_off=0,
+                                bool_log=False,
+                                bool_smooth=False,
+                                smooth_w=5,
+                                smooth_n=1,
+                                interp_factor=0,
+                                bool_save=False,
+                                bool_print=False,
+                                debug_idx=[]):
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -282,111 +437,186 @@ def GaussianBraggEdgeFitting_2D(Ttof,spectrum,spectrum_range=[],calibration_matr
     'edge_width': edge width  
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
-    """ 
+    """
 
-    if(mask.any()):
+    if (mask.any()):
         mymask = mask
         plt.figure()
-        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
-        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.subplot(1, 2, 1), plt.imshow(np.median(
+            Ttof, axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
         plt.tight_layout()
         plt.show()
-        plt.close()  
-        if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+        plt.close()
+        if ([np.shape(Ttof)[0], np.shape(Ttof)[1]] !=
+            [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
-    elif(auto_mask):
+    elif (auto_mask):
         import skimage.filters
         mymask = reduction_tools.medianimage(Ttof)
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
-        mymask[mymask>mask_thresh[1]] = 0.0
-        mymask[mymask<mask_thresh[0]] = 0.0
-        mymask[mymask>0] = 1.0
+        plt.subplot(1, 3,
+                    1), plt.imshow(mymask), plt.title('Full-spectrum Image')
+        mymask[mymask > mask_thresh[1]] = 0.0
+        mymask[mymask < mask_thresh[0]] = 0.0
+        mymask[mymask > 0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
-        mymask = skimage.filters.gaussian(mymask,sigma=2)
-        mymask[mymask>0] = 1.0
-        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
+        plt.subplot(1, 3, 2), plt.imshow(mymask), plt.title('Mask')
+        mymask = skimage.filters.gaussian(mymask, sigma=2)
+        mymask[mymask > 0] = 1.0
+        plt.subplot(1, 3, 3), plt.imshow(mymask), plt.title('Mask - gauss')
         plt.tight_layout()
         plt.show()
-        plt.close()        
+        plt.close()
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
-    if(bool_log):
+    if (bool_log):
         Ttof = -np.log(Ttof)
 
-    if(calibration_matrix.any()):
-        if ((np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1])):
-            print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
+    if (calibration_matrix.any()):
+        if ((np.shape(Ttof)[0] != np.shape(calibration_matrix)[0]) |
+            (np.shape(Ttof)[1] != np.shape(calibration_matrix)[1])):
+            print(
+                '!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!'
+            )
 
-    if(any(debug_idx)): #testing on a single pixel    
-        signal = Ttof[debug_idx[0],debug_idx[1],:]
+    if (any(debug_idx)):  #testing on a single pixel
+        signal = Ttof[debug_idx[0], debug_idx[1], :]
 
-        if(calibration_matrix.any()):
-            lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
+        if (calibration_matrix.any()):
+            lambd = reduction_tools.tof2l_t0k(
+                spectrum, calibration_matrix[debug_idx[0], debug_idx[1], 1],
+                calibration_matrix[debug_idx[0], debug_idx[1], 0])
         else:
             lambd = spectrum
 
-        edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,
-            est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,est_off=est_off,
-            interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=True)
+        edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,
+                                                spectrum=lambd,
+                                                spectrum_range=spectrum_range,
+                                                est_pos=est_pos,
+                                                est_wid=est_wid,
+                                                est_h=est_h,
+                                                pos_BC=pos_BC,
+                                                wid_BC=wid_BC,
+                                                h_BC=h_BC,
+                                                est_off=est_off,
+                                                interp_factor=interp_factor,
+                                                bool_log=bool_log,
+                                                bool_smooth=bool_smooth,
+                                                smooth_w=smooth_w,
+                                                smooth_n=smooth_n,
+                                                bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
-    edge_position = np.nan*np.zeros(np.shape(mymask))
-    edge_width = np.nan*np.zeros(np.shape(mymask))
-    edge_height = np.nan*np.zeros(np.shape(mymask))
-    edge_slope = np.nan*np.zeros(np.shape(mymask))
-    
-    start_time = time.time()
-    for i in tqdm(range(0, np.shape(mymask)[0])): #loop for all pixel position, where the mask is equal to one
-        for j in range(0, np.shape(mymask)[1]):
-            if (mymask[i,j]):
-                signal = Ttof[i,j,:]
+    edge_position = np.nan * np.zeros(np.shape(mymask))
+    edge_width = np.nan * np.zeros(np.shape(mymask))
+    edge_height = np.nan * np.zeros(np.shape(mymask))
+    edge_slope = np.nan * np.zeros(np.shape(mymask))
 
-                if(calibration_matrix.any()):
-                    lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
+    start_time = time.time()
+    for i in tqdm(range(
+            0,
+            np.shape(mymask)
+        [0])):  #loop for all pixel position, where the mask is equal to one
+        for j in range(0, np.shape(mymask)[1]):
+            if (mymask[i, j]):
+                signal = Ttof[i, j, :]
+
+                if (calibration_matrix.any()):
+                    lambd = reduction_tools.tof2l_t0k(
+                        spectrum, calibration_matrix[i, j, 1],
+                        calibration_matrix[i, j, 0])
                 else:
                     lambd = spectrum
 
                 try:
-                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(signal=signal,spectrum=lambd,spectrum_range=spectrum_range,est_pos=est_pos,est_wid=est_wid,
-                        est_h=est_h,pos_BC=pos_BC,wid_BC=wid_BC,h_BC=h_BC,est_off=est_off,
-                        interp_factor=interp_factor,bool_log=bool_log,bool_smooth=bool_smooth,smooth_w=smooth_w,smooth_n=smooth_n,bool_print=False)
-                    edge_position[i,j] = edge_fit['t0']
-                    edge_height[i,j] = edge_fit['edge_height']
-                    edge_width[i,j] = edge_fit['edge_width']
-                    edge_slope[i,j] = edge_fit['edge_slope']
+                    edge_fit = edgefitting_1D.GaussianBraggEdgeFitting(
+                        signal=signal,
+                        spectrum=lambd,
+                        spectrum_range=spectrum_range,
+                        est_pos=est_pos,
+                        est_wid=est_wid,
+                        est_h=est_h,
+                        pos_BC=pos_BC,
+                        wid_BC=wid_BC,
+                        h_BC=h_BC,
+                        est_off=est_off,
+                        interp_factor=interp_factor,
+                        bool_log=bool_log,
+                        bool_smooth=bool_smooth,
+                        smooth_w=smooth_w,
+                        smooth_n=smooth_n,
+                        bool_print=False)
+                    edge_position[i, j] = edge_fit['t0']
+                    edge_height[i, j] = edge_fit['edge_height']
+                    edge_width[i, j] = edge_fit['edge_width']
+                    edge_slope[i, j] = edge_fit['edge_slope']
                 except:
                     # print("Unexpected error at :", i, j)
-                    edge_position[i,j] = np.nan
-                    edge_width[i,j] = np.nan
-                    edge_height[i,j] = np.nan
-                    edge_slope[i,j] = np.nan
+                    edge_position[i, j] = np.nan
+                    edge_width[i, j] = np.nan
+                    edge_height[i, j] = np.nan
+                    edge_slope[i, j] = np.nan
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    if(bool_print):
+    if (bool_print):
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(edge_position), plt.title('Edge position')
-        plt.subplot(1,3,2), plt.imshow(edge_width), plt.title('Edge width')
-        plt.subplot(1,3,3), plt.imshow(edge_height), plt.title('Edge height')
+        plt.subplot(1, 3,
+                    1), plt.imshow(edge_position), plt.title('Edge position')
+        plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
+        plt.subplot(1, 3, 3), plt.imshow(edge_height), plt.title('Edge height')
         plt.tight_layout()
         plt.show()
-        plt.close()       
-    if(bool_save):
+        plt.close()
+    if (bool_save):
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
         np.save('edge_slope.npy', edge_slope)
-   
-    return {'edge_position' : edge_position, 'edge_height': edge_height, 'edge_width': edge_width, 'edge_slope': edge_slope, 'median_image': median_image}
 
-def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=[],abs_window=[],calibration_matrix=np.ndarray([0]),
-            mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],l_hkl1=1,l_hkl2=0,l_hkl3=0,bool_MD=False,est_A1=0,est_R1=1,
-            est_A2=0,est_R2=1,est_A3=0,est_R3=1,Nbeta=50,est_S=0,S_fix=0,bool_log=False,bool_smooth=False,smooth_w=5,smooth_n=1,
-            bool_save=False,bool_print=False,debug_idx=[]):        
+    return {
+        'edge_position': edge_position,
+        'edge_height': edge_height,
+        'edge_width': edge_width,
+        'edge_slope': edge_slope,
+        'median_image': median_image
+    }
+
+
+def TextureFitting2D(Ttof,
+                     spectrum,
+                     ref_coh,
+                     ref_rest,
+                     ref_spectrum,
+                     spectrum_range=[],
+                     abs_window=[],
+                     calibration_matrix=np.ndarray([0]),
+                     mask=np.ndarray([0]),
+                     auto_mask=True,
+                     mask_thresh=[0.05, 0.95],
+                     l_hkl1=1,
+                     l_hkl2=0,
+                     l_hkl3=0,
+                     bool_MD=False,
+                     est_A1=0,
+                     est_R1=1,
+                     est_A2=0,
+                     est_R2=1,
+                     est_A3=0,
+                     est_R3=1,
+                     Nbeta=50,
+                     est_S=0,
+                     S_fix=0,
+                     bool_log=False,
+                     bool_smooth=False,
+                     smooth_w=5,
+                     smooth_n=1,
+                     bool_save=False,
+                     bool_print=False,
+                     debug_idx=[]):
     """ Performs edge fitting with gaussian model to stack of TOF images (x,y,lambda)
     INPUTS:
     Ttof = 3d matrix with the stack of TRANSMISSION (I/I0) TOF images (x,y,lambda) 
@@ -423,120 +653,186 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
     'edge_width': edge width  
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
-    """ 
+    """
 
-    if(mask.any()):
+    if (mask.any()):
         mymask = mask
         plt.figure()
-        plt.subplot(1,2,1), plt.imshow(np.median(Ttof,axis=2)), plt.title('Full-spectrum Image')
-        plt.subplot(1,2,2), plt.imshow(mymask), plt.title('Mask')
+        plt.subplot(1, 2, 1), plt.imshow(np.median(
+            Ttof, axis=2)), plt.title('Full-spectrum Image')
+        plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
         plt.tight_layout()
         plt.show()
-        plt.close()  
-        if( [np.shape(Ttof)[0], np.shape(Ttof)[1]] != [np.shape(mymask)[0], np.shape(mymask)[1]]):
+        plt.close()
+        if ([np.shape(Ttof)[0], np.shape(Ttof)[1]] !=
+            [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
-    elif(auto_mask):
+    elif (auto_mask):
         import skimage.filters
         mymask = reduction_tools.medianimage(Ttof)
         plt.figure()
-        plt.subplot(1,3,1), plt.imshow(mymask), plt.title('Full-spectrum Image')
-        mymask[mymask>mask_thresh[1]] = 0.0
-        mymask[mymask<mask_thresh[0]] = 0.0
-        mymask[mymask>0] = 1.0
+        plt.subplot(1, 3,
+                    1), plt.imshow(mymask), plt.title('Full-spectrum Image')
+        mymask[mymask > mask_thresh[1]] = 0.0
+        mymask[mymask < mask_thresh[0]] = 0.0
+        mymask[mymask > 0] = 1.0
         mymask[np.isinf(mymask)] = 0.0
         mymask[np.isnan(mymask)] = 0.0
-        plt.subplot(1,3,2), plt.imshow(mymask), plt.title('Mask')
-        mymask = skimage.filters.gaussian(mymask,sigma=2)
-        mymask[mymask>0] = 1.0
-        plt.subplot(1,3,3), plt.imshow(mymask), plt.title('Mask - gauss')
+        plt.subplot(1, 3, 2), plt.imshow(mymask), plt.title('Mask')
+        mymask = skimage.filters.gaussian(mymask, sigma=2)
+        mymask[mymask > 0] = 1.0
+        plt.subplot(1, 3, 3), plt.imshow(mymask), plt.title('Mask - gauss')
         plt.tight_layout()
         plt.show()
-        plt.close()        
+        plt.close()
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
-    if(bool_log):
+    if (bool_log):
         Ttof = -np.log(Ttof)
 
-    if(calibration_matrix.any()):
-        if ((np.shape(Ttof)[0]!=np.shape(calibration_matrix)[0]) | (np.shape(Ttof)[1]!=np.shape(calibration_matrix)[1])):
-            print('!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!')
+    if (calibration_matrix.any()):
+        if ((np.shape(Ttof)[0] != np.shape(calibration_matrix)[0]) |
+            (np.shape(Ttof)[1] != np.shape(calibration_matrix)[1])):
+            print(
+                '!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!'
+            )
 
-    if(any(debug_idx)): #testing on a single pixel    
-        signal = Ttof[debug_idx[0],debug_idx[1],:]
+    if (any(debug_idx)):  #testing on a single pixel
+        signal = Ttof[debug_idx[0], debug_idx[1], :]
 
-        if(calibration_matrix.any()):
-            lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[debug_idx[0],debug_idx[1],1],calibration_matrix[debug_idx[0],debug_idx[1],0])
+        if (calibration_matrix.any()):
+            lambd = reduction_tools.tof2l_t0k(
+                spectrum, calibration_matrix[debug_idx[0], debug_idx[1], 1],
+                calibration_matrix[debug_idx[0], debug_idx[1], 0])
         else:
             lambd = spectrum
 
-        edgefitting_1D.TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
-            est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,S_fix,bool_smooth,smooth_w,smooth_n,bool_print=True)
+        edgefitting_1D.TextureFitting(signal,
+                                      spectrum,
+                                      ref_coh,
+                                      ref_rest,
+                                      ref_spectrum,
+                                      spectrum_range,
+                                      abs_window,
+                                      l_hkl1,
+                                      l_hkl2,
+                                      l_hkl3,
+                                      bool_MD,
+                                      est_A1,
+                                      est_R1,
+                                      est_A2,
+                                      est_R2,
+                                      est_A3,
+                                      est_R3,
+                                      Nbeta,
+                                      est_S,
+                                      S_fix,
+                                      bool_smooth,
+                                      smooth_w,
+                                      smooth_n,
+                                      bool_print=True)
         return
 
     median_image = reduction_tools.medianimage(Ttof)
-    A1_map = np.zeros(np.shape(mymask))
-    R1_map = np.zeros(np.shape(mymask))
-    A2_map = np.zeros(np.shape(mymask))
-    R2_map = np.zeros(np.shape(mymask))
-    A3_map = np.zeros(np.shape(mymask))
-    R3_map = np.zeros(np.shape(mymask))
-    S_map = np.zeros(np.shape(mymask))
-    
-    start_time = time.time()
-    for i in tqdm(range(0, np.shape(mymask)[0])): #loop for all pixel position, where the mask is equal to one
-        for j in range(0, np.shape(mymask)[1]):
-            if (mymask[i,j]):
-                signal = Ttof[i,j,:]
+    A1_map = np.nan * np.zeros(np.shape(mymask))
+    R1_map = np.nan * np.zeros(np.shape(mymask))
+    A2_map = np.nan * np.zeros(np.shape(mymask))
+    R2_map = np.nan * np.zeros(np.shape(mymask))
+    A3_map = np.nan * np.zeros(np.shape(mymask))
+    R3_map = np.nan * np.zeros(np.shape(mymask))
+    S_map = np.nan * np.zeros(np.shape(mymask))
 
-                if(calibration_matrix.any()):
-                    lambd = reduction_tools.tof2l_t0k(spectrum,calibration_matrix[i,j,1],calibration_matrix[i,j,0])
+    start_time = time.time()
+    for i in tqdm(range(
+            0,
+            np.shape(mymask)
+        [0])):  #loop for all pixel position, where the mask is equal to one
+        for j in range(0, np.shape(mymask)[1]):
+            if (mymask[i, j]):
+                signal = Ttof[i, j, :]
+
+                if (calibration_matrix.any()):
+                    lambd = reduction_tools.tof2l_t0k(
+                        spectrum, calibration_matrix[i, j, 1],
+                        calibration_matrix[i, j, 0])
                 else:
                     lambd = spectrum
 
                 try:
-                    fit = edgefitting_1D.TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
-                        est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,S_fix,bool_smooth,smooth_w,smooth_n,bool_print=False)
-                    A1_map[i,j] = fit['A1']
-                    R1_map[i,j] = fit['R1']
-                    A2_map[i,j] = fit['A2']
-                    R2_map[i,j] = fit['R2']
-                    A3_map[i,j] = fit['A3']
-                    R3_map[i,j] = fit['R3']
-                    S_map[i,j] = fit['S']
+                    fit = edgefitting_1D.TextureFitting(signal,
+                                                        spectrum,
+                                                        ref_coh,
+                                                        ref_rest,
+                                                        ref_spectrum,
+                                                        spectrum_range,
+                                                        abs_window,
+                                                        l_hkl1,
+                                                        l_hkl2,
+                                                        l_hkl3,
+                                                        bool_MD,
+                                                        est_A1,
+                                                        est_R1,
+                                                        est_A2,
+                                                        est_R2,
+                                                        est_A3,
+                                                        est_R3,
+                                                        Nbeta,
+                                                        est_S,
+                                                        S_fix,
+                                                        bool_smooth,
+                                                        smooth_w,
+                                                        smooth_n,
+                                                        bool_print=False)
+                    A1_map[i, j] = fit['A1']
+                    R1_map[i, j] = fit['R1']
+                    A2_map[i, j] = fit['A2']
+                    R2_map[i, j] = fit['R2']
+                    A3_map[i, j] = fit['A3']
+                    R3_map[i, j] = fit['R3']
+                    S_map[i, j] = fit['S']
                 except:
-                    print("Unexpected error at :", i, j)
-                    A1_map[i,j] = -2.0
-                    R1_map[i,j] = -2.0
-                    A2_map[i,j] = -2.0
-                    R2_map[i,j] = -2.0
-                    A3_map[i,j] = -2.0
-                    R3_map[i,j] = -2.0
-                    S_map[i,j] = -2.0
+                    # print("Unexpected error at :", i, j)
+                    A1_map[i, j] = -np.nan
+                    R1_map[i, j] = -np.nan
+                    A2_map[i, j] = -np.nan
+                    R2_map[i, j] = -np.nan
+                    A3_map[i, j] = -np.nan
+                    R3_map[i, j] = -np.nan
+                    S_map[i, j] = -np.nan
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    if(bool_print):
+    if (bool_print):
         plt.figure()
-        plt.subplot(2,3,1), plt.imshow(A1_map), plt.title('Orientation 1')
-        plt.subplot(2,3,2), plt.imshow(A2_map), plt.title('Orientation 2')
-        plt.subplot(2,3,3), plt.imshow(A3_map), plt.title('Orientation 3')
-        plt.subplot(2,3,4), plt.imshow(R1_map), plt.title('Anisotropy 1')
-        plt.subplot(2,3,5), plt.imshow(R2_map), plt.title('Anisotropy 2')
-        plt.subplot(2,3,6), plt.imshow(R3_map), plt.title('Anisotropy 3')
+        plt.subplot(2, 3, 1), plt.imshow(A1_map), plt.title('Orientation 1')
+        plt.subplot(2, 3, 2), plt.imshow(A2_map), plt.title('Orientation 2')
+        plt.subplot(2, 3, 3), plt.imshow(A3_map), plt.title('Orientation 3')
+        plt.subplot(2, 3, 4), plt.imshow(R1_map), plt.title('Anisotropy 1')
+        plt.subplot(2, 3, 5), plt.imshow(R2_map), plt.title('Anisotropy 2')
+        plt.subplot(2, 3, 6), plt.imshow(R3_map), plt.title('Anisotropy 3')
         plt.tight_layout()
         plt.show()
-        plt.close()             
+        plt.close()
         plt.figure()
-        plt.subplot(2,3,1), plt.imshow(S_map), plt.title('Crystallite size')
+        plt.subplot(2, 3, 1), plt.imshow(S_map), plt.title('Crystallite size')
         plt.tight_layout()
         plt.show()
-        plt.close()     
-    if(bool_save):
+        plt.close()
+    if (bool_save):
         np.save('A1_map.npy', A1_map)
         np.save('A2_map.npy', A2_map)
         np.save('R1_map.npy', R1_map)
         np.save('R2_map.npy', R2_map)
         np.save('S_map.npy', S_map)
         np.save('median_image.npy', median_image)
-   
-    return {'A1_map' : A1_map, 'A2_map': A2_map, 'R1_map': R1_map, 'R2_map': R2_map, 'A3_map' : A3_map, 'R3_map': R3_map, 'median_image': median_image, 'S_map': S_map}
+
+    return {
+        'A1_map': A1_map,
+        'A2_map': A2_map,
+        'R1_map': R1_map,
+        'R2_map': R2_map,
+        'A3_map': A3_map,
+        'R3_map': R3_map,
+        'median_image': median_image,
+        'S_map': S_map
+    }
