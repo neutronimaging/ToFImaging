@@ -11,7 +11,7 @@ Currently implemented packages:
  
 For a detailed guide of how to use this package please visit https://neutronimaging.github.io/ToFImaging/.
 
-For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch
+For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch or use the issue box https://github.com/neutronimaging/ToFImaging/issues
 
 # How to Install
 The package can be installed via pip using the command:
@@ -33,7 +33,8 @@ import tofimaging.EdgeFitting as efit
 import tofimaging.PhaseFitting as pfit
 import tofimaging.ReductionTools as rt
 ```
-This procedure, though, may require further installation of external modules, listed in requirements.txt
+Make sure to update the "path-to-repository" with the path to this downloaded package in the local machine and appending the "\\src" as shown.
+This procedure, may require further installation of external modules, listed in requirements.txt
 
 # How to Use
 The functions can inspected in the documentation and called in the command prompt or jupyter notebook. E.g. if you installed using the above:
