@@ -1,5 +1,5 @@
 import numpy as np
-import reduction_tools
+import tofimaging.ReductionTools as rt
 from tqdm import tqdm
 
 def chopper_time_delays_generator(time, nslits=8, nrep=2, mode='pseudorandom', rng = 0.25):
@@ -237,18 +237,18 @@ def full_fobi_reduction(y,y0,t,tmax,nrep,chopper_id,c=1e-1,bool_roll=False,bool_
         D = time_delays_5x8(tn)
 
     # FIXED POLDI angles: now it's working as deconvolution!
-    # x0rec = reduction_tools.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
-    # yrec = reduction_tools.savitzky_golay(wiener_decorrelation(y,D,c),SG_w,SG_o)
+    # x0rec = rt.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
+    # yrec = rt.savitzky_golay(wiener_decorrelation(y,D,c),SG_w,SG_o)
     # Trec = np.divide(yrec,x0rec)
-    # #Trec = reduction_tools.savitzky_golay(wiener_decorrelation(np.divide(y,y0),D,c),SG_w,SG_o)
+    # #Trec = rt.savitzky_golay(wiener_decorrelation(np.divide(y,y0),D,c),SG_w,SG_o)
 
     y0rec = wiener_deconvolution(y0,D,c)
     yrec = wiener_deconvolution(y,D,c)
     if(bool_smooth):
-        y0rec = reduction_tools.savitzky_golay(y0rec,SG_w,SG_o)
-        yrec = reduction_tools.savitzky_golay(yrec,SG_w,SG_o)
+        y0rec = rt.savitzky_golay(y0rec,SG_w,SG_o)
+        yrec = rt.savitzky_golay(yrec,SG_w,SG_o)
     Trec = np.divide(yrec,y0rec)
-    # Trec = reduction_tools.savitzky_golay(wiener_deconvolution(np.divide(y,y0),D,c),SG_w,SG_o)
+    # Trec = rt.savitzky_golay(wiener_deconvolution(np.divide(y,y0),D,c),SG_w,SG_o)
 
     if(bool_roll==True):
         min_id = np.argmin(y0rec[0:np.shape(y0rec)[0]/nrep])

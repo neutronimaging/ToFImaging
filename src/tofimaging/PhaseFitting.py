@@ -467,8 +467,6 @@ def WavelengthSelectiveRatio(lac,spectrum,l1,l2,l1_w=0,l2_w=0,bool_SG=False,SG_w
 
     return {'WSR': WSR}    
 
-    import numpy as np
-
 def WavelengthSelectiveRatio2D(lac_tof,spectrum,l1,l2,l1_w=0,l2_w=0,calibration_matrix=np.ndarray([0]),mask=np.ndarray([0]),auto_mask=True,mask_thresh=[0.05, 0.95],bool_SG=False,SG_w=5,SG_n=1,bool_save=False,bool_print=False,debug_idx=[]):
     """ Performs phase ratio fitting on linear combination of two basis functions, works with linear attenuation coefficient (LAC) spectra
     INPUTS:

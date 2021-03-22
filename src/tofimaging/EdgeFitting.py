@@ -1041,7 +1041,7 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
         else:
             lambd = spectrum
 
-        TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
+        TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
             est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,S_fix,bool_smooth,smooth_w,smooth_n,bool_print=True)
         return
 
@@ -1066,7 +1066,7 @@ def TextureFitting2D(Ttof,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range=
                     lambd = spectrum
 
                 try:
-                    fit = TextureFitting(signal,spectrum,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
+                    fit = TextureFitting(signal,lambd,ref_coh,ref_rest,ref_spectrum,spectrum_range,abs_window,l_hkl1,l_hkl2,l_hkl3,bool_MD,
                         est_A1,est_R1,est_A2,est_R2,est_A3,est_R3,Nbeta,est_S,S_fix,bool_smooth,smooth_w,smooth_n,bool_print=False)
                     A1_map[i,j] = fit['A1']
                     R1_map[i,j] = fit['R1']
