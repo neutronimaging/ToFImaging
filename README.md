@@ -11,7 +11,7 @@ Currently implemented packages:
  
 For a detailed guide of how to use this package please visit https://neutronimaging.github.io/ToFImaging/.
 
-For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch
+For questions please contact matteo.busi@psi.ch or anders.kaestner@psi.ch or use the issue box https://github.com/neutronimaging/ToFImaging/issues
 
 # How to Install
 The package can be installed via pip using the command:
