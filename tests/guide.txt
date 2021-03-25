@@ -1,0 +1,4 @@
+To test:
+- open anaconda prompt
+- cd to this folder
+- python -m unittest
