@@ -7,12 +7,12 @@ m = 1.674927471e-27  #Neutron mass [kg]
 
 
 #Unit Conversions
-def Ang2MeV(Angstrom):
+def Ang2meV(Angstrom):
     return 81.82 / (Angstrom**2)
 
 
-def MeV2Ang(MeV):
-    return np.sqrt(81.82 / MeV)
+def meV2Ang(meV):
+    return np.sqrt(81.82 / meV)
 
 
 #Calibration functions
