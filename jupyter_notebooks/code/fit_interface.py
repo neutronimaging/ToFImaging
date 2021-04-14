@@ -174,6 +174,7 @@ class Interface(QMainWindow):
 
 
 
+
     def activate_moving_average_clicked(self):
         status = self.ui.activate_moving_average_checkBox.isChecked()
         self.ui.moving_average_groupBox.setEnabled(status)

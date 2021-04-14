@@ -50,3 +50,8 @@ def make_or_reset_folder(folder_name):
 def find_nearest_index(array, value):
     idx = (np.abs(np.array(array) - value)).argmin()
     return idx
+
+
+def remove_file_ending_by(list=None, ending=""):
+    clean_list = [_file for _file in list if not _file.endswith(ending)]
+    return clean_list

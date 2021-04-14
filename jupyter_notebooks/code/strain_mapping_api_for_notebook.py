@@ -20,7 +20,7 @@ from jupyter_notebooks.code import detector_correction
 from jupyter_notebooks.code import utilities
 
 DEBUG = True
-DEBUG_PATH = "/Users/j35/IPTS/IPTS-strain-mapping/raw"
+DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-strain-mapping/"
 
 
 class StrainMappingAPIForNotebook:
@@ -94,6 +94,7 @@ class StrainMappingAPIForNotebook:
             # only one folder
             self.working_dir = input_folders[0]
             list_files, ext = utilities.retrieve_list_of_most_dominant_extension_from_folder(folder=input_folders[0])
+            list_files = utilities.remove_file_ending_by(list=list_files, ending="_SummedImg.fits")
             o_norm = Normalization()
             if data_type == 'sample':
                 o_norm.load(file=list_files, notebook=True)
