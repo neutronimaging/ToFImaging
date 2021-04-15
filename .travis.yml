@@ -18,11 +18,7 @@ branches:
 install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-    else
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    fi
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
@@ -30,11 +26,14 @@ install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
+  - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
+  - source activate testenv
+  - pip install -r requirements.txt
   - pip install -U pytest
   - pip install codecov
   - python setup.py install
 
-  - conda env create -n book -f environment.yml
+  -
   # - conda init zsh
   # - source /home/travis/miniconda/etc/profile.d/conda.sh
 
