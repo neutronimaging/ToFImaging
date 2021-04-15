@@ -87,6 +87,7 @@ class TestReductionTools:
     def test_mean_of_tof_array(self):
         images_path = str(self.images_path)
         full_list_tif = np.array(glob.glob(images_path + '/*.tif'))
+        full_list_tif.sort()
         list_tif_1_index = [0, 1, 2, 4]
         list_tif_2_index = [1, 2, 3, 0]
         list_tif_3_index = [2, 3, 4, 1]
@@ -116,7 +117,7 @@ class TestReductionTools:
 
         mean_of_tof_arrays_returned = reduction_tools.mean_of_tof_arrays(data)
         print(f"mean_of_tof_arrays_returned[0][0][0]= {mean_of_tof_arrays_returned[0][0][0]}")
-        assert pytest.approx(mean_of_tof_arrays_returned[0][0][0], 1e-5) == 1.1293992
+        assert pytest.approx(mean_of_tof_arrays_returned[0][0][0], 1e-5) == 0.92379
 
 
 class TestMovingAverage1D:
