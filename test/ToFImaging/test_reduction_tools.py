@@ -266,19 +266,6 @@ class TestMovingAverage2D:
             for _output, _expected in zip(_output_row, _expected_row):
                 assert _output == pytest.approx(_expected, 1e-2)
 
-        # input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
-        # output_array = reduction_tools.moving_average_2D(input_array=input_array,
-        #                                                  box_kernel=[2, 3])
-        # expected_array = np.array([[1/4, 11/4, 21/4],
-        #                           [10/4, (1+10+9+2)/4, (10+11+2+1)/4],
-        #                           [(9+1)/4, (9+2+1+30)/4, (2+1+30+15)/4]])
-        #
-        # print(output_array)
-        #
-        # for _output_row, _expected_row in zip(output_array, expected_array):
-        #     for _output, _expected in zip(_output_row, _expected_row):
-        #         assert _output == pytest.approx(_expected, 1e-5)
-
 
 class TestDataFiltering:
 
@@ -332,6 +319,7 @@ class TestDataFiltering:
     def test_2d_input_array_with_2d_box_kernel(self):
         input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
         output_array = reduction_tools.data_filtering(input_array, box_kernel=[2, 2])
-        print(output_array)
-        assert False
-
+        expected_array = [[22, 24, 12], [42, 48, 16], [31, 45, 15]]
+        for expected_row, output_row in zip(expected_array, output_array):
+            for expected_value, output_value in zip(expected_row, output_row):
+                assert expected_value == output_value
