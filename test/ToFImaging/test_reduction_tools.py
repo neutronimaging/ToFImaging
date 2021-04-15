@@ -223,28 +223,20 @@ class TestMovingAverage2D:
         input_array = input_array.transpose(1, 2, 0)
         output_array = reduction_tools.moving_average_2D(input_array=input_array,
                                                          custom_kernel=np.ones((3, 3)))
-        expected_array = np.array([[[(1 + 10 + 9 + 2) / 9, (1 + 10 + 11 + 9 + 2 + 1) / 9, (10 + 11 + 2 + 1) / 9],
-                                    [(1 + 10 + 9 + 2 + 1 + 30) / 9, (1 + 10 + 11 + 9 + 2 + 1 + 1 + 30 + 15) / 9,
-                                     (10 + 11 + 2 + 1 + 30 + 15) / 9],
-                                    [(9 + 2 + 1 + 30) / 9, (9 + 2 + 1 + 1 + 30 + 15) / 9, (2 + 1 + 30 + 15) / 9]],
-                                   [[(1 + 10 + 9 + 2) / 9, (1 + 10 + 11 + 9 + 2 + 1) / 9, (10 + 11 + 2 + 1) / 9],
-                                    [(1 + 10 + 9 + 2 + 1 + 30) / 9, (1 + 10 + 11 + 9 + 2 + 1 + 1 + 30 + 15) / 9,
-                                     (10 + 11 + 2 + 1 + 30 + 15) / 9],
-                                    [(9 + 2 + 1 + 30) / 9, (9 + 2 + 1 + 1 + 30 + 15) / 9, (2 + 1 + 30 + 15) / 9]],
-                                   [[(1 + 10 + 9 + 2) / 9, (1 + 10 + 11 + 9 + 2 + 1) / 9, (10 + 11 + 2 + 1) / 9],
-                                    [(1 + 10 + 9 + 2 + 1 + 30) / 9, (1 + 10 + 11 + 9 + 2 + 1 + 1 + 30 + 15) / 9,
-                                     (10 + 11 + 2 + 1 + 30 + 15) / 9],
-                                    [(9 + 2 + 1 + 30) / 9, (9 + 2 + 1 + 1 + 30 + 15) / 9, (2 + 1 + 30 + 15) / 9]],
-                                  [[(1 + 10 + 9 + 2) / 9, (1 + 10 + 11 + 9 + 2 + 1) / 9, (10 + 11 + 2 + 1) / 9],
-                                   [(1 + 10 + 9 + 2 + 1 + 30) / 9, (1 + 10 + 11 + 9 + 2 + 1 + 1 + 30 + 15) / 9,
-                                    (10 + 11 + 2 + 1 + 30 + 15) / 9],
-                                   [(9 + 2 + 1 + 30) / 9, (9 + 2 + 1 + 1 + 30 + 15) / 9, (2 + 1 + 30 + 15) / 9]]])
-        expected_array = expected_array.transpose(1, 2, 0)
+        expected_array = np.array([[[2.44, 3.67, 3.67, 2.44],
+                                   [4.89, 7.33, 7.33, 4.89],
+                                   [4.67, 7., 7., 4.67]],
+                                  [[2.44, 3.67, 3.67, 2.44],
+                                   [2.67, 4., 4., 2.67],
+                                   [0.67, 1, 1, 0.67]],
+                                  [[6.89, 10.33, 10.33, 6.89],
+                                   [10.22, 15.33, 15.33, 10.22],
+                                   [10, 15, 15, 10]]])
         assert np.shape(input_array) == np.shape(output_array)
         for _output_tof, _expected_tof in zip(output_array, expected_array):
             for _output_row, _expected_row in zip(_output_tof, _expected_tof):
                 for _output, _expected in zip(_output_row, _expected_row):
-                    assert _output == pytest.approx(_expected, 1e-5)
+                    assert _output == pytest.approx(_expected, 1e-2)
 
     def test_using_box_kernel(self):
         input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
