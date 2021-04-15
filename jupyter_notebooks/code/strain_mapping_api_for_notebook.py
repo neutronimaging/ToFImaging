@@ -14,6 +14,13 @@ import ipywe.fileselector
 from NeuNorm.normalization import Normalization
 from NeuNorm.roi import ROI
 from neutronbraggedge.experiment_handler import TOF, Experiment
+from jupyter_notebooks.code.neutronimaging.detector_correction import read_shutter_count
+from jupyter_notebooks.code.neutronimaging.detector_correction import read_shutter_time
+from jupyter_notebooks.code.neutronimaging.detector_correction import read_spectra
+from jupyter_notebooks.code.neutronimaging.detector_correction import merge_meta_data
+from jupyter_notebooks.code.neutronimaging.detector_correction import load_images
+from jupyter_notebooks.code.neutronimaging.detector_correction import correct_images
+from jupyter_notebooks.code.neutronimaging.detector_correction import skipping_meta_data
 
 from ToFImaging import reduction_tools
 from jupyter_notebooks.code import detector_correction
@@ -28,7 +35,8 @@ class StrainMappingAPIForNotebook:
     normalization_flag_ui = None
 
     working_dir = DEBUG_PATH if DEBUG else "./"
-    is_working_with_raw_data_default = False
+    is_working_with_raw_data_default = True
+    do_you_want_to_normalize_the_data = True
 
     sample_projections = None     # x, y, lambda
     ob_projections = None         # x, y, lambda
@@ -54,7 +62,7 @@ class StrainMappingAPIForNotebook:
                              ])
         self.is_mcp_corrected_ui = box1.children[0]
 
-        box2 = widgets.HBox([widgets.Checkbox(value=True,
+        box2 = widgets.HBox([widgets.Checkbox(value=self.do_you_want_to_normalize_the_data,
                                               layout=widgets.Layout(width="200px")),
                              widgets.Label("Do you want to normalize your data?",
                                            layout=widgets.Layout(width="400px")),
@@ -272,21 +280,46 @@ class StrainMappingAPIForNotebook:
         for _index_folder, _input_folder in enumerate(input_folders):
             print(f"MCP detector correction with folder {_index_folder+1}/{len(input_folders)} ... IN PROGRESS",
                   end="")
+            os.system('mcp_detector_correction')
+
             _short_input_folder = str(PurePath(_input_folder).name) + "_corrected"
             _output_folder = str(Path(_input_folder).parent / _short_input_folder)
             utilities.make_or_reset_folder(_output_folder)
             _shutter_count_file = glob.glob(_input_folder + "/*_ShutterCount.txt")[0]
             _shutter_time_file = glob.glob(_input_folder + "/*_ShutterTimes.txt")[0]
             _spectra_file = glob.glob(_input_folder + '/*_Spectra.txt')[0]
-            df_meta = detector_correction.merge_meta_data(detector_correction.read_shutter_count(_shutter_count_file),
-                                                          detector_correction.read_shutter_time(_shutter_time_file),
-                                                          detector_correction.read_spectra(_spectra_file))
-            o_norm = detector_correction.load_images(_input_folder)
-            img_corrected = detector_correction.correct_images(o_norm,
-                                                               df_meta,
-                                                               skip_first_and_last=True)
+            df_meta = merge_meta_data(read_shutter_count(_shutter_count_file),
+                                      read_shutter_time(_shutter_time_file),
+                                      read_spectra(_spectra_file))
+            o_norm = load_images(_input_folder)
+
+            # running correction
+            img_corrected = correct_images(o_norm,
+                                           df_meta,
+                                           skip_first_and_last=True)
+
+            # exporting data
             o_norm.data['sample']['data'] = img_corrected
             o_norm.export(folder=_output_folder, data_type='sample')
+
+            out_shutter_count = os.path.join(_output_folder,
+                                             os.path.basename(_shutter_count_file))
+            out_shutter_time = os.path.join(_output_folder,
+                                            os.path.basename(_shutter_time_file))
+            out_spectra_file = os.path.join(_output_folder,
+                                            os.path.basename(_spectra_file))
+            shutil.copyfile(_shutter_count_file, out_shutter_count)
+            shutil.copyfile(_shutter_time_file, out_shutter_time)
+            # handle proper spectra parsing
+            skipping_meta_data(df_meta).to_csv(
+                    out_spectra_file,
+                    columns=['shutter_time', 'counts'],
+                    index=False,
+                    index_label=False,
+                    header=False,
+                    sep='\t',
+            )
+
             new_input_folders.append(_output_folder)
             clear_output(wait=False)
             print(f"MCP detector correction with folder {_index_folder + 1}/{len(input_folders)} ... DONE")
