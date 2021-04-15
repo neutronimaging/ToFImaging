@@ -1,3 +1,6 @@
+[![Build Status](https://www.travis-ci.com/neutronimaging/ToFImaging.svg?branch=master)](https://www.travis-ci.com/neutronimaging/ToFImaging)
+
+
 # Time of Flight neutron Imaging
 This package includes modules for data reduction and analysis of various Time Of Flight (TOF) neutron imaging data. Initially designed for MCP/Timepix data, most of the modules are compatible with 3D matrixes with dimension (x,y,lambda/TOF).
 Currently implemented packages:
