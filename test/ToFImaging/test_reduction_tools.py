@@ -115,6 +115,7 @@ class TestReductionTools:
         del o_norm2
 
         mean_of_tof_arrays_returned = reduction_tools.mean_of_tof_arrays(data)
+        print(f"mean_of_tof_arrays_returned[0][0][0]= {mean_of_tof_arrays_returned[0][0][0]}")
         assert pytest.approx(mean_of_tof_arrays_returned[0][0][0], 1e-5) == 1.1293992
 
 
