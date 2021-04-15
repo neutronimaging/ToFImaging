@@ -244,15 +244,27 @@ class TestMovingAverage2D:
             reduction_tools.moving_average_2D(input_array=input_array,
                                               box_kernel=[1, 2, 3])
 
-        input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
+        input_array = np.array([[[1, 10, 11], [9, 2, 1], [1, 30, 15]],
+                                [[1, 10, 11], [9, 2, 1], [1, 30, 15]],
+                                [[1, 10, 11], [9, 2, 1], [1, 30, 15]],
+                                [[1, 10, 11], [9, 2, 1], [1, 30, 15]]])
         output_array = reduction_tools.moving_average_2D(input_array=input_array,
                                                          box_kernel=[2, 2])
-        expected_array = np.array([[1/4, 11/4, 21/4],
-                                  [10/4, (1+10+9+2)/4, (10+11+2+1)/4],
-                                  [(9+1)/4, (9+2+1+30)/4, (2+1+30+15)/4]])
+        expected_array = [[[0.25, 2.75, 5.25],
+                           [2.5, 5.5, 6],
+                           [2.5, 10.5, 12]],
+                          [[0.25, 2.75, 5.25],
+                           [2.5, 5.5, 6.],
+                           [2.5, 10.5, 12.]],
+                          [[0.25, 2.75, 5.25],
+                           [2.5, 5.5, 6],
+                           [2.5, 10.5, 12]],
+                          [[0.25, 2.75, 5.25],
+                           [2.5, 5.5, 6],
+                           [2.5, 10.5, 12.]]]
         for _output_row, _expected_row in zip(output_array, expected_array):
             for _output, _expected in zip(_output_row, _expected_row):
-                assert _output == pytest.approx(_expected, 1e-5)
+                assert _output == pytest.approx(_expected, 1e-2)
 
         # input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
         # output_array = reduction_tools.moving_average_2D(input_array=input_array,
