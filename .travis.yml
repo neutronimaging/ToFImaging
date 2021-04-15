@@ -25,12 +25,12 @@ install:
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
   - pip install -r requirements.txt
-  - pip install -U pytest
+  - pip install pytest
   - pip install codecov
   - python setup.py install
 
 script:
-  - pytest -v --cov=test/
+  - pytest -v --cov
 
 after_success:
   - codecov
