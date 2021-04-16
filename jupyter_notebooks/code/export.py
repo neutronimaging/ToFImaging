@@ -4,7 +4,7 @@ from pathlib import Path
 
 from NeuNorm.normalization import Normalization
 
-from jupyter_notebooks.code.utilities import make_or_reset_folder
+from jupyter_notebooks.code.utilities.file import make_or_reset_folder
 
 
 class Export:

@@ -12,11 +12,12 @@ from NeuNorm.normalization import Normalization
 from ToFImaging import reduction_tools
 from jupyter_notebooks.code.decorators import wait_cursor
 from jupyter_notebooks.code.fit_handler import FitHandler
-from jupyter_notebooks.code.utilities import find_nearest_index
+from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.initialization import Initialization
 from jupyter_notebooks.code.roi_selection import Interface as RoiInterface
-from jupyter_notebooks.code.normalization import Normalization as LocalNormalization
 from jupyter_notebooks.code.export import Export
+from jupyter_notebooks.code.event_handler import EventHandler
+from jupyter_notebooks.code.prepare_data import PrepareData
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -128,47 +129,12 @@ class Interface(QMainWindow):
 
     @wait_cursor
     def prepare_data_button_clicked(self):
-        self.ui.setEnabled(False)
+        o_event = PrepareData(parent=self)
+        o_event.prepare_data()
 
-        # collect parameters
-        is_with_normalization = self.o_api.normalization_flag_ui.value
-        self.is_with_normalization = is_with_normalization
-        normalization_mode = self._get_normalization_mode()
-        kernel_dimension = self._get_kernel_dimensions()
-        kernel_size = self._get_kernel_size()
-        kernel_type = self._get_kernel_type()
-
-        self.mcp_correction()
-
-        if self.ui.activate_moving_average_checkBox.isChecked():
-
-            if not self.can_we_use_buffered_data(kernel_dimension=kernel_dimension,
-                                                 kernel_size=kernel_size,
-                                                 kernel_type=kernel_type):
-
-                self.calculate_moving_average(kernel_dimension=kernel_dimension,
-                                              kernel_size=kernel_size,
-                                              kernel_type=kernel_type)
-
-        o_norm = LocalNormalization(parent=self)
-        o_norm.run(flag=is_with_normalization,
-                   mode=normalization_mode)
-
-        self.calculate_mask()
-        self.display_prepare_data_preview_image()
-
-        self.display_fit_data_tab()
-
-        self.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
-        QtGui.QGuiApplication.processEvents()
-        self.ui.toolBox.setItemEnabled(1, True)
-        # self.ui.toolBox.setCurrentIndex(1)  # switch to next tab
-        self.ui.export_prepared_data_pushButton.setEnabled(True)
-        self.ui.setEnabled(True)
-
-    def mcp_correction(self):
-        if self.is_mcp_correction_requested:
-            self.ui.statusbar.showMessage("MCP correction ... processing!")
+    # def mcp_correction(self):
+    #     if self.is_mcp_correction_requested:
+    #         self.ui.statusbar.showMessage("MCP correction ... processing!")
 
 
 
@@ -200,8 +166,8 @@ class Interface(QMainWindow):
 
     def init_rough_peak_slider(self):
         lambda_range = self.bragg_peak_range_ui.getRegion()
-        minimum_value = find_nearest_index(self.o_roi.lambda_array, lambda_range[0])
-        maximum_value = find_nearest_index(self.o_roi.lambda_array, lambda_range[1])
+        minimum_value = Get.nearest_index(self.o_roi.lambda_array, lambda_range[0])
+        maximum_value = Get.nearest_index(self.o_roi.lambda_array, lambda_range[1])
 
         current_rough_peak_value = self.ui.rough_lambda_peak_position_slider.value()
         if (current_rough_peak_value <= minimum_value) or (current_rough_peak_value >= maximum_value):
@@ -225,8 +191,6 @@ class Interface(QMainWindow):
 
             self.pixel_marker = {'x': np.int(x),
                                  'y': np.int(y)}
-
-
 
     def pixel_marker_changed(self):
         region = self.pixel_marker_item.getArraySlice(self.live_image,
@@ -427,13 +391,13 @@ class Interface(QMainWindow):
         rough_peak_position = self.get_rough_peak_position()
 
         new_lambda_range = self.bragg_peak_range_ui.getRegion()
-        left_index = find_nearest_index(self.o_roi.lambda_array, new_lambda_range[0])
-        right_index = find_nearest_index(self.o_roi.lambda_array, new_lambda_range[1])
+        left_index = Get.nearest_index(self.o_roi.lambda_array, new_lambda_range[0])
+        right_index = Get.nearest_index(self.o_roi.lambda_array, new_lambda_range[1])
 
         if (rough_peak_position <= new_lambda_range[0]) or (rough_peak_position >= new_lambda_range[1]):
             self.rough_peak_index_position = np.mean([left_index, right_index])
 
-        rough_peak_index_position = find_nearest_index(self.o_roi.lambda_array, rough_peak_position)
+        rough_peak_index_position = Get.nearest_index(self.o_roi.lambda_array, rough_peak_position)
 
         self.ui.rough_lambda_peak_position_slider.setMinimum(left_index)
         self.ui.rough_lambda_peak_position_slider.setMaximum(right_index)
@@ -494,103 +458,14 @@ class Interface(QMainWindow):
         self.ui.process_image_view.view.getViewBox().setXLink('raw image')
         self.ui.process_image_view.view.getViewBox().setYLink('raw image')
 
-    def calculate_moving_average(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
-
-        self.ui.statusbar.showMessage("Moving Average of Sample ... IN PROGRESS")
-        QtGui.QGuiApplication.processEvents()
-
-        x = kernel_size['x']
-        y = kernel_size['y']
-
-        if kernel_dimension == '2d':
-            kernel = np.ones((y, x))
-            self.sample_projections = reduction_tools.moving_average_2D(self.sample_projections,
-                                                                        custom_kernel=kernel)
-
-            if self.is_with_normalization:
-                self.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
-                QtGui.QGuiApplication.processEvents()
-
-                self.ob_projections = reduction_tools.moving_average_2D(self.ob_projections,
-                                                                        custom_kernel=kernel)
-
-            self.ui.statusbar.showMessage("Moving Average ... DONE!")
-            QtGui.QGuiApplication.processEvents()
-
-        elif kernel_dimension == '3d':
-            l = kernel_size['lambda']
-            kernel = np.ones((y, x, l))
-
-            raise NotImplementedError("kernel dimension not implemented yet!")
-
-        else:
-            raise NotImplementedError("kernel dimension does not exist!")
-
-        # T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
-        #                                            custom_kernel=kernel)
-        # self.T_mavg = T_mavg
-
-        moving_average_config = {'kernel_type': kernel_type,
-                                 'kernel_size': kernel_size,
-                                 'kernel_dimension': kernel_dimension}
-        self.moving_average_config = moving_average_config
-
-        QtGui.QGuiApplication.processEvents()
-
     def calculate_mask(self):
-        self.ui.statusbar.showMessage("Calculate mask ... IN PROGRESS")
-        QtGui.QGuiApplication.processEvents()
-
-        list_roi = self.list_roi
-        [_, height, width] = np.shape(self.normalize_projections)
-        mask = np.zeros((height, width))
-
-        for _roi_key in list_roi.keys():
-            _roi = list_roi[_roi_key]
-            x0 = _roi['x0']
-            y0 = _roi['y0']
-            x1 = _roi['x1']
-            y1 = _roi['y1']
-            mask[y0:y1 + 1, x0:x1 + 1] = 1
-        self.mask = mask
-
-        QtGui.QGuiApplication.processEvents()
+        o_event = EventHandler(parent=self)
+        o_event.calculate_mask()
 
     def normalization_radioButton_clicked(self):
         state = self.ui.normal_normalization_radioButton.isChecked()
         self.ui.select_background_roi_pushButton.setEnabled(state)
         self.ui.normalization_message_label.setEnabled(state)
-
-    def _get_kernel_type(self):
-        if self.ui.kernel_type_box_radioButton.isChecked():
-            return 'box'
-        elif self.ui.kernel_type_gaussian_radioButton.isChecked():
-            return 'gaussian'
-        else:
-            raise NotImplementedError("kernel type not implemented!")
-
-    def _get_kernel_size(self):
-        if self.ui.kernel_size_default_radioButton.isChecked():
-            return self.default_kernel_size
-        else:
-            y = np.int(str(self.ui.kernel_size_custom_y_lineEdit.text()))
-            x = np.int(str(self.ui.kernel_size_custom_x_lineEdit.text()))
-            l = np.int(str(self.ui.kernel_size_custom_lambda_lineEdit.text()))
-            return {'y': y, 'x': x, 'lambda': l}
-
-    def _get_kernel_dimensions(self):
-        if self.ui.kernel_dimension_3d_radioButton.isChecked():
-            return '3d'
-        else:
-            return '2d'
-
-    def _get_normalization_mode(self):
-        if self.ui.normalization_by_roi_radioButton.isChecked():
-            return 'by ROI'
-        elif self.ui.normalization_pixel_by_pixel_radioButton.isChecked():
-            return 'pixel by pixel'
-        else:
-            raise NotImplementedError("normalization mode not implemented!")
 
     @wait_cursor
     def fit_pixel_clicked(self):

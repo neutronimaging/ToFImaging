@@ -21,6 +21,8 @@ from jupyter_notebooks.code.neutronimaging.detector_correction import merge_meta
 from jupyter_notebooks.code.neutronimaging.detector_correction import load_images
 from jupyter_notebooks.code.neutronimaging.detector_correction import correct_images
 from jupyter_notebooks.code.neutronimaging.detector_correction import skipping_meta_data
+from jupyter_notebooks.code.utilities.get import Get
+from jupyter_notebooks.code.utilities import file as file_utilities
 
 from ToFImaging import reduction_tools
 from jupyter_notebooks.code import detector_correction
@@ -35,7 +37,7 @@ class StrainMappingAPIForNotebook:
     normalization_flag_ui = None
 
     working_dir = DEBUG_PATH if DEBUG else "./"
-    is_working_with_raw_data_default = True
+    is_working_with_raw_data_default = False
     do_you_want_to_normalize_the_data = True
 
     sample_projections = None     # x, y, lambda
@@ -101,8 +103,8 @@ class StrainMappingAPIForNotebook:
         if len(input_folders) == 1:
             # only one folder
             self.working_dir = input_folders[0]
-            list_files, ext = utilities.retrieve_list_of_most_dominant_extension_from_folder(folder=input_folders[0])
-            list_files = utilities.remove_file_ending_by(list=list_files, ending="_SummedImg.fits")
+            list_files, ext = Get.list_of_most_dominant_extension_from_folder(folder=input_folders[0])
+            list_files = file_utilities.remove_file_ending_by(list=list_files, ending="_SummedImg.fits")
             o_norm = Normalization()
             if data_type == 'sample':
                 o_norm.load(file=list_files, notebook=True)
@@ -116,7 +118,7 @@ class StrainMappingAPIForNotebook:
             # calculate mean of projections of the input folders
             list_projections = []
             for _folder in input_folders:
-                list_files, ext = utilities.retrieve_list_of_most_dominant_extension_from_folder(folder=_folder)
+                list_files, ext = Get.list_of_most_dominant_extension_from_folder(folder=_folder)
                 o_norm = Normalization()
                 o_norm.load(file=list_files, notebook=True)
                 projection = np.array(o_norm.data['sample']['data'])
@@ -269,12 +271,6 @@ class StrainMappingAPIForNotebook:
         self.display_message()
 
     @staticmethod
-    def make_or_reset_folder(folder_name):
-        if os.path.exists(folder_name):
-            shutil.rmtree(folder_name)
-        os.makedirs(folder_name)
-
-    @staticmethod
     def mcp_correct_input_folders(input_folders=None):
         new_input_folders = []
         for _index_folder, _input_folder in enumerate(input_folders):
@@ -284,7 +280,7 @@ class StrainMappingAPIForNotebook:
 
             _short_input_folder = str(PurePath(_input_folder).name) + "_corrected"
             _output_folder = str(Path(_input_folder).parent / _short_input_folder)
-            utilities.make_or_reset_folder(_output_folder)
+            file_utilities.make_or_reset_folder(_output_folder)
             _shutter_count_file = glob.glob(_input_folder + "/*_ShutterCount.txt")[0]
             _shutter_time_file = glob.glob(_input_folder + "/*_ShutterTimes.txt")[0]
             _spectra_file = glob.glob(_input_folder + '/*_Spectra.txt')[0]
