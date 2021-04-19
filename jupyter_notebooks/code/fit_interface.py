@@ -1,7 +1,6 @@
 import os
 from qtpy.QtWidgets import QMainWindow
 from jupyter_notebooks.code import load_ui
-import pyqtgraph as pg
 import numpy as np
 import copy
 import inflect
@@ -16,6 +15,7 @@ from jupyter_notebooks.code.event_handler import EventHandler
 from jupyter_notebooks.code.prepare_data import PrepareData
 from jupyter_notebooks.code.step3_settings_handler import Step3SettingsHandler
 from jupyter_notebooks.code.step4_settings_handler import Step4SettingsHandler
+from jupyter_notebooks.code.display import Display
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -123,7 +123,8 @@ class Interface(QMainWindow):
         o_init = Initialization(parent=self)
         o_init.widgets()
         if not self.debugging_mode:
-            self.display_prepare_data_raw_image()
+            o_display = Display(parent=self)
+            o_display.prepare_data_raw_image()
 
     @wait_cursor
     def prepare_data_button_clicked(self):
@@ -137,21 +138,6 @@ class Interface(QMainWindow):
     def export_prepared_data_clicked(self):
         o_export = Export(parent=self)
         o_export.run()
-
-    def display_prepare_data_raw_image(self):
-        live_image = np.transpose(self.live_image)
-        self.ui.raw_image_view.setImage(live_image)
-
-    def display_fit_data_tab(self):
-        self.initialize_pixel_marker()
-        self.display_image()
-        self.display_profile()
-        self.display_roi()
-        self.display_cross_of_pixel_to_fit()
-        self.display_box_around_pixel_to_fit()
-        self.display_lambda_range_to_fit()
-        self.init_rough_peak_slider()
-        self.display_rough_peak_position()
 
     def init_rough_peak_slider(self):
         lambda_range = self.bragg_peak_range_ui.getRegion()
@@ -190,9 +176,10 @@ class Interface(QMainWindow):
         self.pixel_marker['x'] = x0
         self.pixel_marker['y'] = y0
 
-        self.display_cross_of_pixel_to_fit()
+        o_display = Display(parent=self)
+        o_display.cross_of_pixel_to_fit()
         self.check_status_of_fit_buttons()
-        self.display_profile()
+        o_display.profile()
 
     def check_status_of_fit_buttons(self):
 
@@ -216,115 +203,115 @@ class Interface(QMainWindow):
         self.ui.statusbar.showMessage("Pixel must be inside one of the ROI selected!")
         self.ui.statusbar.setStyleSheet("color: red")
 
-    def display_lambda_range_to_fit(self):
-        if self.default_bragg_peak_range is None:
-            lambda_array = self.o_roi.lambda_array
-            nbr_lambda = len(lambda_array)
-            self.default_bragg_peak_range = [lambda_array[np.int(nbr_lambda/2)],
-                                             lambda_array[np.int(nbr_lambda/2) + 10]]
+    # def display_lambda_range_to_fit(self):
+    #     if self.default_bragg_peak_range is None:
+    #         lambda_array = self.o_roi.lambda_array
+    #         nbr_lambda = len(lambda_array)
+    #         self.default_bragg_peak_range = [lambda_array[np.int(nbr_lambda/2)],
+    #                                          lambda_array[np.int(nbr_lambda/2) + 10]]
+    #
+    #     self.bragg_peak_range_ui = pg.LinearRegionItem(values=self.default_bragg_peak_range,
+    #                                                    orientation='vertical',
+    #                                                    movable=True)
+    #     self.bragg_peak_range_ui.sigRegionChanged.connect(self.lambda_range_changed)
+    #
+    #     self.bragg_peak_range_ui.setZValue(-10)
+    #     self.ui.plot_view.addItem(self.bragg_peak_range_ui)
 
-        self.bragg_peak_range_ui = pg.LinearRegionItem(values=self.default_bragg_peak_range,
-                                                       orientation='vertical',
-                                                       movable=True)
-        self.bragg_peak_range_ui.sigRegionChanged.connect(self.lambda_range_changed)
+    # def display_box_around_pixel_to_fit(self):
+    #     x, y = self.pixel_marker['x'], self.pixel_marker['y']
+    #
+    #     self.pixel_marker_item = pg.ROI([x, y],
+    #                                [MARKER_WIDTH, MARKER_HEIGHT],
+    #                                scaleSnap=True)
+    #     self.ui.image_view.addItem(self.pixel_marker_item)
+    #     self.pixel_marker_item.sigRegionChanged.connect(self.pixel_marker_changed)
 
-        self.bragg_peak_range_ui.setZValue(-10)
-        self.ui.plot_view.addItem(self.bragg_peak_range_ui)
+    # def display_cross_of_pixel_to_fit(self):
+    #
+    #     if self.cross_of_pixel_to_fit:
+    #         self.ui.image_view.removeItem(self.cross_of_pixel_to_fit)
+    #
+    #     x, y = self.pixel_marker['x'], self.pixel_marker['y']
+    #
+    #     pos = []
+    #     adj = []
+    #
+    #     # vertical guide
+    #     pos.append([x + MARKER_WIDTH / 2, y - MARKER_HEIGHT / 2])
+    #     pos.append([x + MARKER_WIDTH / 2, y + MARKER_HEIGHT + MARKER_HEIGHT / 2])
+    #     adj.append([0, 1])
+    #
+    #     # horizontal guide
+    #     pos.append([x - MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
+    #     pos.append([x + MARKER_WIDTH + MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
+    #     adj.append([2, 3])
+    #
+    #     pos = np.array(pos)
+    #     adj = np.array(adj)
+    #
+    #     line_color = (255, 0, 0, 255, 1)
+    #     lines = np.array([line_color for _ in np.arange(len(pos))],
+    #                      dtype=[('red', np.ubyte), ('green', np.ubyte),
+    #                             ('blue', np.ubyte), ('alpha', np.ubyte),
+    #                             ('width', float)])
+    #     self.cross_of_pixel_to_fit = pg.GraphItem()
+    #     self.ui.image_view.addItem(self.cross_of_pixel_to_fit)
+    #     self.cross_of_pixel_to_fit.setData(pos=pos,
+    #                               adj=adj,
+    #                               pen=lines,
+    #                               symbol=None,
+    #                               pxMode=False)
 
-    def display_box_around_pixel_to_fit(self):
-        x, y = self.pixel_marker['x'], self.pixel_marker['y']
+    # def display_roi(self):
+    #     for _index_roi in self.o_roi.list_roi:
+    #         _roi = self.o_roi.list_roi[_index_roi]
+    #         _id = _roi['id']
+    #
+    #         pos = _id.pos()
+    #         size = _id.size()
+    #
+    #         new_id = pg.ROI(pos, size, movable=False)
+    #         self.ui.image_view.addItem(new_id)
 
-        self.pixel_marker_item = pg.ROI([x, y],
-                                   [MARKER_WIDTH, MARKER_HEIGHT],
-                                   scaleSnap=True)
-        self.ui.image_view.addItem(self.pixel_marker_item)
-        self.pixel_marker_item.sigRegionChanged.connect(self.pixel_marker_changed)
+    # def display_image(self):
+    #     self.live_image = self.o_roi.live_image
+    #     live_image = np.transpose(self.live_image)
+    #     self.ui.image_view.setImage(live_image)
 
-    def display_cross_of_pixel_to_fit(self):
+    # def display_profile(self):
+    #     self.ui.plot_view.clear()
+    #
+    #     self.calculate_profile_of_roi()
+    #     x_axis = self.o_roi.lambda_array
+    #
+    #     # remove left and right files
+    #     nbr_left = self.nbr_files_to_exclude_from_plot['left']
+    #     nbr_right = len(x_axis) - self.nbr_files_to_exclude_from_plot['right']
+    #
+    #     x_axis = x_axis[nbr_left: nbr_right]
+    #     profile_y_axis = self.profile_y_axis[nbr_left: nbr_right]
+    #     self.ui.plot_view.plot(x_axis, profile_y_axis)
+    #
+    #     self.calculate_profile_of_pixel_selected()
+    #
+    #     profile_of_pixel_selected = self.profile_of_pixel_selected[nbr_left: nbr_right]
+    #     self.ui.plot_view.plot(x_axis, profile_of_pixel_selected, pen=COLOR_LAMBDA_RANGE)
+    #
+    #     if self.bragg_peak_range_ui:
+    #         self.ui.plot_view.addItem(self.bragg_peak_range_ui)
+    #
+    #     self.display_rough_peak_position()
 
-        if self.cross_of_pixel_to_fit:
-            self.ui.image_view.removeItem(self.cross_of_pixel_to_fit)
-
-        x, y = self.pixel_marker['x'], self.pixel_marker['y']
-
-        pos = []
-        adj = []
-
-        # vertical guide
-        pos.append([x + MARKER_WIDTH / 2, y - MARKER_HEIGHT / 2])
-        pos.append([x + MARKER_WIDTH / 2, y + MARKER_HEIGHT + MARKER_HEIGHT / 2])
-        adj.append([0, 1])
-
-        # horizontal guide
-        pos.append([x - MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
-        pos.append([x + MARKER_WIDTH + MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
-        adj.append([2, 3])
-
-        pos = np.array(pos)
-        adj = np.array(adj)
-
-        line_color = (255, 0, 0, 255, 1)
-        lines = np.array([line_color for _ in np.arange(len(pos))],
-                         dtype=[('red', np.ubyte), ('green', np.ubyte),
-                                ('blue', np.ubyte), ('alpha', np.ubyte),
-                                ('width', float)])
-        self.cross_of_pixel_to_fit = pg.GraphItem()
-        self.ui.image_view.addItem(self.cross_of_pixel_to_fit)
-        self.cross_of_pixel_to_fit.setData(pos=pos,
-                                  adj=adj,
-                                  pen=lines,
-                                  symbol=None,
-                                  pxMode=False)
-
-    def display_roi(self):
-        for _index_roi in self.o_roi.list_roi:
-            _roi = self.o_roi.list_roi[_index_roi]
-            _id = _roi['id']
-
-            pos = _id.pos()
-            size = _id.size()
-
-            new_id = pg.ROI(pos, size, movable=False)
-            self.ui.image_view.addItem(new_id)
-
-    def display_image(self):
-        self.live_image = self.o_roi.live_image
-        live_image = np.transpose(self.live_image)
-        self.ui.image_view.setImage(live_image)
-
-    def display_profile(self):
-        self.ui.plot_view.clear()
-
-        self.calculate_profile_of_roi()
-        x_axis = self.o_roi.lambda_array
-
-        # remove left and right files
-        nbr_left = self.nbr_files_to_exclude_from_plot['left']
-        nbr_right = len(x_axis) - self.nbr_files_to_exclude_from_plot['right']
-
-        x_axis = x_axis[nbr_left: nbr_right]
-        profile_y_axis = self.profile_y_axis[nbr_left: nbr_right]
-        self.ui.plot_view.plot(x_axis, profile_y_axis)
-
-        self.calculate_profile_of_pixel_selected()
-
-        profile_of_pixel_selected = self.profile_of_pixel_selected[nbr_left: nbr_right]
-        self.ui.plot_view.plot(x_axis, profile_of_pixel_selected, pen=COLOR_LAMBDA_RANGE)
-
-        if self.bragg_peak_range_ui:
-            self.ui.plot_view.addItem(self.bragg_peak_range_ui)
-
-        self.display_rough_peak_position()
-
-    def display_rough_peak_position(self):
-        if self.rough_peak_ui:
-            self.ui.plot_view.removeItem(self.rough_peak_ui)
-
-        rough_peak = self.o_roi.lambda_array[self.ui.rough_lambda_peak_position_slider.value()]
-        self.rough_peak_ui = pg.InfiniteLine(rough_peak,
-                                             pen=COLOR_ROUGH_LAMBDA,
-                                             label='Estimated Bragg Peak')
-        self.ui.plot_view.addItem(self.rough_peak_ui)
+    # def display_rough_peak_position(self):
+    #     if self.rough_peak_ui:
+    #         self.ui.plot_view.removeItem(self.rough_peak_ui)
+    #
+    #     rough_peak = self.o_roi.lambda_array[self.ui.rough_lambda_peak_position_slider.value()]
+    #     self.rough_peak_ui = pg.InfiniteLine(rough_peak,
+    #                                          pen=COLOR_ROUGH_LAMBDA,
+    #                                          label='Estimated Bragg Peak')
+    #     self.ui.plot_view.addItem(self.rough_peak_ui)
 
     def calculate_profile_of_pixel_selected(self):
         pixel_marker = self.pixel_marker
@@ -368,10 +355,13 @@ class Interface(QMainWindow):
         right_number = np.int(str(self.ui.right_number_of_files_to_exclude_slider.value()))
         self.nbr_files_to_exclude_from_plot['left'] = left_number
         self.nbr_files_to_exclude_from_plot['right'] = right_number
-        self.display_profile()
+
+        o_display = Display(parent=self)
+        o_display.profile()
 
     def rough_lambda_peak_position_slider_changed(self, value):
-        self.display_rough_peak_position()
+        o_display = Display(parent=self)
+        o_display.rough_peak_position()
 
     def get_rough_peak_position(self):
         return self.rough_peak_ui.pos()[0]
@@ -437,15 +427,6 @@ class Interface(QMainWindow):
             return False
 
         return True
-
-    def display_prepare_data_preview_image(self):
-        prepare_data = self.normalize_projections
-        self.live_process_data = np.mean(prepare_data, axis=0)
-        live_process_image = np.transpose(self.live_process_data)
-        self.ui.process_image_view.setImage(live_process_image)
-
-        self.ui.process_image_view.view.getViewBox().setXLink('raw image')
-        self.ui.process_image_view.view.getViewBox().setYLink('raw image')
 
     def calculate_mask(self):
         o_event = EventHandler(parent=self)

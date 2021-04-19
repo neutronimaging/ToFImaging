@@ -6,6 +6,7 @@ from ToFImaging import reduction_tools
 from jupyter_notebooks.code.normalization import Normalization as LocalNormalization
 from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.parent import Parent
+from jupyter_notebooks.code.display import Display
 
 
 class PrepareData(Parent):
@@ -57,8 +58,10 @@ class PrepareData(Parent):
                    mode=normalization_mode)
 
         self.calculate_mask()
-        self.parent.display_prepare_data_preview_image()
-        self.parent.display_fit_data_tab()
+
+        o_display = Display(parent=self.parent)
+        o_display.prepare_data_preview_image()
+        o_display.fit_data_tab()
 
         self.parent.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
         QtGui.QGuiApplication.processEvents()
