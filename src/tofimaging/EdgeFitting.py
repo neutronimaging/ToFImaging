@@ -570,7 +570,7 @@ def AdvancedBraggEdgeFitting2D(Ttof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure()
+        plt.figure(figsize(figsize=(15,10)))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             Ttof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -581,7 +581,7 @@ def AdvancedBraggEdgeFitting2D(Ttof,
     elif (auto_mask):
         import skimage.filters
         mymask = rt.medianimage(Ttof)
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -675,7 +675,7 @@ def AdvancedBraggEdgeFitting2D(Ttof,
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(edge_position), plt.title('Edge position')
         plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
@@ -1015,7 +1015,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
     }
 
 
-def AdvancedDirectBraggEdgeFitting_2D(Ttof,
+def AdvancedDirectBraggEdgeFitting2D(Ttof,
                                       spectrum,
                                       spectrum_range=[],
                                       calibration_matrix=np.ndarray([0]),
@@ -1066,7 +1066,7 @@ def AdvancedDirectBraggEdgeFitting_2D(Ttof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             Ttof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -1077,7 +1077,7 @@ def AdvancedDirectBraggEdgeFitting_2D(Ttof,
     elif (auto_mask):
         import skimage.filters
         mymask = rt.medianimage(Ttof)
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -1179,7 +1179,7 @@ def AdvancedDirectBraggEdgeFitting_2D(Ttof,
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(edge_position), plt.title('Edge position')
         plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
@@ -1322,7 +1322,7 @@ def GaussianBraggEdgeFitting(signal,
         print('off fit = ', result.best_values.get('off'))
         print('idx_low = ', id_low, 'idx_high = ', id_high)
 
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(2, 1, 1),
         plt.plot(spectrum, signal)
         plt.plot(t0,
@@ -1425,7 +1425,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             Ttof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -1438,7 +1438,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
     elif (auto_mask):
         import skimage.filters
         mymask = rt.medianimage(Ttof)
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -1546,7 +1546,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(edge_position), plt.title('Edge position')
         plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
@@ -1582,7 +1582,7 @@ def MarchDollase(A, R, l, l_hkl, Nbeta=50, bool_plotPole=False):
                         (1 - B**2) / R, -3 / 2), axis=0) / (Nbeta)
     P[np.isnan(P)] = 1
     if (bool_plotPole):
-        plt.figure
+        plt.figure(figsize=(15,10))
         plt.imshow(np.power(R**2 * B**2 + (1 - B**2) / R, -3 / 2))
         plt.show(), plt.close()
         plt.plot(l, P)
@@ -1889,7 +1889,7 @@ def TextureFitting2D(Ttof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             Ttof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -1902,7 +1902,7 @@ def TextureFitting2D(Ttof,
     elif (auto_mask):
         import skimage.filters
         mymask = rt.medianimage(Ttof)
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -2034,7 +2034,7 @@ def TextureFitting2D(Ttof,
     print("--- %s seconds ---" % (time.time() - start_time))
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(2, 3, 1), plt.imshow(A1_map), plt.title('Orientation 1')
         plt.subplot(2, 3, 2), plt.imshow(A2_map), plt.title('Orientation 2')
         plt.subplot(2, 3, 3), plt.imshow(A3_map), plt.title('Orientation 3')
@@ -2044,7 +2044,7 @@ def TextureFitting2D(Ttof,
         plt.tight_layout()
         plt.show()
         plt.close()
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(2, 3, 1), plt.imshow(S_map), plt.title('Crystallite size')
         plt.tight_layout()
         plt.show()

@@ -189,7 +189,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
         return
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1),
         if (len(np.shape(mysignal)) == 3):
             plt.imshow(np.nanmean(
