@@ -105,7 +105,7 @@ def PhaseRatioLinearCombination(lac,
         plt.plot(spectrum, phase1lac, '--', label='Phase 1')
         plt.plot(spectrum, phase2lac, '--', label='Phase 2')
         plt.plot(l_cut, two_phases(ph1, ph2, phi), label='Fitted ratio')
-        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
+        plt.title('Bragg pattern'), plt.xlabel('Wavelength [Å]')
         plt.legend(), plt.show(), plt.close()
 
     return {'phi': phi}
@@ -390,7 +390,7 @@ def PhaseRatioLinearCombination3(lac,
         plt.plot(l_cut,
                  three_phases(ph1, ph2, ph3, phi1, phi2, phi3),
                  label='Fitted ratio')
-        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
+        plt.title('Bragg pattern'), plt.xlabel('Wavelength [Å]')
         plt.legend(), plt.show(), plt.close()
 
     return {'phi1': phi1_n, 'phi2': phi2_n, 'phi3': phi3_n}

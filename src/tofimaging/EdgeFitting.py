@@ -134,7 +134,7 @@ def AdvancedBraggEdgeFitting(signal,
         plt.plot(t, signal)
         plt.plot(t0_f, signal[est_pos], 'x', markeredgewidth=3, c='orange')
         plt.title('Bragg edge pattern and initial guess'), plt.xlabel(
-            'Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+            'Wavelength [Å]'), plt.ylabel('Transmission I/I$_{0}$')
         plt.show()
         plt.close()
         #plt.savefig('step1_fitting.pdf')
@@ -162,7 +162,7 @@ def AdvancedBraggEdgeFitting(signal,
             plt.plot(t, interception_before + slope_before * t, 'g')
             plt.plot(t, interception_after + slope_after * t, 'r')
             plt.title('Linear fitting before and after the given edge position'
-                      ), plt.xlabel('Wavelenght [Å]'), plt.ylabel(
+                      ), plt.xlabel('Wavelength [Å]'), plt.ylabel(
                           'Transmission I/I$_{0}$')
             plt.show()
             plt.close()
@@ -210,7 +210,7 @@ def AdvancedBraggEdgeFitting(signal,
                      exp_combined(t, a1_f, a2_f, a5_f, a6_f),
                      'r',
                      label='fitted exp after')
-            plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+            plt.xlabel('Wavelength [Å]'), plt.ylabel('Transmission I/I$_{0}$')
             plt.title('Exponential and line fitting adjacent to Bragg edge')
             plt.legend()
             plt.plot(
@@ -433,7 +433,7 @@ def AdvancedBraggEdgeFitting(signal,
     #     plt.plot(t,fit_before,'o-')
     #     plt.plot(t,fit_after,'o-')
     #     plt.plot(t,fitted_data,'.-')
-    #     plt.title('Final Fit'), plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+    #     plt.title('Final Fit'), plt.xlabel('Wavelength [Å]'), plt.ylabel('Transmission I/I$_{0}$')
 
     ## Attempt n.1 -------- Here I was searching the last 0 value and the first value with 1.0 in the step function, however is it not a robust solution
     #     step_function = B(t,t0_f,alpha_f,sigma_f)
@@ -497,7 +497,7 @@ def AdvancedBraggEdgeFitting(signal,
         plt.plot(t, result5.best_fit, '--', color='gray')
         plt.plot(t, result6.best_fit, '--', color='gray')
         plt.plot(t, result7.best_fit, 'r', linewidth='1.5', label='final fit')
-        plt.legend(), plt.xlabel('Wavelenght [Å]'), plt.ylabel(
+        plt.legend(), plt.xlabel('Wavelength [Å]'), plt.ylabel(
             'Transmission I/I$_{0}$')
 
         plt.plot(t0_f, result7.best_fit[index_t0], 'ok')
@@ -570,7 +570,7 @@ def AdvancedBraggEdgeFitting2D(Ttof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure(figsize(figsize=(15,10)))
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             Ttof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -826,7 +826,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
             plt.plot(t, interception_before + slope_before * t, 'g')
             plt.plot(t, interception_after + slope_after * t, 'r')
             plt.title('Linear fitting before and after the given edge position'
-                      ), plt.xlabel('Wavelenght [Å]'), plt.ylabel(
+                      ), plt.xlabel('Wavelength [Å]'), plt.ylabel(
                           'Transmission I/I$_{0}$')
             plt.show()
             plt.close()
@@ -874,7 +874,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
                      exp_combined(t, a1_f, a2_f, a5_f, a6_f),
                      'r',
                      label='fitted exp after')
-            plt.xlabel('Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+            plt.xlabel('Wavelength [Å]'), plt.ylabel('Transmission I/I$_{0}$')
             plt.title('Exponential and line fitting adjacent to Bragg edge')
             plt.legend()
             plt.plot(
@@ -896,7 +896,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
                  BraggEdgeExponential(t, t0_f, est_alpha, est_sigma, a1_f,
                                       a2_f, a5_f, a6_f),
                  label='First fit')
-        plt.title('First step'), plt.xlabel('Wavelenght [Å]'), plt.ylabel(
+        plt.title('First step'), plt.xlabel('Wavelength [Å]'), plt.ylabel(
             'Transmission I/I$_{0}$')
         plt.show(), plt.close()
 
@@ -967,7 +967,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
                                       a5_f, a6_f),
                  label='Fit')
         plt.title('Final iteration: all'), plt.xlabel(
-            'Wavelenght [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+            'Wavelength [Å]'), plt.ylabel('Transmission I/I$_{0}$')
         plt.show(), plt.close()
 
     # if (bool_print):
@@ -1332,7 +1332,7 @@ def GaussianBraggEdgeFitting(signal,
                  c='orange')
         # plt.plot(t0-edge_width, signal[find_nearest(spectrum, t0-edge_width)],'+', markeredgewidth=3, c='orange')
         # plt.plot(t0+edge_width, signal[find_nearest(spectrum, t0+edge_width)],'+', markeredgewidth=3, c='orange')
-        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
+        plt.title('Bragg pattern'), plt.xlabel('Wavelength [Å]')
         plt.subplot(2, 1, 2),
         plt.plot(d_spectrum, d_signal, label='data'),
         plt.plot(d_spectrum,
@@ -1355,7 +1355,7 @@ def GaussianBraggEdgeFitting(signal,
                  '+',
                  markeredgewidth=3,
                  c='orange')
-        plt.title('Bragg pattern derivative'), plt.xlabel('Wavelenght [Å]')
+        plt.title('Bragg pattern derivative'), plt.xlabel('Wavelength [Å]')
         plt.tight_layout()
         plt.legend(), plt.show(), plt.close()
     return {
