@@ -99,13 +99,13 @@ def PhaseRatioLinearCombination(lac,
 
     if (bool_print):
         print('phase fraction (ph1 %) = ', 100 * phi, '%')
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.plot(sp0, lac0, label='LAC')
         plt.plot(spectrum, lac, label='LAC (normalization)')
         plt.plot(spectrum, phase1lac, '--', label='Phase 1')
         plt.plot(spectrum, phase2lac, '--', label='Phase 2')
         plt.plot(l_cut, two_phases(ph1, ph2, phi), label='Fitted ratio')
-        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
+        plt.title('Bragg pattern'), plt.xlabel('Wavelength [Å]')
         plt.legend(), plt.show(), plt.close()
 
     return {'phi': phi}
@@ -160,7 +160,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             lac_tof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -173,7 +173,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
     elif (auto_mask):
         import skimage.filters
         mymask = rt.medianimage(lac_tof)
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -255,7 +255,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
                     phase_ratio[i, j] = -2.0
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.imshow(phase_ratio, cmap='jet'), plt.title('Phase ratio (%)')
         plt.colorbar()
         plt.show(), plt.close()
@@ -381,7 +381,7 @@ def PhaseRatioLinearCombination3(lac,
         print('Phase fraction 1 (ph1 %) = ', 100 * phi1, '%')
         print('Phase fraction 2 (ph2 %) = ', 100 * phi2, '%')
         print('Phase fraction 3 (ph3 %) = ', 100 * phi3, '%')
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.plot(sp0, lac0, label='LAC')
         plt.plot(spectrum, lac, label='LAC (normalization)')
         plt.plot(spectrum, phase1lac, '--', label='Phase 1')
@@ -390,7 +390,7 @@ def PhaseRatioLinearCombination3(lac,
         plt.plot(l_cut,
                  three_phases(ph1, ph2, ph3, phi1, phi2, phi3),
                  label='Fitted ratio')
-        plt.title('Bragg pattern'), plt.xlabel('Wavelenght [Å]')
+        plt.title('Bragg pattern'), plt.xlabel('Wavelength [Å]')
         plt.legend(), plt.show(), plt.close()
 
     return {'phi1': phi1_n, 'phi2': phi2_n, 'phi3': phi3_n}
@@ -452,7 +452,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             lac_tof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask)
@@ -466,7 +466,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
     elif (auto_mask):
         import skimage.filters
         mymask = rt.medianimage(lac_tof)
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -558,7 +558,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
                     phase3_ratio[i, j] = -2.0
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3, 1), plt.imshow(
             phase1_ratio,
             cmap='jet'), plt.title('Phase 1 weight (%)'), plt.colorbar()
@@ -675,7 +675,7 @@ def WavelengthSelectiveRatio2D(lac_tof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             lac_tof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -688,7 +688,7 @@ def WavelengthSelectiveRatio2D(lac_tof,
     elif (auto_mask):
         import skimage.filters
         mymask = rt.medianimage(lac_tof)
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -764,7 +764,7 @@ def WavelengthSelectiveRatio2D(lac_tof,
                     phase_ratio[i, j] = -2.0
 
     if (bool_print):
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.imshow(phase_ratio, cmap='jet'), plt.title('Phase ratio')
         plt.colorbar()
         plt.show(), plt.close()
