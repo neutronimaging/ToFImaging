@@ -29,9 +29,7 @@ class Log(QMainWindow):
     def __init__(self, parent=None):
         self.parent = parent
         QMainWindow.__init__(self, parent=parent)
-        ui_full_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                    os.path.join('ui',
-                                                 'log.ui'))
+        ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'log.ui'))
         self.ui = load_ui(ui_full_path, baseinstance=self)
         self.setWindowTitle("Log")
         self.ui.log_text.setReadOnly(True)
@@ -40,7 +38,7 @@ class Log(QMainWindow):
         self.ui.refresh_pushButton.setIcon(refresh_icon)
 
         o_get = Get(parent=self.parent)
-        self.log_file_name = o_get.get_log_file_name()
+        self.log_file_name = o_get.log_file_name()
         self.loading_logging_file()
 
         # jump to end of file

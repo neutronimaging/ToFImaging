@@ -4,11 +4,17 @@ from qtpy.QtGui import QIcon
 import numpy as np
 import os
 
+from jupyter_notebooks.code.config_handler import ConfigHandler
+
 
 class Initialization:
 
     def __init__(self, parent=None):
         self.parent = parent
+
+        # load config
+        o_config = ConfigHandler(parent=self.parent)
+        o_config.load()
 
     def widgets(self):
 

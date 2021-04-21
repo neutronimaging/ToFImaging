@@ -30,6 +30,7 @@ COLOR_ROUGH_LAMBDA = [50, 255, 50]
 
 class Interface(QMainWindow):
 
+    config = None
     debugging_mode = False
 
     o_roi = None
@@ -75,6 +76,7 @@ class Interface(QMainWindow):
 
     step3_settings_ui = None
     step4_settings_ui = None
+    log_id = None
 
     step3_config = {'is_automatic_masking': False,
                     'threshold_low': 0.05,
@@ -134,13 +136,13 @@ class Interface(QMainWindow):
 
         # configuration of config
         o_get = Get(parent=self)
-        log_file_name = o_get.get_log_file_name()
+        log_file_name = o_get.log_file_name()
         logging.basicConfig(filename=log_file_name,
                             filemode='a',
                             format='[%(levelname)s] - %(asctime)s - %(message)s',
                             level=logging.INFO)
         logging.info("*** Starting a new session ***")
-        logging.info(f" Version: {versioneer.get_version()}")
+        # logging.info(f" Version: {versioneer.get_version()}")
 
     def log_button_clicked(self):
         LogLauncher(parent=self)

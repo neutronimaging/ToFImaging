@@ -29,7 +29,7 @@ from jupyter_notebooks.code import detector_correction
 from jupyter_notebooks.code import utilities
 
 DEBUG = True
-DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-strain-mapping/"
+DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-strain-mapping/to_test_notebook/"
 
 
 class StrainMappingAPIForNotebook:
@@ -38,7 +38,7 @@ class StrainMappingAPIForNotebook:
 
     working_dir = DEBUG_PATH if DEBUG else "./"
     is_working_with_raw_data_default = False
-    do_you_want_to_normalize_the_data = True
+    do_you_want_to_normalize_the_data = False
 
     sample_projections = None     # x, y, lambda
     ob_projections = None         # x, y, lambda
