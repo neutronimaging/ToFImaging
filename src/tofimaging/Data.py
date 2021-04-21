@@ -1,4 +1,7 @@
+import numpy as np
+
 #Notable neutron cross sections
+
 def StainlessSteel316L_Alpha():
     spectrum = np.array([
         [0, 0, 1.30313],
