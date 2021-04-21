@@ -224,7 +224,7 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
     if (len(np.shape(mysignal)) == 2) and (len(kernel) == 3):
         raise ValueError('Data is 2d but filtering kernel is 3D.')
 
-    display_input_signal(signal=mysignal, bool_print=bool_print):
+    display_input_signal(signal=mysignal, bool_print=bool_print)
 
     # TOF data (3D), 2D kernel
     if  len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
