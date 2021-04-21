@@ -1,0 +1,173 @@
+{
+  "list_of_instruments": {
+    "ANTARES": {
+      "file_extension": "*.fits"
+    },
+    "CG-1D": {
+      "file_extension": "*.tif*"
+    },
+    "SNAP": {
+      "file_extension": "*.fits"
+    },
+    "OTHER": {
+      "file_extension": "*.fits"
+    }
+  },
+  "session_file_name": ".angel_session.json",
+  "log_file_name": ".angel.log",
+  "default_instrument": "ANTARES",
+  "homepath": "/Volumes/G-DRIVE/IPTS/Grating/Angel/nGI_Testdata/",
+  "filters": {
+    "sample data": {
+      "enabled": true,
+      "threshold1": 80,
+      "threshold2": 100,
+      "threshold3": 200,
+      "sigma for log": 0.8
+    },
+    "dc": {
+      "enabled": false,
+      "threshold1": 20,
+      "threshold2": 40,
+      "threshold3": 100,
+      "sigma for log": 0.8
+    }
+  },
+  "image binning flag": false,
+  "image binning size": 2,
+  "outlier removal in epythermal dc flag": false,
+  "outlier removal in epithermal dc": 1.5,
+  "parameters_tab": {
+    "password": "angel",
+    "table": {
+      "path of sample images": [
+        "sample data",
+        "folder"
+      ],
+      "sample first image": [
+        "sample data",
+        "first file"
+      ],
+      "sample last image": [
+        "sample data",
+        "last file"
+      ],
+      "sample number of images": [
+        "sample data",
+        ""
+      ],
+      "path of OB images": [
+        "open beam",
+        "folder"
+      ],
+      "ob first image": [
+        "open beam",
+        "first file"
+      ],
+      "ob last image": [
+        "open beam",
+        "last file"
+      ],
+      "ob number of images": [
+        "open beam",
+        ""
+      ],
+      "path of dc images": [
+        "dark image",
+        "folder"
+      ],
+      "dc first image": [
+        "dark image",
+        "first file"
+      ],
+      "dc last image": [
+        "dark image",
+        "last image"
+      ],
+      "dc number of images": [
+        "dark image",
+        ""
+      ],
+      "number of scanned periods": [
+        "general settings",
+        "number of scanned periods"
+      ],
+      "full period": [
+        "general settings",
+        "full period"
+      ],
+      "rotation of G0rz": [
+        "general settings",
+        "rotation of g0rz"
+      ],
+      "number of images per step": [
+        "general settings",
+        "number of images per step"
+      ],
+      "sample/ob gamma filter": [
+        ""
+      ],
+      "sample/ob threshold 3x3": [
+        ""
+      ],
+      "sample/ob threshold 5x5": [
+        ""
+      ],
+      "sample/ob threshold 7x7": [
+        ""
+      ],
+      "sample/ob sigma for LoG": [
+        ""
+      ],
+      "dc gamma filter": [
+        ""
+      ],
+      "dc threshold 3x3": [
+        ""
+      ],
+      "dc threshold 5x5": [
+        ""
+      ],
+      "dc threshold 7x7": [
+        ""
+      ],
+      "dc sigma for LoG": [
+        ""
+      ],
+      "image binning flag": [
+        ""
+      ],
+      "image binning size": [
+        ""
+      ],
+      "outlier removal in epithermal dc flag": [
+        ""
+      ],
+      "outlier removal in epithermal dc": [
+        ""
+      ],
+      "fit procedure index selected": [
+        ""
+      ],
+      "fit procedure list": [
+        ""
+      ],
+      "sample region of interest ([y0,y1,x0,x1])": [
+        ""
+      ],
+      "norm region of interest ([y0,y1,x0,x1])": [
+        ""
+      ],
+      "use norm region of interest": [
+        ""
+      ]
+    }
+  },
+  "fitting": {
+    "list procedures": [
+      "Matrix",
+      "EM"
+    ],
+    "index procedure selected": 0
+  }
+}
