@@ -195,10 +195,10 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
     if kernel is None:
         raise ValueError("You need to provide a kernel!")
 
-    if len(np.shape(kernel)) == 1:
+    if len(kernel) == 1:
         raise ValueError('Kernel must be at least of size 2.')
 
-    if (len(np.shape(mysignal)) == 2) and (len(np.shape(kernel)) == 3):
+    if (len(np.shape(mysignal)) == 2) and (len(kernel) == 3):
         raise ValueError('Data is 2d but filtering kernel is 3D.')
 
     if bool_print:
@@ -306,40 +306,22 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
     return
 
 
-def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print=False):
+def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
+    import scipy.ndimage
     # ERRORS in dataset
+    if (len(np.shape(mysignal)) == 1):
+        print('Data must be 2D image or 3D volume, or TOF stack of 2D images.')
+        return
+    if ((len(BoxKernel) == 1 or len(GaussianKernel) == 1)):
+        print('Kernels must be at least of size 2.')
+        return
+    if (len(np.shape(mysignal)) == 2
+            and (len(BoxKernel) == 3 or len(GaussianKernel) == 3)):
+        print('Data is 2d but filtering kernel is 3D.')
+        return
 
-    if mysignal is None:
-        raise ValueError("Provide a signal")
-
-    if len(np.shape(mysignal)) == 1:
-        raise ValueError("Data must be 2D image or 3D volume, or TOF stack of 2D images.")
-
-    if len(np.shape(mysignal)) > 3:
-        raise ValueError("Data must be 2D image or 3D volume, or TOF stack of 2D images.")
-
-    if (BoxKernel is None) and (GaussianKernel is None):
-        raise ValueError("You need to provide at least one kernel!")
-
-    if BoxKernel is None:
-
-        if len(np.shape(GaussianKernel)) == 1:
-            raise ValueError('Gaussian Kernels must be at least of size 2.')
-
-        if len(np.shape(GaussianKernel)) == 3:
-            raise ValueError('Data is 2d but filtering kernel is 3D.')
-
-    if GaussianKernel is None:
-
-        if len(np.shape(BoxKernel)) == 1:
-            raise ValueError("BoxKernels must be at least of size 2.")
-
-        if (len(np.shape(mysignal)) == 2) and (len(np.shape(BoxKernel)) == 3):
-            raise ValueError('Data is 2d but filtering kernel is 3D.')
-
-
-    if bool_print:
-        plt.figure(figsize=(15,10))
+    if (bool_print):
+        plt.figure(figsize=(15, 10))
         plt.subplot(1, 2, 1),
         if (len(np.shape(mysignal)) == 3):
             plt.imshow(np.nanmean(
@@ -349,13 +331,13 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
 
     # TOF data (3D), 2D kernel
     if (len(np.shape(mysignal)) == 3
-            and (BoxKernel and (len(BoxKernel) == 2) or (GaussianKernel and len(GaussianKernel) == 2))):
+            and (len(BoxKernel) == 2 or len(GaussianKernel) == 2)):
         print(
             'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
         )
         outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1],
                               np.shape(mysignal)[2]))
-        if BoxKernel:
+        if (any(BoxKernel)):
             kernel = np.ones((BoxKernel[0], BoxKernel[1]))
             kernel = kernel / np.sum(np.ravel(kernel))
             for i in tqdm(range(0, np.shape(mysignal)[2])):
@@ -368,7 +350,7 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
                                       axis=2)), plt.title('Output image')
                 plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
             return outsignal
-        if GaussianKernel:
+        if (any(GaussianKernel)):
             for i in tqdm(range(0, np.shape(mysignal)[2])):
                 outsignal[:, :, i] = scipy.ndimage.gaussian_filter(
                     mysignal[:, :, i], GaussianKernel)
@@ -386,7 +368,7 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
         print(
             'Data and filtering kernel are 3D. Applying 3D filter convolution.'
         )
-        if BoxKernel:
+        if (any(BoxKernel)):
             kernel = np.ones((BoxKernel[0], BoxKernel[1], BoxKernel[2]))
             kernel = kernel / np.sum(np.ravel(kernel))
             outsignal = scipy.ndimage.convolve(mysignal, kernel)
@@ -396,7 +378,7 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
                                       axis=2)), plt.title('Output image')
                 plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
             return outsignal
-        if GaussianKernel:
+        if (any(GaussianKernel)):
             outsignal = scipy.ndimage.gaussian_filter(mysignal, GaussianKernel)
             if (bool_print):
                 plt.subplot(1, 2, 2),
@@ -411,7 +393,7 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
         print(
             'Data and filtering kernel are 2D. Applying 2D filter convolution.'
         )
-        if BoxKernel:
+        if (any(BoxKernel)):
             kernel = np.ones((BoxKernel[0], BoxKernel[1]))
             kernel = kernel / np.sum(np.ravel(kernel))
             outsignal = scipy.ndimage.convolve(mysignal, kernel)
@@ -420,7 +402,7 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
                 plt.imshow(outsignal), plt.title('Output image')
                 plt.tight_layout(), plt.show(), plt.close()
             return outsignal
-        if GaussianKernel:
+        if (any(GaussianKernel)):
             outsignal = scipy.ndimage.gaussian_filter(mysignal, GaussianKernel)
             if (bool_print):
                 plt.subplot(1, 2, 2),
@@ -429,7 +411,6 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
             return outsignal
 
     return
-
 
 def spatial_image_rebinning(image, new_shape, operation='sum'):
     """
