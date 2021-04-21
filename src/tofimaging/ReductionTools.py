@@ -211,7 +211,7 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
             plt.imshow(mysignal), plt.title('Input image'), plt.colorbar()
 
     # TOF data (3D), 2D kernel
-    if len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
+    if  len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
         print(
             'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
         )

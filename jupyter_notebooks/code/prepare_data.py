@@ -117,20 +117,15 @@ class PrepareData(Parent):
 
         x = kernel_size['x']
         y = kernel_size['y']
+        kernel = [y, x]
+        if kernel_dimension == '3d':
+            l = kernel_size['lambda']
+            kernel_size.append(l)
 
         logging.debug(f"--> kernel dimension: {kernel_dimension}")
-        if kernel_dimension == '2d':
-            kernel = np.ones((y, x))
-
-        elif kernel_dimension == '3d':
-            l = kernel_size['lambda']
-            kernel = np.ones((y, x, l))
-
-        else:
-            raise NotImplementedError("kernel dimension does not exist!")
-
         logging.debug(f"--> kernel shape: {np.shape(kernel)}")
         logging.debug(f"--> len(sample_projections): {len(self.parent.sample_projections)}")
+        logging.debug(f"--> kernel: {kernel}")
 
         # self.parent.sample_projections = reduction_tools.moving_average_2D(self.parent.sample_projections,
         #                                                                    custom_kernel=kernel)
