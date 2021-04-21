@@ -2,6 +2,7 @@ import numpy as np
 import glob
 from collections import Counter
 import os
+from os.path import expanduser
 
 
 class Get:
@@ -39,6 +40,12 @@ class Get:
             return 'pixel by pixel'
         else:
             raise NotImplementedError("normalization mode not implemented!")
+
+    def log_file_name(self):
+        log_file_name = self.parent.config['log_file_name']
+        full_log_file_name = Get.get_full_home_file_name(log_file_name)
+        return full_log_file_name
+
 
     @staticmethod
     def nearest_index(array, value):
@@ -80,3 +87,9 @@ class Get:
         list_of_input_files = [os.path.abspath(_file) for _file in list_of_input_files]
 
         return [list_of_input_files, dominant_extension]
+
+    @staticmethod
+    def full_home_file_name(base_file_name):
+        home_folder = expanduser("~")
+        full_log_file_name = os.path.join(home_folder, base_file_name)
+        return full_log_file_name

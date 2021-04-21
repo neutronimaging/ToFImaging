@@ -7,6 +7,7 @@ from jupyter_notebooks.code.normalization import Normalization as LocalNormaliza
 from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.parent import Parent
 from jupyter_notebooks.code.display import Display
+from src.tofimaging import ReductionTools
 
 
 class PrepareData(Parent):
@@ -80,27 +81,42 @@ class PrepareData(Parent):
 
         if kernel_dimension == '2d':
             kernel = np.ones((y, x))
-            self.parent.sample_projections = reduction_tools.moving_average_2D(self.parent.sample_projections,
-                                                                               custom_kernel=kernel)
-
-            if self.parent.is_with_normalization:
-                self.parent.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
-                QtGui.QGuiApplication.processEvents()
-
-                self.parent.ob_projections = reduction_tools.moving_average_2D(self.parent.ob_projections,
-                                                                               custom_kernel=kernel)
-
-            self.parent.ui.statusbar.showMessage("Moving Average ... DONE!")
-            QtGui.QGuiApplication.processEvents()
 
         elif kernel_dimension == '3d':
             l = kernel_size['lambda']
             kernel = np.ones((y, x, l))
 
-            raise NotImplementedError("kernel dimension not implemented yet!")
-
         else:
             raise NotImplementedError("kernel dimension does not exist!")
+
+        # self.parent.sample_projections = reduction_tools.moving_average_2D(self.parent.sample_projections,
+        #                                                                    custom_kernel=kernel)
+        if kernel_type == 'box':
+            ReductionTools.DataFiltering(self.parent.sample_projections,
+                                         BoxKernel=kernel)
+        elif kernel_type == 'gaussian':
+            ReductionTools.DataFiltering(self.parent.sample_projections,
+                                         GaussianKernel=kernel)
+        else:
+            raise ValueError(f"kernel type {kernel_type} not supported!")
+
+        if self.parent.is_with_normalization:
+            self.parent.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
+            QtGui.QGuiApplication.processEvents()
+
+            # self.parent.ob_projections = reduction_tools.moving_average_2D(self.parent.ob_projections,
+            #                                                                custom_kernel=kernel)
+            if kernel_type == 'box':
+                ReductionTools.DataFiltering(self.parent.ob_projections,
+                                             BoxKernel=kernel)
+            elif kernel_type == 'gaussian':
+                ReductionTools.DataFiltering(self.parent.ob_projections,
+                                             GaussianKernel=kernel)
+            else:
+                raise ValueError(f"kernel type {kernel_type} not supported!")
+
+        self.parent.ui.statusbar.showMessage("Moving Average ... DONE!")
+        QtGui.QGuiApplication.processEvents()
 
         # T_mavg = reduction_tools.moving_average_2D(self.normalize_projections,
         #                                            custom_kernel=kernel)

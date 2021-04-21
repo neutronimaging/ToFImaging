@@ -25,6 +25,7 @@ class Interface(QMainWindow):
         # self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
         self.sample_projections_lambda_x_y = self.sample_projections
 
+        self.o_api = main_api
         self.tof_array = main_api.tof_array
         self.lambda_array = main_api.lambda_array
 
@@ -422,6 +423,7 @@ class Interface(QMainWindow):
             _y1 = _roi['y1']
             mask[_y0: _y1+1, _x0: _x1+1] = 1
         self.mask = mask
+
         self.close()
         display(HTML('<span style="font-size: 15px; color:green">You selected ' + str(len(self.list_roi)) +
                      ' ROI(s)</span>'))

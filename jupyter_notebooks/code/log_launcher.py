@@ -6,7 +6,7 @@ import logging
 
 from . import load_ui
 from .utilities.get import Get
-from .utilities.file_utilities import read_ascii, write_ascii
+from .utilities.file import read_ascii, write_ascii
 from . import refresh_image
 
 

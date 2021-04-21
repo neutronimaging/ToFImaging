@@ -4,6 +4,9 @@ from jupyter_notebooks.code import load_ui
 import numpy as np
 import copy
 import inflect
+import logging
+import versioneer
+import warnings
 
 from jupyter_notebooks.code.decorators import wait_cursor
 from jupyter_notebooks.code.fit_handler import FitHandler
@@ -16,6 +19,9 @@ from jupyter_notebooks.code.prepare_data import PrepareData
 from jupyter_notebooks.code.step3_settings_handler import Step3SettingsHandler
 from jupyter_notebooks.code.step4_settings_handler import Step4SettingsHandler
 from jupyter_notebooks.code.display import Display
+from jupyter_notebooks.code.log_launcher import LogLauncher
+
+# warnings.filterwarnings('ignore')
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -125,6 +131,19 @@ class Interface(QMainWindow):
         if not self.debugging_mode:
             o_display = Display(parent=self)
             o_display.prepare_data_raw_image()
+
+        # configuration of config
+        o_get = Get(parent=self)
+        log_file_name = o_get.get_log_file_name()
+        logging.basicConfig(filename=log_file_name,
+                            filemode='a',
+                            format='[%(levelname)s] - %(asctime)s - %(message)s',
+                            level=logging.INFO)
+        logging.info("*** Starting a new session ***")
+        logging.info(f" Version: {versioneer.get_version()}")
+
+    def log_button_clicked(self):
+        LogLauncher(parent=self)
 
     @wait_cursor
     def prepare_data_button_clicked(self):

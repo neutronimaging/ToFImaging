@@ -34,7 +34,7 @@
          <x>0</x>
          <y>0</y>
          <width>1689</width>
-         <height>902</height>
+         <height>908</height>
         </rect>
        </property>
        <attribute name="label">
@@ -556,7 +556,7 @@
          <x>0</x>
          <y>0</y>
          <width>1689</width>
-         <height>902</height>
+         <height>908</height>
         </rect>
        </property>
        <attribute name="label">
@@ -853,8 +853,23 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionLog"/>
+   </widget>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLog">
+   <property name="text">
+    <string>Log ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -1146,6 +1161,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionLog</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>log_button_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>857</x>
+     <y>546</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>apply_clicked()</slot>
@@ -1162,5 +1193,6 @@
   <slot>normalization_radioButton_clicked()</slot>
   <slot>export_prepared_data_clicked()</slot>
   <slot>activate_moving_average_clicked()</slot>
+  <slot>log_button_clicked()</slot>
  </slots>
 </ui>
