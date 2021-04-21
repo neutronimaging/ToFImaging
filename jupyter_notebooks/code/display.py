@@ -2,6 +2,7 @@ import numpy as np
 import pyqtgraph as pg
 
 from jupyter_notebooks.code.parent import Parent
+from jupyter_notebooks.code.utilities.get import Get
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -15,7 +16,7 @@ class Display(Parent):
         self.parent.ui.raw_image_view.setImage(live_image)
 
     def fit_data_tab(self):
-        self.parent.initialize_pixel_marker()
+        self.initialize_pixel_marker()
         self.image()
         self.profile()
         self.roi()
@@ -25,6 +26,33 @@ class Display(Parent):
         self.parent.init_rough_peak_slider()
         self.rough_peak_position()
 
+    def init_rough_peak_slider(self):
+        lambda_range = self.parent.bragg_peak_range_ui.getRegion()
+        minimum_value = Get.nearest_index(self.parent.o_roi.lambda_array, lambda_range[0])
+        maximum_value = Get.nearest_index(self.parent.o_roi.lambda_array, lambda_range[1])
+
+        current_rough_peak_value = self.parent.ui.rough_lambda_peak_position_slider.value()
+        if (current_rough_peak_value <= minimum_value) or (current_rough_peak_value >= maximum_value):
+            current_rough_peak_value = np.int(np.mean([minimum_value, maximum_value]))
+            self.parent.rough_peak_index_position = current_rough_peak_value
+
+        self.parent.ui.rough_lambda_peak_position_slider.setMinimum(minimum_value)
+        self.parent.ui.rough_lambda_peak_position_slider.setMaximum(maximum_value)
+        self.parent.ui.rough_lambda_peak_position_slider.setValue(current_rough_peak_value)
+
+    def initialize_pixel_marker(self):
+        for _index_roi in self.parent.o_roi.list_roi:
+            _roi = self.parent.o_roi.list_roi[_index_roi]
+            _x0 = _roi['x0']
+            _y0 = _roi['y0']
+            _x1 = _roi['x1']
+            _y1 = _roi['y1']
+
+            x = np.mean([_x0, _x1])
+            y = np.mean([_y0, _y1])
+
+            self.parent.pixel_marker = {'x': np.int(x),
+                                        'y': np.int(y)}
 
     def prepare_data_preview_image(self):
         prepare_data = self.parent.normalize_projections

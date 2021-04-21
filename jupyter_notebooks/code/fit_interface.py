@@ -12,7 +12,6 @@ from jupyter_notebooks.code.decorators import wait_cursor
 from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.initialization import Initialization
-from jupyter_notebooks.code.roi_selection import Interface as RoiInterface
 from jupyter_notebooks.code.export import Export
 from jupyter_notebooks.code.event_handler import EventHandler
 from jupyter_notebooks.code.prepare_data import PrepareData
@@ -160,34 +159,6 @@ class Interface(QMainWindow):
         o_export = Export(parent=self)
         o_export.run()
 
-    def init_rough_peak_slider(self):
-        lambda_range = self.bragg_peak_range_ui.getRegion()
-        minimum_value = Get.nearest_index(self.o_roi.lambda_array, lambda_range[0])
-        maximum_value = Get.nearest_index(self.o_roi.lambda_array, lambda_range[1])
-
-        current_rough_peak_value = self.ui.rough_lambda_peak_position_slider.value()
-        if (current_rough_peak_value <= minimum_value) or (current_rough_peak_value >= maximum_value):
-            current_rough_peak_value = np.int(np.mean([minimum_value, maximum_value]))
-            self.rough_peak_index_position = current_rough_peak_value
-
-        self.ui.rough_lambda_peak_position_slider.setMinimum(minimum_value)
-        self.ui.rough_lambda_peak_position_slider.setMaximum(maximum_value)
-        self.ui.rough_lambda_peak_position_slider.setValue(current_rough_peak_value)
-
-    def initialize_pixel_marker(self):
-        for _index_roi in self.o_roi.list_roi:
-            _roi = self.o_roi.list_roi[_index_roi]
-            _x0 = _roi['x0']
-            _y0 = _roi['y0']
-            _x1 = _roi['x1']
-            _y1 = _roi['y1']
-
-            x = np.mean([_x0, _x1])
-            y = np.mean([_y0, _y1])
-
-            self.pixel_marker = {'x': np.int(x),
-                                 'y': np.int(y)}
-
     def pixel_marker_changed(self):
         region = self.pixel_marker_item.getArraySlice(self.live_image,
                                                       self.ui.image_view.imageItem)
@@ -203,26 +174,8 @@ class Interface(QMainWindow):
         o_display.profile()
 
     def check_status_of_fit_buttons(self):
-
-        # we need to make sure the pixel selected is inside one of the ROI
-        x_pixel, y_pixel = self.pixel_marker['x'], self.pixel_marker['y']
-
-        list_roi = self.o_roi.list_roi
-        for _index_roi in list_roi.keys():
-            _roi = list_roi[_index_roi]
-            _x0 = _roi['x0']
-            _y0 = _roi['y0']
-            _x1 = _roi['x1']
-            _y1 = _roi['y1']
-
-            if (x_pixel >= _x0) and (x_pixel <= _x1) and \
-                (y_pixel >= _y0) and (y_pixel <= _y1):
-                self.ui.step3_fit_pixel_pushButton.setEnabled(True)
-                self.ui.statusbar.showMessage("")
-                return
-        self.ui.step3_fit_pixel_pushButton.setEnabled(False)
-        self.ui.statusbar.showMessage("Pixel must be inside one of the ROI selected!")
-        self.ui.statusbar.setStyleSheet("color: red")
+        o_event = EventHandler(parent=self)
+        o_event.check_status_of_fit_buttons()
 
     def calculate_profile_of_pixel_selected(self):
         pixel_marker = self.pixel_marker
@@ -274,11 +227,9 @@ class Interface(QMainWindow):
         o_display = Display(parent=self)
         o_display.rough_peak_position()
 
-    def get_rough_peak_position(self):
-        return self.rough_peak_ui.pos()[0]
-
     def lambda_range_changed(self):
-        rough_peak_position = self.get_rough_peak_position()
+        o_get = Get(parent=self)
+        rough_peak_position = o_get.rough_peak_position()
 
         new_lambda_range = self.bragg_peak_range_ui.getRegion()
         left_index = Get.nearest_index(self.o_roi.lambda_array, new_lambda_range[0])
@@ -308,36 +259,6 @@ class Interface(QMainWindow):
         p = inflect.engine()
         message = "{} ".format(nbr_of_roi) + p.plural("ROI", nbr_of_roi) + " selected!"
         self.ui.normalization_message_label.setText(message)
-
-    def can_we_use_buffered_data(self, kernel_dimension=None, kernel_size=None, kernel_type=None):
-
-        if self.moving_average_config is None:
-            return False
-
-        buffered_kernel_dimension = self.moving_average_config.get('kernel_dimension', None)
-        if buffered_kernel_dimension is None:
-            return False
-        if not (kernel_dimension == buffered_kernel_dimension):
-            return False
-
-        buffered_kernel_size = self.moving_average_config.get('kernel_size', None)
-        if buffered_kernel_size is None:
-            return False
-        if not (buffered_kernel_size['x'] == kernel_size['x']):
-            return False
-        if not (buffered_kernel_size['y'] == kernel_size['y']):
-            return False
-        if kernel_dimension == '3d':
-            if not (buffered_kernel_size['lambda'] == kernel_size['lambda']):
-                return False
-
-        buffered_kernel_type = self.moving_average_config.get('kernel_type', None)
-        if buffered_kernel_type is None:
-            return False
-        if not (buffered_kernel_type == kernel_type):
-            return False
-
-        return True
 
     def calculate_mask(self):
         o_event = EventHandler(parent=self)
@@ -387,39 +308,4 @@ class Interface(QMainWindow):
             self.step4_settings_ui = step4_settings_ui
 
     def apply_clicked(self):
-        self.close()
-
-
-class NormRoiSelection(RoiInterface):
-
-    def __init__(self, parent=None, main_api=None):
-        super(RoiInterface, self).__init__(parent)
-        self.parent = parent
-
-        self.sample_projections_lambda_x_y = main_api.sample_projections  # lambda, y, x
-        # self.sample_projections_lambda_x_y = self.sample_projections.transpose(2, 0, 1)  # lambda, x, y
-        self.tof_array = main_api.tof_array
-        self.lambda_array = main_api.lambda_array
-
-        ui_full_path = os.path.join(os.path.dirname(__file__), os.path.join('ui', 'ui_roi_selection.ui'))
-        self.ui = load_ui(ui_full_path, baseinstance=self)
-        self.setWindowTitle("Select region to fit!")
-
-        self.init_widgets()
-        self.display_image()
-
-    def apply_clicked(self):
-        mask = np.zeros(np.shape(self.live_image))
-        for _index_roi in self.list_roi.keys():
-            _roi = self.list_roi[_index_roi]
-            _x0 = _roi['x0']
-            _y0 = _roi['y0']
-            _x1 = _roi['x1']
-            _y1 = _roi['y1']
-            mask[_y0: _y1 + 1, _x0: _x1 + 1] = 1
-        self.mask = mask
-
-        self.parent.update_number_of_normalization_roi(nbr_of_roi=len(self.list_roi))
-        self.parent.ob_list_roi = self.list_roi
-
         self.close()

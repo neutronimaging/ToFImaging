@@ -2,7 +2,6 @@ from ipywidgets import widgets
 from IPython.core.display import HTML
 from IPython.display import display, clear_output
 import os
-import copy
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +11,6 @@ import shutil
 import ipywe.fileselector
 import ipywe.fileselector
 from NeuNorm.normalization import Normalization
-from NeuNorm.roi import ROI
 from neutronbraggedge.experiment_handler import TOF, Experiment
 from jupyter_notebooks.code.neutronimaging.detector_correction import read_shutter_count
 from jupyter_notebooks.code.neutronimaging.detector_correction import read_shutter_time
@@ -25,8 +23,6 @@ from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.utilities import file as file_utilities
 
 from ToFImaging import reduction_tools
-from jupyter_notebooks.code import detector_correction
-from jupyter_notebooks.code import utilities
 
 DEBUG = True
 DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-strain-mapping/to_test_notebook/"

@@ -46,6 +46,8 @@ class Get:
         full_log_file_name = Get.full_home_file_name(log_file_name)
         return full_log_file_name
 
+    def rough_peak_position(self):
+        return self.parent.rough_peak_ui.pos()[0]
 
     @staticmethod
     def nearest_index(array, value):
