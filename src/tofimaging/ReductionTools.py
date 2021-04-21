@@ -180,6 +180,29 @@ def moving_average_2D(mysignal, box_kernel=[], custom_kernel=np.ndarray([0])):
     return outsignal
 
 
+def display_input_signal(signal=None, bool_print=False):
+    if not bool_print:
+        return
+    plt.figure(figsize=(15, 10))
+    plt.subplot(1, 2, 1),
+    if len(np.shape(signal)) == 3:
+        plt.imshow(np.nanmean(signal, axis=2))
+    else:
+        plt.imshow(signal)
+    plt.title('Input image'),
+    plt.colorbar()
+
+
+def display_output_signal(signal=None, bool_print=False):
+    if not bool_print:
+        return
+    plt.subplot(1, 2, 2),
+    plt.imshow(np.nanmean(signal, axis=2)), plt.title('Output image')
+    plt.colorbar()
+    plt.tight_layout()
+    plt.show()
+    plt.close()
+
 
 def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, bool_print=False):
 
@@ -201,14 +224,7 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
     if (len(np.shape(mysignal)) == 2) and (len(kernel) == 3):
         raise ValueError('Data is 2d but filtering kernel is 3D.')
 
-    if bool_print:
-        plt.figure(figsize=(15,10))
-        plt.subplot(1, 2, 1),
-        if (len(np.shape(mysignal)) == 3):
-            plt.imshow(np.nanmean(
-                mysignal, axis=2)), plt.title('Input image'), plt.colorbar()
-        else:
-            plt.imshow(mysignal), plt.title('Input image'), plt.colorbar()
+    display_input_signal(signal=mysignal, bool_print=bool_print):
 
     # TOF data (3D), 2D kernel
     if  len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
@@ -224,12 +240,7 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
             for i in tqdm(range(0, np.shape(mysignal)[2])):
                 outsignal[:, :, i] = scipy.ndimage.convolve(
                     mysignal[:, :, i], kernel)
-
-            if (bool_print):
-                plt.subplot(1, 2, 2),
-                plt.imshow(np.nanmean(outsignal,
-                                      axis=2)), plt.title('Output image')
-                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
 
         elif kernel_type == KernelType.gaussian:
@@ -237,11 +248,7 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
                 outsignal[:, :, i] = scipy.ndimage.gaussian_filter(
                     mysignal[:, :, i], kernel)
 
-            if (bool_print):
-                plt.subplot(1, 2, 2),
-                plt.imshow(np.nanmean(outsignal,
-                                      axis=2)), plt.title('Output image')
-                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
 
         else:
@@ -257,20 +264,12 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
             kernel = np.ones((kernel[0], kernel[1], kernel[2]))
             kernel = kernel / np.sum(np.ravel(kernel))
             outsignal = scipy.ndimage.convolve(mysignal, kernel)
-            if (bool_print):
-                plt.subplot(1, 2, 2),
-                plt.imshow(np.nanmean(outsignal,
-                                      axis=2)), plt.title('Output image')
-                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
 
         elif kernel_type == KernelType.gaussian:
             outsignal = scipy.ndimage.gaussian_filter(mysignal, kernel)
-            if (bool_print):
-                plt.subplot(1, 2, 2),
-                plt.imshow(np.nanmean(outsignal,
-                                      axis=2)), plt.title('Output image')
-                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
 
         else:
@@ -286,18 +285,12 @@ def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, b
             kernel = np.ones((kernel[0], kernel[1]))
             kernel = kernel / np.sum(np.ravel(kernel))
             outsignal = scipy.ndimage.convolve(mysignal, kernel)
-            if (bool_print):
-                plt.subplot(1, 2, 2),
-                plt.imshow(outsignal), plt.title('Output image')
-                plt.tight_layout(), plt.show(), plt.close()
+            display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
 
         elif kernel_type == KernelType.gaussian:
             outsignal = scipy.ndimage.gaussian_filter(mysignal, kernel)
-            if (bool_print):
-                plt.subplot(1, 2, 2),
-                plt.imshow(outsignal), plt.title('Output image')
-                plt.tight_layout(), plt.show(), plt.close()
+            display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
 
         else:
