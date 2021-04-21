@@ -4,6 +4,8 @@ from collections import Counter
 import os
 from os.path import expanduser
 
+from src.tofimaging.ReductionTools import KernelType
+
 
 class Get:
 
@@ -12,9 +14,9 @@ class Get:
 
     def kernel_type(self):
         if self.parent.ui.kernel_type_box_radioButton.isChecked():
-            return 'box'
+            return KernelType.box
         elif self.parent.ui.kernel_type_gaussian_radioButton.isChecked():
-            return 'gaussian'
+            return KernelType.gaussian
         else:
             raise NotImplementedError("kernel type not implemented!")
 

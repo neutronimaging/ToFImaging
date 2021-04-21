@@ -28,7 +28,7 @@ class TestReductionTools:
         image123_3d = np.array([self.image1, self.image2, self.image3])
         self.image123_3d = image123_3d.transpose(1, 2, 0)
 
-    def test_data_filtering_parameters_error(self):
+    def test_DataFilering_parameters_error(self):
         with pytest.raises(ValueError):
             ReductionTools.DataFiltering()
 
@@ -62,3 +62,30 @@ class TestReductionTools:
             my_signal = np.ones((10, 10))
             gaussian_kernel = np.ones((10, 10, 10))
             ReductionTools.DataFiltering(mysignal=my_signal, GaussianKernel=gaussian_kernel)
+
+    def test_data_filtering_parameters_error(self):
+        with pytest.raises(ValueError):
+            ReductionTools.data_filering()
+
+        with pytest.raises(ValueError):
+            my_signal = np.zeros((10))
+            ReductionTools.data_filering(mysignal=my_signal)
+
+        with pytest.raises(ValueError):
+            box_kernel = np.ones((10, 10))
+            my_signal = np.zeros((10, 10, 10, 10))
+            ReductionTools.data_filering(mysignal=my_signal, kernel=box_kernel)
+
+        with pytest.raises(ValueError):
+            my_signal = np.zeros((10, 10))
+            ReductionTools.data_filering(mysignal=my_signal)
+
+        with pytest.raises(ValueError):
+            my_signal = np.zeros((10, 10))
+            kernel = np.ones((10))
+            ReductionTools.data_filering(mysignal=my_signal, kernel=kernel)
+
+        with pytest.raises(ValueError):
+            my_signal = np.zeros((10, 10))
+            kernel = np.ones((10, 10, 20))
+            ReductionTools.data_filering(mysignal=my_signal, kernel=kernel)

@@ -139,7 +139,7 @@ class Interface(QMainWindow):
         logging.basicConfig(filename=log_file_name,
                             filemode='a',
                             format='[%(levelname)s] - %(asctime)s - %(message)s',
-                            level=logging.INFO)
+                            level=logging.DEBUG)
         logging.info("*** Starting a new session ***")
         # logging.info(f" Version: {versioneer.get_version()}")
 

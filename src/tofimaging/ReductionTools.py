@@ -1,9 +1,15 @@
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import scipy.ndimage
 
 h = 6.62607004e-34  #Planck constant [m^2 kg / s]
 m = 1.674927471e-27  #Neutron mass [kg]
+
+
+class KernelType:
+    box = 0
+    gaussian = 1
 
 
 #Unit Conversions
@@ -174,8 +180,133 @@ def moving_average_2D(mysignal, box_kernel=[], custom_kernel=np.ndarray([0])):
     return outsignal
 
 
+
+def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, bool_print=False):
+
+    if mysignal is None:
+        raise ValueError("Provide a signal")
+
+    if len(np.shape(mysignal)) == 1:
+        raise ValueError("Data must be 2D image or 3D volume, or TOF stack of 2D images.")
+
+    if len(np.shape(mysignal)) > 3:
+        raise ValueError("Data must be 2D image or 3D volume, or TOF stack of 2D images.")
+
+    if kernel is None:
+        raise ValueError("You need to provide a kernel!")
+
+    if len(np.shape(kernel)) == 1:
+        raise ValueError('Kernel must be at least of size 2.')
+
+    if (len(np.shape(mysignal)) == 2) and (len(np.shape(kernel)) == 3):
+        raise ValueError('Data is 2d but filtering kernel is 3D.')
+
+    if bool_print:
+        plt.figure(figsize=(15,10))
+        plt.subplot(1, 2, 1),
+        if (len(np.shape(mysignal)) == 3):
+            plt.imshow(np.nanmean(
+                mysignal, axis=2)), plt.title('Input image'), plt.colorbar()
+        else:
+            plt.imshow(mysignal), plt.title('Input image'), plt.colorbar()
+
+    # TOF data (3D), 2D kernel
+    if len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
+        print(
+            'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
+        )
+        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1],
+                              np.shape(mysignal)[2]))
+
+        if kernel_type == KernelType.box:
+            kernel = np.ones((kernel[0], kernel[1]))
+            kernel = kernel / np.sum(np.ravel(kernel))
+            for i in tqdm(range(0, np.shape(mysignal)[2])):
+                outsignal[:, :, i] = scipy.ndimage.convolve(
+                    mysignal[:, :, i], kernel)
+
+            if (bool_print):
+                plt.subplot(1, 2, 2),
+                plt.imshow(np.nanmean(outsignal,
+                                      axis=2)), plt.title('Output image')
+                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            return outsignal
+
+        elif kernel_type == KernelType.gaussian:
+            for i in tqdm(range(0, np.shape(mysignal)[2])):
+                outsignal[:, :, i] = scipy.ndimage.gaussian_filter(
+                    mysignal[:, :, i], kernel)
+
+            if (bool_print):
+                plt.subplot(1, 2, 2),
+                plt.imshow(np.nanmean(outsignal,
+                                      axis=2)), plt.title('Output image')
+                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            return outsignal
+
+        else:
+            raise ValueError(f"Kernel Type {kernel_type} not supported! ")
+
+    # TOF data (3D), 3D kernel
+    elif len(np.shape(mysignal)) == 3 and (len(kernel) == 3):
+        print(
+            'Data and filtering kernel are 3D. Applying 3D filter convolution.'
+        )
+
+        if kernel_type == KernelType.box:
+            kernel = np.ones((kernel[0], kernel[1], kernel[2]))
+            kernel = kernel / np.sum(np.ravel(kernel))
+            outsignal = scipy.ndimage.convolve(mysignal, kernel)
+            if (bool_print):
+                plt.subplot(1, 2, 2),
+                plt.imshow(np.nanmean(outsignal,
+                                      axis=2)), plt.title('Output image')
+                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            return outsignal
+
+        elif kernel_type == KernelType.gaussian:
+            outsignal = scipy.ndimage.gaussian_filter(mysignal, kernel)
+            if (bool_print):
+                plt.subplot(1, 2, 2),
+                plt.imshow(np.nanmean(outsignal,
+                                      axis=2)), plt.title('Output image')
+                plt.colorbar(), plt.tight_layout(), plt.show(), plt.close()
+            return outsignal
+
+        else:
+            raise ValueError(f"Kernel Type {kernel_type} not supported! ")
+
+    # image data (2D), 2D kernel
+    elif len(np.shape(mysignal)) == 2 and (len(kernel) == 2):
+        print(
+            'Data and filtering kernel are 2D. Applying 2D filter convolution.'
+        )
+
+        if kernel_type == KernelType.box:
+            kernel = np.ones((kernel[0], kernel[1]))
+            kernel = kernel / np.sum(np.ravel(kernel))
+            outsignal = scipy.ndimage.convolve(mysignal, kernel)
+            if (bool_print):
+                plt.subplot(1, 2, 2),
+                plt.imshow(outsignal), plt.title('Output image')
+                plt.tight_layout(), plt.show(), plt.close()
+            return outsignal
+
+        elif kernel_type == KernelType.gaussian:
+            outsignal = scipy.ndimage.gaussian_filter(mysignal, kernel)
+            if (bool_print):
+                plt.subplot(1, 2, 2),
+                plt.imshow(outsignal), plt.title('Output image')
+                plt.tight_layout(), plt.show(), plt.close()
+            return outsignal
+
+        else:
+            raise ValueError(f"Kernel Type {kernel_type} not supported! ")
+
+    return
+
+
 def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print=False):
-    import scipy.ndimage
     # ERRORS in dataset
 
     if mysignal is None:
@@ -197,7 +328,6 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
 
         if len(np.shape(GaussianKernel)) == 3:
             raise ValueError('Data is 2d but filtering kernel is 3D.')
-            return
 
     if GaussianKernel is None:
 
@@ -206,6 +336,7 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
 
         if (len(np.shape(mysignal)) == 2) and (len(np.shape(BoxKernel)) == 3):
             raise ValueError('Data is 2d but filtering kernel is 3D.')
+
 
     if bool_print:
         plt.figure(figsize=(15,10))
@@ -218,7 +349,7 @@ def DataFiltering(mysignal=None, BoxKernel=None, GaussianKernel=None, bool_print
 
     # TOF data (3D), 2D kernel
     if (len(np.shape(mysignal)) == 3
-            and (len(BoxKernel) == 2 or len(GaussianKernel) == 2)):
+            and (BoxKernel and (len(BoxKernel) == 2) or (GaussianKernel and len(GaussianKernel) == 2))):
         print(
             'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
         )
