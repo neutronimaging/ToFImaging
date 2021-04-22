@@ -129,9 +129,9 @@ class PrepareData(Parent):
 
         # self.parent.sample_projections = reduction_tools.moving_average_2D(self.parent.sample_projections,
         #                                                                    custom_kernel=kernel)
-        ReductionTools.data_filering(self.parent.sample_projections,
-                                     kernel=kernel,
-                                     kernel_type=kernel_type)
+        self.parent.sample_projections = ReductionTools.data_filering(self.parent.sample_projections,
+                                                                      kernel=kernel,
+                                                                      kernel_type=kernel_type)
 
         if self.parent.is_with_normalization:
             self.parent.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
@@ -139,9 +139,9 @@ class PrepareData(Parent):
 
             # self.parent.ob_projections = reduction_tools.moving_average_2D(self.parent.ob_projections,
             #                                                                custom_kernel=kernel)
-            ReductionTools.data_filering(self.parent.ob_projections,
-                                         kernel=kernel,
-                                         kernel_type=kernel_type)
+            self.parent.ob_projections = ReductionTools.data_filering(self.parent.ob_projections,
+                                                                      kernel=kernel,
+                                                                      kernel_type=kernel_type)
 
         self.parent.ui.statusbar.showMessage("Moving Average ... DONE!")
         QtGui.QGuiApplication.processEvents()

@@ -36,6 +36,9 @@ class Interface(QMainWindow):
     o_api = None
     live_image = None
 
+    histogram_level = {"process_image_view": [],
+                       "image_view": []}
+
     list_roi = None
     ob_list_roi = None
 

@@ -55,6 +55,7 @@ class Display(Parent):
                                         'y': np.int(y)}
 
     def prepare_data_preview_image(self):
+        self.parent.ui.process_image_view.clear()
         prepare_data = self.parent.normalize_projections
         self.parent.live_process_data = np.mean(prepare_data, axis=0)
         live_process_image = np.transpose(self.parent.live_process_data)
@@ -64,6 +65,10 @@ class Display(Parent):
         self.parent.ui.process_image_view.view.getViewBox().setYLink('raw image')
 
     def image(self):
+        # debug_data = self.parent.live_process_data - self.parent.o_roi.live_image
+        # live_image = np.transpose(debug_data)
+        # self.parent.ui.image_view.setImage(live_image)
+
         self.parent.live_image = self.parent.o_roi.live_image
         live_image = np.transpose(self.parent.live_image)
         self.parent.ui.image_view.setImage(live_image)
