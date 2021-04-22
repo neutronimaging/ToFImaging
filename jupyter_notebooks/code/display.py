@@ -23,7 +23,7 @@ class Display(Parent):
         self.cross_of_pixel_to_fit()
         self.box_around_pixel_to_fit()
         self.lambda_range_to_fit()
-        self.parent.init_rough_peak_slider()
+        self.init_rough_peak_slider()
         self.rough_peak_position()
 
     def init_rough_peak_slider(self):

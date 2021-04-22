@@ -120,7 +120,7 @@ class PrepareData(Parent):
         kernel = [y, x]
         if kernel_dimension == '3d':
             l = kernel_size['lambda']
-            kernel_size.append(l)
+            kernel.append(l)
 
         logging.debug(f"--> kernel dimension: {kernel_dimension}")
         logging.debug(f"--> kernel shape: {np.shape(kernel)}")
