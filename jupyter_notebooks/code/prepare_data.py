@@ -2,8 +2,6 @@ from qtpy import QtGui
 import numpy as np
 import logging
 
-from src.tofimaging.ReductionTools import KernelType, data_filering
-
 from jupyter_notebooks.code.normalization import Normalization as LocalNormalization
 from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.parent import Parent
@@ -127,21 +125,17 @@ class PrepareData(Parent):
         logging.debug(f"--> len(sample_projections): {len(self.parent.sample_projections)}")
         logging.debug(f"--> kernel: {kernel}")
 
-        # self.parent.sample_projections = reduction_tools.moving_average_2D(self.parent.sample_projections,
-        #                                                                    custom_kernel=kernel)
-        self.parent.sample_projections = ReductionTools.data_filering(self.parent.sample_projections,
-                                                                      kernel=kernel,
-                                                                      kernel_type=kernel_type)
+        self.parent.sample_projections = ReductionTools.data_filtering(self.parent.sample_projections,
+                                                                       kernel=kernel,
+                                                                       kernel_type=kernel_type)
 
         if self.parent.is_with_normalization:
             self.parent.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
             QtGui.QGuiApplication.processEvents()
 
-            # self.parent.ob_projections = reduction_tools.moving_average_2D(self.parent.ob_projections,
-            #                                                                custom_kernel=kernel)
-            self.parent.ob_projections = ReductionTools.data_filering(self.parent.ob_projections,
-                                                                      kernel=kernel,
-                                                                      kernel_type=kernel_type)
+            self.parent.ob_projections = ReductionTools.data_filtering(self.parent.ob_projections,
+                                                                       kernel=kernel,
+                                                                       kernel_type=kernel_type)
 
         self.parent.ui.statusbar.showMessage("Moving Average ... DONE!")
         QtGui.QGuiApplication.processEvents()

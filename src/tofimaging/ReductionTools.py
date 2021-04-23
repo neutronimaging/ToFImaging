@@ -204,7 +204,7 @@ def display_output_signal(signal=None, bool_print=False):
     plt.close()
 
 
-def data_filering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, bool_print=False):
+def data_filtering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, bool_print=False):
 
     if mysignal is None:
         raise ValueError("Provide a signal")

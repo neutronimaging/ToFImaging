@@ -7,10 +7,10 @@ import numpy.matlib
 from tqdm import tqdm
 import time
 
-import tofimaging.ReductionTools as rt
-from tofimaging.ReductionTools import tof2l
-from tofimaging.ReductionTools import find_nearest
-from tofimaging.ReductionTools import savitzky_golay as SG_filter
+import src.tofimaging.ReductionTools as rt
+from src.tofimaging.ReductionTools import tof2l
+from src.tofimaging.ReductionTools import find_nearest
+from src.tofimaging.ReductionTools import savitzky_golay as SG_filter
 
 
 #------------------------------ SINGLE EDGE FITTING ------------------------#

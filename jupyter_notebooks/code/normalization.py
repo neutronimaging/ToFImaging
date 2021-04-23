@@ -29,15 +29,16 @@ class Normalization:
 
             if self.parent.ui.normalization_pixel_by_pixel_radioButton.isChecked():
 
-                self.parent.normalize_projections = Normalization.normalization_pixel_by_pixel(working_ob_projections,
-                                                                                               working_sample_projections)
+                self.parent.normalize_projections = \
+                    Normalization.normalization_pixel_by_pixel(working_ob_projections,
+                                                               working_sample_projections)
 
             elif self.parent.ui.normalization_by_roi_radioButton.isChecked():
 
                 list_roi = self.parent.o_roi.list_roi
                 self.parent.normalize_projections = Normalization.normalization_by_roi(list_roi,
-                                                                                working_ob_projections,
-                                                                                working_sample_projections)
+                                                                                       working_ob_projections,
+                                                                                       working_sample_projections)
 
             elif self.parent.ui.normal_normalization_radioButton.isChecked():
 

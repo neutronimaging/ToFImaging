@@ -1,8 +1,10 @@
 from qtpy import QtGui, QtCore
 from qtpy.QtWidgets import QApplication
 import numpy as np
+import logging
 
-from ToFImaging.edgefitting_2D import GaussianBraggEdgeFitting_2D
+from src.tofimaging.EdgeFitting import GaussianBraggEdgeFitting2D
+from jupyter_notebooks.code.utilities.get import Get
 
 
 class FitHandler:
@@ -14,20 +16,29 @@ class FitHandler:
         self.parent = parent
 
     def fit(self, mode='pixel'):
+        logging.info("Fitting started ...")
+        logging.info(f"-> mode: {mode}")
         self.parent.ui.setEnabled(False)
 
         # get algorithm selected
         algorithm_selected = self.get_algorithm_selected()
+        logging.info(f"-> algorithm selected: {algorithm_selected}")
 
         # get lambda range and full array
         lambda_range = self.parent.bragg_peak_range_ui.getRegion()
         lambda_array = self.parent.o_roi.lambda_array
+        logging.info(f"-> len(lambda_array): {len(lambda_array)}")
+        logging.info(f"-> lambda_range: {lambda_range}")
 
         # get estimated bragg peak position
-        est_position = self.parent.get_rough_peak_position()
+        o_get = Get(parent=self.parent)
+        est_position = o_get.rough_peak_position()
+        logging.info(f"-> estimated bragg edge position: {est_position}")
 
         mask = self.parent.mask
-        T_mavg = self.parent.T_mavg
+        logging.debug(f"-> np.shape(mask): {np.shape(mask)}")
+        normalize_projections = self.parent.normalize_projections
+        logging.debug(f"-> np.shape(normalize_projections): {np.shape(normalize_projections)}")
 
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... IN PROGRESS".format(
                 mode, algorithm_selected))
@@ -36,7 +47,7 @@ class FitHandler:
 
         if mode == 'pixel':
             result = self.fit_pixel(algorithm_selected,
-                                    T_mavg,
+                                    normalize_projections,
                                     lambda_array,
                                     lambda_range,
                                     mask,
@@ -62,7 +73,7 @@ class FitHandler:
             est_width = self.parent.pixel_fit_result['edge_width']
             est_position = self.parent.pixel_fit_result['edge_position']
             result = self.fit_full_roi(algorithm_selected,
-                                       T_mavg,
+                                       normalize_projections,
                                        lambda_array,
                                        lambda_range,
                                        mask,
@@ -86,17 +97,17 @@ class FitHandler:
             pos_bc = config['estimated_bragg_edge_position_range']
             wid_bc = config['estimated_bragg_edge_width_range']
 
-            fit_result = GaussianBraggEdgeFitting_2D(T_mavg,
-                                                     lambda_array,
-                                                     lambda_range,
-                                                     mask=mask,
-                                                     bool_log=False,
-                                                     est_position=est_position,
-                                                     est_wid=est_width,
-                                                     est_h=est_height,
-                                                     wid_BC=wid_bc,
-                                                     pos_BC=pos_bc,
-                                                     )
+            fit_result = GaussianBraggEdgeFitting2D(T_mavg,
+                                                    lambda_array,
+                                                    lambda_range,
+                                                    mask=mask,
+                                                    bool_log=False,
+                                                    est_position=est_position,
+                                                    est_wid=est_width,
+                                                    est_h=est_height,
+                                                    wid_BC=wid_bc,
+                                                    pos_BC=pos_bc,
+                                                    )
             return fit_result
 
         else:
@@ -104,39 +115,55 @@ class FitHandler:
 
     def fit_pixel(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, est_position, config):
 
+        logging.info("entering fix_pixel method")
+
         # get pixel coordinates
         pixel_marker = self.parent.pixel_marker
         pixel = [pixel_marker['x'],
                  pixel_marker['y']]
+        logging.info(f"-> pixel: {pixel}")
 
         auto_mask = config['is_automatic_masking']
+        logging.info(f"-> auto_mask: {auto_mask}")
         mask_thresh = [np.float(config['threshold_low']),
                        np.float(config['threshold_high'])]
+        logging.info(f"-> mask_thresh: {mask_thresh}")
         bool_smooth = config['is_perform_savitzky_golay_filtering']
+        logging.info(f"-> bool_smooth: {bool_smooth}")
         smooth_w = np.int(config['window_size'])
+        logging.info(f"-> smooth_w: {smooth_w}")
         smooth_n = np.int(config['order_number'])
+        logging.info(f"-> smooth_n: {smooth_n}")
         if config['is_interpolation_factor']:
             interp_factor = np.int(config['interpolation_factor_value'])
         else:
             interp_factor = 0
+        logging.info(f"-> interp_factor: {interp_factor}")
         bool_log = config['is_cross_section_mode']
+        logging.info(f"-> bool_log: {bool_log}")
 
+        T_mavg = T_mavg.transpose(1, 2, 0)  # lambda, x, y -> x, y, lambda
+        logging.info(f"-> np.shape(T_mavg): {np.shape(T_mavg)}")
+
+        logging.info(f"-> algorithm selected: {algorithm_selected}")
         if algorithm_selected == 'gaussian':
-            fit_result = GaussianBraggEdgeFitting_2D(T_mavg,
-                                                     lambda_array,
-                                                     lambda_range,
-                                                     mask=mask,
-                                                     est_pos=est_position,
-                                                     pos_BC=lambda_range,
-                                                     debug_idx=pixel,
-                                                     bool_save=True,
-                                                     bool_smooth=bool_smooth,
-                                                     smooth_w=smooth_w,
-                                                     smooth_n=smooth_n,
-                                                     auto_mask=auto_mask,
-                                                     mask_thresh=mask_thresh,
-                                                     interp_factor=interp_factor,
-                                                     bool_log=bool_log)
+            logging.info(f"--> about to run GaussianBraggEdgeFitting2D")
+            fit_result = GaussianBraggEdgeFitting2D(T_mavg,
+                                                    lambda_array,
+                                                    lambda_range,
+                                                    mask=mask,
+                                                    est_pos=est_position,
+                                                    pos_BC=lambda_range,
+                                                    debug_idx=pixel,
+                                                    bool_save=True,
+                                                    bool_smooth=bool_smooth,
+                                                    smooth_w=smooth_w,
+                                                    smooth_n=smooth_n,
+                                                    auto_mask=auto_mask,
+                                                    mask_thresh=mask_thresh,
+                                                    interp_factor=interp_factor,
+                                                    bool_log=bool_log)
+            logging.info(f"--> done with GaussianBraggEdgeFitting2D")
             return fit_result
 
         else:
