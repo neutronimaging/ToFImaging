@@ -70,10 +70,6 @@ class Display(Parent):
         self.parent.ui.process_image_view.view.getViewBox().setYLink('raw image')
 
     def image(self):
-        # debug_data = self.parent.live_process_data - self.parent.o_roi.live_image
-        # live_image = np.transpose(debug_data)
-        # self.parent.ui.image_view.setImage(live_image)
-
         self.parent.live_image = self.parent.o_roi.live_image
         live_image = np.transpose(self.parent.live_image)
         self.parent.ui.image_view.setImage(live_image)
@@ -115,35 +111,26 @@ class Display(Parent):
 
     def cross_of_pixel_to_fit(self):
 
-        logging.debug("cross of pixel to fit")
-
         if self.parent.cross_of_pixel_to_fit:
             self.parent.ui.image_view.removeItem(self.parent.cross_of_pixel_to_fit)
 
         x, y = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
-        logging.debug(f"-> x:{x} and y:{y}")
 
         pos = []
         adj = []
 
         # vertical guide
-        # pos.append([x + MARKER_WIDTH / 2, y - MARKER_HEIGHT / 2])
-        # pos.append([x + MARKER_WIDTH / 2, y + MARKER_HEIGHT + MARKER_HEIGHT / 2])
         pos.append([x, y - MARKER_HEIGHT / 2])
         pos.append([x, y + MARKER_HEIGHT / 2])
         adj.append([0, 1])
 
         # horizontal guide
-        # pos.append([x - MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
-        # pos.append([x + MARKER_WIDTH + MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
         pos.append([x - MARKER_WIDTH / 2, y])
         pos.append([x + MARKER_WIDTH / 2, y])
         adj.append([2, 3])
 
         pos = np.array(pos)
         adj = np.array(adj)
-        logging.debug(f"-> pos array: {pos}")
-        logging.debug(f"-> adj array: {adj}")
 
         line_color = (255, 0, 0, 255, 1)
         lines = np.array([line_color for _ in np.arange(len(pos))],
@@ -159,7 +146,7 @@ class Display(Parent):
                                                   pxMode=False)
 
     def box_around_pixel_to_fit(self):
-        x, y = self.parent.pixel_marker['x'] - MARKER_WIDTH, self.parent.pixel_marker['y'] - MARKER_HEIGHT
+        x, y = self.parent.pixel_marker['x'] - MARKER_WIDTH/2, self.parent.pixel_marker['y'] - MARKER_HEIGHT/2
 
         self.parent.pixel_marker_item = pg.ROI([x, y],
                                         [MARKER_WIDTH, MARKER_HEIGHT],

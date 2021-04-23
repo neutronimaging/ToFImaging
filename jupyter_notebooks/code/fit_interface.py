@@ -168,8 +168,14 @@ class Interface(QMainWindow):
 
         x0 = region[0][0].start
         y0 = region[0][1].start
-        self.pixel_marker['x'] = x0
-        self.pixel_marker['y'] = y0
+        x1 = region[0][0].stop
+        y1 = region[0][1].stop
+
+        x = np.int(np.mean([x0, x1]))
+        y = np.int(np.mean([y0, y1]))
+
+        self.pixel_marker['x'] = x
+        self.pixel_marker['y'] = y
 
         o_display = Display(parent=self)
         o_display.cross_of_pixel_to_fit()

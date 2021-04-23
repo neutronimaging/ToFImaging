@@ -119,8 +119,8 @@ class FitHandler:
 
         # get pixel coordinates
         pixel_marker = self.parent.pixel_marker
-        pixel = [pixel_marker['x'],
-                 pixel_marker['y']]
+        pixel = [pixel_marker['y'],
+                 pixel_marker['x']]
         logging.info(f"-> pixel: {pixel}")
 
         auto_mask = config['is_automatic_masking']
