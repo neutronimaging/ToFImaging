@@ -69,6 +69,12 @@ class FitHandler:
 
                 self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
                 self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
+                logging.info("-> Result of fitting (pixel mode):")
+                logging.info(f"--> edge width: {edge_width}")
+                logging.info(f"--> edge height: {result['edge_height']}")
+                logging.info(f"--> edge position: {edge_position}")
+                logging.info(f"--> post_bc: {pos_bc}")
+                logging.info(f"--> wid_bc: {wid_bc}")
 
         if mode == 'full':
             est_width = self.parent.pixel_fit_result['edge_width']
@@ -165,6 +171,10 @@ class FitHandler:
                                                     interp_factor=interp_factor,
                                                     bool_log=bool_log)
             logging.info(f"--> done with GaussianBraggEdgeFitting2D")
+
+            print("debuging")
+            print(f"fit_result: {fit_result}")
+
             return fit_result
 
         else:

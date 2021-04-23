@@ -1361,6 +1361,7 @@ def GaussianBraggEdgeFitting(signal,
     return {
         'fitted_data': fitted_data,
         't0': t0,
+        'edge_position': t0,
         'edge_width': edge_width,
         'edge_height': edge_height,
         'edge_slope': edge_slope
@@ -1476,23 +1477,24 @@ def GaussianBraggEdgeFitting2D(Ttof,
         else:
             lambd = spectrum
 
-        GaussianBraggEdgeFitting(signal=signal,
-                                 spectrum=lambd,
-                                 spectrum_range=spectrum_range,
-                                 est_pos=est_pos,
-                                 est_wid=est_wid,
-                                 est_h=est_h,
-                                 pos_BC=pos_BC,
-                                 wid_BC=wid_BC,
-                                 h_BC=h_BC,
-                                 est_off=est_off,
-                                 interp_factor=interp_factor,
-                                 bool_log=bool_log,
-                                 bool_smooth=bool_smooth,
-                                 smooth_w=smooth_w,
-                                 smooth_n=smooth_n,
-                                 bool_print=True)
-        return
+        result = GaussianBraggEdgeFitting(signal=signal,
+                                          spectrum=lambd,
+                                          spectrum_range=spectrum_range,
+                                          est_pos=est_pos,
+                                          est_wid=est_wid,
+                                          est_h=est_h,
+                                          pos_BC=pos_BC,
+                                          wid_BC=wid_BC,
+                                          h_BC=h_BC,
+                                          est_off=est_off,
+                                          interp_factor=interp_factor,
+                                          bool_log=bool_log,
+                                          bool_smooth=bool_smooth,
+                                          smooth_w=smooth_w,
+                                          smooth_n=smooth_n,
+                                          bool_print=True)
+
+        return result
 
     median_image = rt.medianimage(Ttof)
     edge_position = np.nan * np.zeros(np.shape(mymask))
