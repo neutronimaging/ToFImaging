@@ -17,6 +17,7 @@ class Display(Parent):
         self.parent.ui.raw_image_view.setImage(live_image)
 
     def fit_data_tab(self):
+        self.clear_previous_items()
         self.initialize_pixel_marker()
         self.image()
         self.profile()
@@ -26,6 +27,23 @@ class Display(Parent):
         self.lambda_range_to_fit()
         self.init_rough_peak_slider()
         self.rough_peak_position()
+
+    def clear_previous_items(self):
+        if self.parent.bragg_peak_range_ui:
+            self.parent.ui.plot_view.removeItem(self.parent.bragg_peak_range_ui)
+            self.parent.bragg_peak_range_ui = None
+        if self.parent.roi_id:
+            self.parent.ui.image_view.removeItem(self.parent.roi_id)
+            self.parent.roi_id = None
+        if self.parent.cross_of_pixel_to_fit:
+            self.parent.ui.image_view.removeItem(self.parent.cross_of_pixel_to_fit)
+            self.parent.cross_of_pixel_to_fit = None
+        if self.parent.pixel_marker_item:
+            self.parent.ui.image_view.removeItem(self.parent.pixel_marker_item)
+            self.parent.pixel_marker_item = None
+        if self.parent.rough_peak_ui:
+            self.parent.ui.plot_view.removeItem(self.parent.rough_peak_ui)
+            self.parent.rough_peak_ui = None
 
     def init_rough_peak_slider(self):
         lambda_range = self.parent.bragg_peak_range_ui.getRegion()
@@ -72,6 +90,7 @@ class Display(Parent):
     def image(self):
         self.parent.live_image = self.parent.o_roi.live_image
         live_image = np.transpose(self.parent.live_image)
+        self.parent.ui.image_view.clear()
         self.parent.ui.image_view.setImage(live_image)
 
     def profile(self):
@@ -107,6 +126,7 @@ class Display(Parent):
             size = _id.size()
 
             new_id = pg.ROI(pos, size, movable=False)
+            self.parent.roi_id = new_id
             self.parent.ui.image_view.addItem(new_id)
 
     def cross_of_pixel_to_fit(self):

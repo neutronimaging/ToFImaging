@@ -42,6 +42,13 @@ class Interface(QMainWindow):
     list_roi = None
     ob_list_roi = None
 
+    # pyqtgraph items in fitting tab
+    roi_id = None
+    bragg_peak_range_ui = None
+    cross_of_pixel_to_fit = None
+    pixel_marker_item = None
+    rough_peak_ui = None
+
     moving_average_config = None
 
     is_with_normalization = False
@@ -59,7 +66,6 @@ class Interface(QMainWindow):
     cross_of_pixel_to_fit = None
 
     default_bragg_peak_range = None
-    bragg_peak_range_ui = None
 
     nbr_files_to_exclude_from_plot = {'left': 40,
                                       'right': 40}
