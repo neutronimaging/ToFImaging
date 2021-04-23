@@ -167,7 +167,10 @@
                        <item>
                         <layout class="QHBoxLayout" name="horizontalLayout_5">
                          <item>
-                          <widget class="QLabel" name="label_6">
+                          <widget class="QLabel" name="kernel_size_custom_y_label">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
                            <property name="minimumSize">
                             <size>
                              <width>30</width>
@@ -193,6 +196,9 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="kernel_size_custom_y_lineEdit">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
                            <property name="minimumSize">
                             <size>
                              <width>50</width>
@@ -211,7 +217,10 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLabel" name="label_7">
+                          <widget class="QLabel" name="kernel_size_custom_x_label">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
                            <property name="minimumSize">
                             <size>
                              <width>40</width>
@@ -234,6 +243,9 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="kernel_size_custom_x_lineEdit">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
                            <property name="minimumSize">
                             <size>
                              <width>50</width>
@@ -253,6 +265,9 @@
                          </item>
                          <item>
                           <widget class="QLabel" name="kernel_size_custom_lambda_label">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
                            <property name="minimumSize">
                             <size>
                              <width>40</width>
@@ -275,6 +290,9 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="kernel_size_custom_lambda_lineEdit">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
                            <property name="minimumSize">
                             <size>
                              <width>50</width>
@@ -1046,8 +1064,8 @@
    <slot>normalization_mode_checkBox_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>84</x>
-     <y>448</y>
+     <x>110</x>
+     <y>492</y>
     </hint>
     <hint type="destinationlabel">
      <x>11</x>
@@ -1062,8 +1080,8 @@
    <slot>select_background_roi_button_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>787</x>
-     <y>449</y>
+     <x>914</x>
+     <y>500</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>
@@ -1078,8 +1096,8 @@
    <slot>normalization_radioButton_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>218</x>
-     <y>447</y>
+     <x>260</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1094,8 +1112,8 @@
    <slot>normalization_radioButton_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>370</x>
-     <y>451</y>
+     <x>460</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
      <x>459</x>
@@ -1110,8 +1128,8 @@
    <slot>normalization_radioButton_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>572</x>
-     <y>446</y>
+     <x>694</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
      <x>736</x>
@@ -1183,6 +1201,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>kernel_size_default_radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>moving_average_size_radioButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>264</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>352</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kernel_size_custom_radioButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>moving_average_size_radioButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>323</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>apply_clicked()</slot>
@@ -1200,5 +1250,6 @@
   <slot>export_prepared_data_clicked()</slot>
   <slot>activate_moving_average_clicked()</slot>
   <slot>log_button_clicked()</slot>
+  <slot>moving_average_size_radioButton_clicked()</slot>
  </slots>
 </ui>

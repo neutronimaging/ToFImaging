@@ -19,6 +19,7 @@ from jupyter_notebooks.code.step3_settings_handler import Step3SettingsHandler
 from jupyter_notebooks.code.step4_settings_handler import Step4SettingsHandler
 from jupyter_notebooks.code.display import Display
 from jupyter_notebooks.code.log_launcher import LogLauncher
+from jupyter_notebooks.code.gui_handler import GuiHandler
 
 # warnings.filterwarnings('ignore')
 
@@ -154,6 +155,10 @@ class Interface(QMainWindow):
 
     def log_button_clicked(self):
         LogLauncher(parent=self)
+
+    def moving_average_size_radioButton_clicked(self):
+        o_gui = GuiHandler(parent=self)
+        o_gui.moving_average_size_radioButton_clicked()
 
     @wait_cursor
     def prepare_data_button_clicked(self):
