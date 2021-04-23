@@ -30,27 +30,27 @@ class TestReductionTools:
 
     def test_data_filtering_parameters_error(self):
         with pytest.raises(ValueError):
-            ReductionTools.data_filering()
+            ReductionTools.data_filtering()
 
         with pytest.raises(ValueError):
             my_signal = np.zeros((10))
-            ReductionTools.data_filering(mysignal=my_signal)
+            ReductionTools.data_filtering(mysignal=my_signal)
 
         with pytest.raises(ValueError):
             box_kernel = np.ones((10, 10))
             my_signal = np.zeros((10, 10, 10, 10))
-            ReductionTools.data_filering(mysignal=my_signal, kernel=box_kernel)
+            ReductionTools.data_filtering(mysignal=my_signal, kernel=box_kernel)
 
         with pytest.raises(ValueError):
             my_signal = np.zeros((10, 10))
-            ReductionTools.data_filering(mysignal=my_signal)
+            ReductionTools.data_filtering(mysignal=my_signal)
 
         with pytest.raises(ValueError):
             my_signal = np.zeros((10, 10))
             kernel = [3]
-            ReductionTools.data_filering(mysignal=my_signal, kernel=kernel)
+            ReductionTools.data_filtering(mysignal=my_signal, kernel=kernel)
 
         with pytest.raises(ValueError):
             my_signal = np.zeros((10, 10))
             kernel = [2,3,3]
-            ReductionTools.data_filering(mysignal=my_signal, kernel=kernel)
+            ReductionTools.data_filtering(mysignal=my_signal, kernel=kernel)

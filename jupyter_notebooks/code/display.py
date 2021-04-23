@@ -1,5 +1,6 @@
 import numpy as np
 import pyqtgraph as pg
+import logging
 
 from jupyter_notebooks.code.parent import Parent
 from jupyter_notebooks.code.utilities.get import Get
@@ -41,8 +42,11 @@ class Display(Parent):
         self.parent.ui.rough_lambda_peak_position_slider.setValue(current_rough_peak_value)
 
     def initialize_pixel_marker(self):
+        logging.debug("initialize_pixel_marker")
         for _index_roi in self.parent.o_roi.list_roi:
+            logging.debug(f"-> _index_roi: {_index_roi}")
             _roi = self.parent.o_roi.list_roi[_index_roi]
+            logging.debug(f"-> _roi: {_roi}")
             _x0 = _roi['x0']
             _y0 = _roi['y0']
             _x1 = _roi['x1']
@@ -53,6 +57,7 @@ class Display(Parent):
 
             self.parent.pixel_marker = {'x': np.int(x),
                                         'y': np.int(y)}
+            logging.debug(f"-> self.parent.pixel_marker: {self.parent.pixel_marker}")
 
     def prepare_data_preview_image(self):
         self.parent.ui.process_image_view.clear()
@@ -110,26 +115,35 @@ class Display(Parent):
 
     def cross_of_pixel_to_fit(self):
 
+        logging.debug("cross of pixel to fit")
+
         if self.parent.cross_of_pixel_to_fit:
             self.parent.ui.image_view.removeItem(self.parent.cross_of_pixel_to_fit)
 
         x, y = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
+        logging.debug(f"-> x:{x} and y:{y}")
 
         pos = []
         adj = []
 
         # vertical guide
-        pos.append([x + MARKER_WIDTH / 2, y - MARKER_HEIGHT / 2])
-        pos.append([x + MARKER_WIDTH / 2, y + MARKER_HEIGHT + MARKER_HEIGHT / 2])
+        # pos.append([x + MARKER_WIDTH / 2, y - MARKER_HEIGHT / 2])
+        # pos.append([x + MARKER_WIDTH / 2, y + MARKER_HEIGHT + MARKER_HEIGHT / 2])
+        pos.append([x, y - MARKER_HEIGHT / 2])
+        pos.append([x, y + MARKER_HEIGHT / 2])
         adj.append([0, 1])
 
         # horizontal guide
-        pos.append([x - MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
-        pos.append([x + MARKER_WIDTH + MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
+        # pos.append([x - MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
+        # pos.append([x + MARKER_WIDTH + MARKER_WIDTH / 2, y + MARKER_HEIGHT / 2])
+        pos.append([x - MARKER_WIDTH / 2, y])
+        pos.append([x + MARKER_WIDTH / 2, y])
         adj.append([2, 3])
 
         pos = np.array(pos)
         adj = np.array(adj)
+        logging.debug(f"-> pos array: {pos}")
+        logging.debug(f"-> adj array: {adj}")
 
         line_color = (255, 0, 0, 255, 1)
         lines = np.array([line_color for _ in np.arange(len(pos))],
@@ -145,7 +159,7 @@ class Display(Parent):
                                                   pxMode=False)
 
     def box_around_pixel_to_fit(self):
-        x, y = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
+        x, y = self.parent.pixel_marker['x'] - MARKER_WIDTH, self.parent.pixel_marker['y'] - MARKER_HEIGHT
 
         self.parent.pixel_marker_item = pg.ROI([x, y],
                                         [MARKER_WIDTH, MARKER_HEIGHT],
