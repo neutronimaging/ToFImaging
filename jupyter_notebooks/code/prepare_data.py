@@ -120,22 +120,35 @@ class PrepareData(Parent):
             l = kernel_size['lambda']
             kernel.append(l)
 
+        sample_projections = self.parent.sample_projections.transpose(2, 1, 0)  # lambda, x, y -> x, y, lambda
+
         logging.debug(f"--> kernel dimension: {kernel_dimension}")
         logging.debug(f"--> kernel shape: {np.shape(kernel)}")
-        logging.debug(f"--> len(sample_projections): {len(self.parent.sample_projections)}")
+        logging.debug(f"--> len(sample_projections): {len(sample_projections)}")
         logging.debug(f"--> kernel: {kernel}")
 
-        self.parent.sample_projections = ReductionTools.data_filtering(self.parent.sample_projections,
-                                                                       kernel=kernel,
-                                                                       kernel_type=kernel_type)
+        logging.info(f" before running data_filtering -> shape(sample_projections):"
+                     f" {np.shape(sample_projections)}")
+        sample_projections = ReductionTools.data_filtering(sample_projections,
+                                                           kernel=kernel,
+                                                           kernel_type=kernel_type)
+        self.parent.sample_projections = sample_projections.transpose(2, 1, 0)
+        logging.info(f" after running data_filtering -> shape(sample_projections):"
+                     f" {np.shape(self.parent.sample_projections)}")
 
         if self.parent.is_with_normalization:
             self.parent.ui.statusbar.showMessage("Moving Average of OB ... IN PROGRESS")
             QtGui.QGuiApplication.processEvents()
 
-            self.parent.ob_projections = ReductionTools.data_filtering(self.parent.ob_projections,
-                                                                       kernel=kernel,
-                                                                       kernel_type=kernel_type)
+            ob_projections = self.parent.ob_projections.transpose(2, 1, 0)
+            logging.info(f" before running data_filtering -> shape(ob_projections):"
+                         f" {np.shape(ob_projections)}")
+            ob_projections = ReductionTools.data_filtering(ob_projections,
+                                                           kernel=kernel,
+                                                           kernel_type=kernel_type)
+            self.parent.ob_projections = ob_projections.transpose(2, 1, 0)
+            logging.info(f" after running data_filtering -> shape(ob_projections):"
+                         f" {np.shape(self.parent.ob_projections)}")
 
         self.parent.ui.statusbar.showMessage("Moving Average ... DONE!")
         QtGui.QGuiApplication.processEvents()
@@ -144,11 +157,10 @@ class PrepareData(Parent):
         #                                            custom_kernel=kernel)
         # self.T_mavg = T_mavg
 
-        moving_average_config = {'kernel_type'     : kernel_type,
-                                 'kernel_size'     : kernel_size,
+        moving_average_config = {'kernel_type': kernel_type,
+                                 'kernel_size': kernel_size,
                                  'kernel_dimension': kernel_dimension}
         self.parent.moving_average_config = moving_average_config
 
         QtGui.QGuiApplication.processEvents()
         logging.info("-> calculate moving average ... done!")
-

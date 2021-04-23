@@ -149,7 +149,7 @@ class Interface(QMainWindow):
         logging.basicConfig(filename=log_file_name,
                             filemode='a',
                             format='[%(levelname)s] - %(asctime)s - %(message)s',
-                            level=logging.DEBUG)
+                            level=logging.INFO)
         logging.info("*** Starting a new session ***")
         # logging.info(f" Version: {versioneer.get_version()}")
 
@@ -271,9 +271,10 @@ class Interface(QMainWindow):
         self.ui.normalization_groupBox.setEnabled(is_with_normalization)
 
     def select_background_roi_button_clicked(self):
-        self.o_normalization_roi_gui = NormRoiSelection(parent=self,
-                                                        main_api=self.o_api)
-        self.o_normalization_roi_gui.show()
+        pass
+        # self.o_normalization_roi_gui = NormRoiSelection(parent=self,
+        #                                                 main_api=self.o_api)
+        # self.o_normalization_roi_gui.show()
 
     def update_number_of_normalization_roi(self, nbr_of_roi=0):
         p = inflect.engine()

@@ -19,35 +19,35 @@ class Normalization:
             sample_projections = self.parent.sample_projections
             ob_projections = self.parent.ob_projections
 
-            # working_sample_projections = sample_projections.transpose(2, 0, 1)
-            # working_ob_projections = ob_projections.transpose(2, 0, 1)
+            working_sample_projections = sample_projections.transpose(2, 1, 0)  # lambda, y, x
+            working_ob_projections = ob_projections.transpose(2, 1, 0)  # lambda, y, x
 
-            working_sample_projections = sample_projections
-            working_ob_projections = ob_projections
+            # working_sample_projections = sample_projections
+            # working_ob_projections = ob_projections
 
             # normalize_projections = list()
 
             if self.parent.ui.normalization_pixel_by_pixel_radioButton.isChecked():
 
-                self.parent.normalize_projections = \
+                normalize_projections = \
                     Normalization.normalization_pixel_by_pixel(working_ob_projections,
                                                                working_sample_projections)
 
             elif self.parent.ui.normalization_by_roi_radioButton.isChecked():
 
                 list_roi = self.parent.o_roi.list_roi
-                self.parent.normalize_projections = Normalization.normalization_by_roi(list_roi,
+                normalize_projections = Normalization.normalization_by_roi(list_roi,
                                                                                        working_ob_projections,
                                                                                        working_sample_projections)
 
             elif self.parent.ui.normal_normalization_radioButton.isChecked():
 
                 list_roi = self.parent.ob_list_roi
-                self.parent.normalize_projections = Normalization.normalization_by_roi_of_ob(list_roi,
+                normalize_projections = Normalization.normalization_by_roi_of_ob(list_roi,
                                                                                              working_ob_projections,
                                                                                              working_sample_projections)
 
-            # self.normalize_projections = normalize_projections.transpose(1, 2, 0)
+            self.normalize_projections = normalize_projections.transpose(2, 1, 0)  # x, y, lambda
 
         else:  # no normalization
             self.parent.normalize_projections = copy.deepcopy(self.parent.sample_projections)

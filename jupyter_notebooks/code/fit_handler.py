@@ -36,9 +36,10 @@ class FitHandler:
         logging.info(f"-> estimated bragg edge position: {est_position}")
 
         mask = self.parent.mask
-        logging.debug(f"-> np.shape(mask): {np.shape(mask)}")
+        mask = np.transpose(mask)
+        logging.info(f"-> np.shape(mask): {np.shape(mask)}")
         normalize_projections = self.parent.normalize_projections
-        logging.debug(f"-> np.shape(normalize_projections): {np.shape(normalize_projections)}")
+        logging.info(f"-> np.shape(normalize_projections): {np.shape(normalize_projections)}")
 
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... IN PROGRESS".format(
                 mode, algorithm_selected))
@@ -119,8 +120,8 @@ class FitHandler:
 
         # get pixel coordinates
         pixel_marker = self.parent.pixel_marker
-        pixel = [pixel_marker['y'],
-                 pixel_marker['x']]
+        pixel = [pixel_marker['x'],
+                 pixel_marker['y']]
         logging.info(f"-> pixel: {pixel}")
 
         auto_mask = config['is_automatic_masking']
@@ -142,7 +143,7 @@ class FitHandler:
         bool_log = config['is_cross_section_mode']
         logging.info(f"-> bool_log: {bool_log}")
 
-        T_mavg = T_mavg.transpose(1, 2, 0)  # lambda, x, y -> x, y, lambda
+        T_mavg = T_mavg.transpose(2, 1, 0)  # lambda, x, y -> x, y, lambda
         logging.info(f"-> np.shape(T_mavg): {np.shape(T_mavg)}")
 
         logging.info(f"-> algorithm selected: {algorithm_selected}")
