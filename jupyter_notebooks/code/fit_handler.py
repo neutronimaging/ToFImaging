@@ -78,15 +78,12 @@ class FitHandler:
                 logging.info(f"--> wid_bc: {wid_bc}")
 
         if mode == 'full':
-            est_width = self.parent.step4_config['estimated_bragg_edge_width_value']
-            est_position = self.parent.step4_config['estimated_bragg_edge_position_value']
             result = self.fit_full_roi(algorithm_selected,
                                        normalize_projections,
                                        lambda_array,
                                        lambda_range,
                                        mask,
-                                       est_position,
-                                       est_width)
+                                       config=self.parent.step4_config)
             self.parent.full_fit_result = result
 
         self.parent.ui.setEnabled(True)
