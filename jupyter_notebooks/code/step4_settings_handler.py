@@ -16,10 +16,10 @@ class Step4SettingsHandler(QMainWindow):
     def init_widgets(self):
         config = self.parent.step4_config
 
-        self.ui.estimated_bragg_edge_position_lineEdit.setText("{.2f}".format(config[
+        self.ui.estimated_bragg_edge_position_lineEdit.setText("{:.2f}".format(config[
                                                                                   'estimated_bragg_edge_position_value']))
-        self.ui.estimated_bragg_edge_width_lineEdit.setText("{.2f}".format(config['estimated_bragg_edge_width_value']))
-        self.ui.estimated_bragg_edge_height_lineEdit.setText("{.2f}".format(config[
+        self.ui.estimated_bragg_edge_width_lineEdit.setText("{:.2f}".format(config['estimated_bragg_edge_width_value']))
+        self.ui.estimated_bragg_edge_height_lineEdit.setText("{:.2f}".format(config[
                                                                                 'estimated_bragg_edge_height_value']))
 
         position_from = config['estimated_bragg_edge_position_range'][0]

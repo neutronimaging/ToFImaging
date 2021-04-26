@@ -77,8 +77,8 @@ class FitHandler:
                 logging.info(f"--> wid_bc: {wid_bc}")
 
         if mode == 'full':
-            est_width = self.parent.pixel_fit_result['edge_width']
-            est_position = self.parent.pixel_fit_result['edge_position']
+            est_width = self.parent.step4_config['estimated_bragg_edge_width_value']
+            est_position = self.parent.step4_config['estimated_bragg_edge_position_value']
             result = self.fit_full_roi(algorithm_selected,
                                        normalize_projections,
                                        lambda_array,
@@ -96,25 +96,37 @@ class FitHandler:
 
     def fit_full_roi(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, config):
 
+        logging.info(f"fitting full roi")
+        logging.debug("entering fit_full_roi")
+
+        est_position = config['estimated_bragg_edge_position_value']
+        est_width = config['estimated_bragg_edge_width_value']
+        est_height = config['estimated_bragg_edge_height_value']
+        pos_bc = config['estimated_bragg_edge_position_range']
+        wid_bc = config['estimated_bragg_edge_width_range']
+
+        logging.info(f"-> estimated bragg edge position value: {est_position}")
+        logging.info(f"-> estimated bragg edge width value: {est_width}")
+        logging.info(f"-> estimated bragg edge height value: {est_height}")
+        logging.info(f"-> estimated bragg edge position range: {pos_bc}")
+        logging.info(f"-> estimated bragg edge width range: {wid_bc}")
+
+        logging.info(f"-> algorithm selected {algorithm_selected}")
         if algorithm_selected == 'gaussian':
 
-            est_position = config['estimated_bragg_edge_position_value']
-            est_width = config['estimated_bragg_edge_width_value']
-            est_height = config['estimated_bragg_edge_height_value']
-            pos_bc = config['estimated_bragg_edge_position_range']
-            wid_bc = config['estimated_bragg_edge_width_range']
-
+            logging.info(f"--> about to run GaussianBraggEdgeFitting2D")
             fit_result = GaussianBraggEdgeFitting2D(T_mavg,
                                                     lambda_array,
                                                     lambda_range,
                                                     mask=mask,
                                                     bool_log=False,
-                                                    est_position=est_position,
+                                                    est_pos=est_position,
                                                     est_wid=est_width,
                                                     est_h=est_height,
                                                     wid_BC=wid_bc,
                                                     pos_BC=pos_bc,
                                                     )
+            logging.info(f"--> done with GaussianBraggEdgeFitting2D")
             return fit_result
 
         else:
@@ -122,7 +134,7 @@ class FitHandler:
 
     def fit_pixel(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, est_position, config):
 
-        logging.info("entering fix_pixel method")
+        logging.debug("entering fix_pixel method")
 
         # get pixel coordinates
         pixel_marker = self.parent.pixel_marker

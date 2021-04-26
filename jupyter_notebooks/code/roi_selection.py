@@ -65,7 +65,8 @@ class Interface(QMainWindow):
     def display_image(self):
         sample_projections = self.sample_projections
         self.live_image = np.mean(sample_projections, axis=0)
-        live_image = np.transpose(self.live_image)
+        # live_image = np.transpose(self.live_image)
+        live_image = self.live_image
         self.ui.image_view.setImage(live_image)
         self.integrated_image_size['height'], self.integrated_image_size['width'] = np.shape(live_image)
 
@@ -306,13 +307,19 @@ class Interface(QMainWindow):
             _roi = list_roi[_row]
 
             roi_id = _roi['id']
-            region = roi_id.getArraySlice(np.transpose(self.live_image),
-                                          self.ui.image_view.imageItem)
+            # region = roi_id.getArraySlice(np.transpose(self.live_image),
+            #                               self.ui.image_view.imageItem)
+            # x0 = region[0][0].start
+            # x1 = region[0][0].stop
+            # y0 = region[0][1].start
+            # y1 = region[0][1].stop
 
-            x0 = region[0][0].start
-            x1 = region[0][0].stop
-            y0 = region[0][1].start
-            y1 = region[0][1].stop
+            region = roi_id.getArraySlice(self.live_image,
+                                          self.ui.image_view.imageItem)
+            y0 = region[0][0].start
+            y1 = region[0][0].stop
+            x0 = region[0][1].start
+            x1 = region[0][1].stop
 
             _roi['x0'] = x0
             _roi['x1'] = x1

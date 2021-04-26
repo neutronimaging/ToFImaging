@@ -55,7 +55,7 @@ class Step3SettingsHandler(QMainWindow):
                         'window_size': str(self.ui.window_size_lineEdit.text()),
                         'order_number': str(self.ui.order_number_lineEdit.text()),
                         'is_interpolation_factor': self.ui.interpolation_factor_checkBox.isChecked(),
-                        'interpolation_factor_value': str(self.ui.interpolation_factor_lineEdit),
+                        'interpolation_factor_value': str(self.ui.interpolation_factor_lineEdit.text()),
                         'is_cross_section_mode': self.ui.cross_section_mode_radioButton.isChecked()}
         self.parent.step3_config = step3_config
 
