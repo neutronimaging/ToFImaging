@@ -128,6 +128,7 @@ class Interface(QMainWindow):
         if not self.debugging_mode:
             self.live_image = self.o_roi.live_image
             self.sample_projections = self.o_api.sample_projections
+            self.untouched_sample_projections = copy.deepcopy(self.o_api.sample_projections)
             self.ob_projections = self.o_api.ob_projections
             self.list_roi = self.o_roi.list_roi
 

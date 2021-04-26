@@ -120,7 +120,8 @@ class PrepareData(Parent):
             l = kernel_size['lambda']
             kernel.append(l)
 
-        sample_projections = self.parent.sample_projections.transpose(2, 1, 0)  # lambda, x, y -> x, y, lambda
+        sample_projections = self.parent.untouched_sample_projections.transpose(2, 1, 0)  # lambda, x, y -> x, y,
+        # lambda
 
         logging.debug(f"--> kernel dimension: {kernel_dimension}")
         logging.debug(f"--> kernel shape: {np.shape(kernel)}")
