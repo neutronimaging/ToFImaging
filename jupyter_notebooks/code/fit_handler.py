@@ -43,6 +43,7 @@ class FitHandler:
 
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... IN PROGRESS".format(
                 mode, algorithm_selected))
+        self.parent.ui.statusbar.setStyleSheet("color: blue")
         QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         QtGui.QGuiApplication.processEvents()
 
@@ -92,6 +93,7 @@ class FitHandler:
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... DONE".format(
                 mode, algorithm_selected),
                                              15000)
+        self.parent.ui.statusbar.setStyleSheet("color: green")
         QApplication.restoreOverrideCursor()
 
     def fit_full_roi(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, config):

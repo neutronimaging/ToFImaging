@@ -137,7 +137,8 @@ class Display(Parent):
         if self.parent.cross_of_pixel_to_fit:
             self.parent.ui.image_view.removeItem(self.parent.cross_of_pixel_to_fit)
 
-        x, y = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
+        # x, y = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
+        y, x = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
 
         pos = []
         adj = []
@@ -169,7 +170,8 @@ class Display(Parent):
                                                   pxMode=False)
 
     def box_around_pixel_to_fit(self):
-        x, y = self.parent.pixel_marker['x'] - MARKER_WIDTH/2, self.parent.pixel_marker['y'] - MARKER_HEIGHT/2
+        # x, y = self.parent.pixel_marker['x'] - MARKER_WIDTH/2, self.parent.pixel_marker['y'] - MARKER_HEIGHT/2
+        y, x = self.parent.pixel_marker['x'] - MARKER_WIDTH/2, self.parent.pixel_marker['y'] - MARKER_HEIGHT/2
 
         self.parent.pixel_marker_item = pg.ROI([x, y],
                                                [MARKER_WIDTH, MARKER_HEIGHT],

@@ -177,10 +177,15 @@ class Interface(QMainWindow):
         region = self.pixel_marker_item.getArraySlice(self.live_image,
                                                       self.ui.image_view.imageItem)
 
-        x0 = region[0][0].start
-        y0 = region[0][1].start
-        x1 = region[0][0].stop
-        y1 = region[0][1].stop
+        # x0 = region[0][0].start
+        # y0 = region[0][1].start
+        # x1 = region[0][0].stop
+        # y1 = region[0][1].stop
+
+        y0 = region[0][0].start
+        x0 = region[0][1].start
+        y1 = region[0][0].stop
+        x1 = region[0][1].stop
 
         x = np.int(np.mean([x0, x1]))
         y = np.int(np.mean([y0, y1]))
