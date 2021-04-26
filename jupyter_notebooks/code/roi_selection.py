@@ -291,7 +291,7 @@ class Interface(QMainWindow):
         _pen = QPen()
         _pen.setColor(_color)
         _pen.setWidthF(self.roi_width)
-        _roi_id = pg.ROI([x0, y0], [width, height], pen=_pen, scaleSnap=True)
+        _roi_id = pg.ROI([y0, x0], [height, width], pen=_pen, scaleSnap=True)
         _roi_id.addScaleHandle([1, 1], [0, 0])
         _roi_id.addScaleHandle([0, 0], [1, 1])
         self.ui.image_view.addItem(_roi_id)
@@ -309,17 +309,18 @@ class Interface(QMainWindow):
             roi_id = _roi['id']
             # region = roi_id.getArraySlice(np.transpose(self.live_image),
             #                               self.ui.image_view.imageItem)
-            # x0 = region[0][0].start
-            # x1 = region[0][0].stop
-            # y0 = region[0][1].start
-            # y1 = region[0][1].stop
 
             region = roi_id.getArraySlice(self.live_image,
                                           self.ui.image_view.imageItem)
-            y0 = region[0][0].start
-            y1 = region[0][0].stop
-            x0 = region[0][1].start
-            x1 = region[0][1].stop
+            x0 = region[0][0].start
+            x1 = region[0][0].stop
+            y0 = region[0][1].start
+            y1 = region[0][1].stop
+
+            # y0 = region[0][0].start
+            # y1 = region[0][0].stop
+            # x0 = region[0][1].start
+            # x1 = region[0][1].stop
 
             _roi['x0'] = x0
             _roi['x1'] = x1
@@ -389,7 +390,8 @@ class Interface(QMainWindow):
 
                 if _projection_index == 0:
                     total_number_of_pixels_in_roi += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
-                total_counts_of_roi += np.sum(_projection[_y0: _y1+1, _x0: _x1+1])
+                # total_counts_of_roi += np.sum(_projection[_y0: _y1+1, _x0: _x1+1])
+                total_counts_of_roi += np.sum(_projection[_x0: _x1 + 1, _y0: _y1 + 1])
 
             mean_counts_of_roi = total_counts_of_roi / total_number_of_pixels_in_roi
             y_axis.append(mean_counts_of_roi)

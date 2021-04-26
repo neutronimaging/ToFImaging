@@ -614,18 +614,33 @@ def AdvancedBraggEdgeFitting2D(Ttof,
         else:
             lambd = spectrum
 
-        AdvancedBraggEdgeFitting(signal=signal,
-                                 spectrum=lambd,
-                                 spectrum_range=spectrum_range,
-                                 est_pos=est_pos,
-                                 est_sigma=est_sigma,
-                                 est_alpha=est_alpha,
-                                 bool_smooth=bool_smooth,
-                                 smooth_w=smooth_w,
-                                 smooth_n=smooth_n,
-                                 bool_linear=bool_linear,
-                                 bool_print=True)
-        return
+        result = AdvancedBraggEdgeFitting(signal=signal,
+                                          spectrum=lambd,
+                                          spectrum_range=spectrum_range,
+                                          est_pos=est_pos,
+                                          est_sigma=est_sigma,
+                                          est_alpha=est_alpha,
+                                          bool_smooth=bool_smooth,
+                                          smooth_w=smooth_w,
+                                          smooth_n=smooth_n,
+                                          bool_linear=bool_linear,
+                                          bool_print=True)
+
+        # return {
+        #     't0'          : t0_f,
+        #     'sigma'       : sigma_f,
+        #     'alpha'       : alpha_f,
+        #     'a1'          : a1_f,
+        #     'a2'          : a2_f,
+        #     'a5'          : a5_f,
+        #     'a6'          : a6_f,
+        #     'final_result': result7,
+        #     'fitted_data' : fitted_data,
+        #     'pos_extrema' : pos_extrema,
+        #     'height'      : height
+        # }
+
+        return result
 
     median_image = rt.medianimage(Ttof)
     edge_position = np.nan * np.zeros(np.shape(mymask))

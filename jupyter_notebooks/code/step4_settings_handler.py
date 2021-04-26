@@ -2,6 +2,8 @@ import os
 from qtpy.QtWidgets import QMainWindow
 from jupyter_notebooks.code import load_ui
 
+ANGSTROMS = u"\u212B"
+
 
 class Step4SettingsHandler(QMainWindow):
 
@@ -15,6 +17,13 @@ class Step4SettingsHandler(QMainWindow):
 
     def init_widgets(self):
         config = self.parent.step4_config
+
+        self.ui.position_label.setText(ANGSTROMS)
+        self.ui.width_label.setText(ANGSTROMS)
+        self.ui.position_from_label.setText(ANGSTROMS)
+        self.ui.position_to_label.setText(ANGSTROMS)
+        self.ui.width_from_label.setText(ANGSTROMS)
+        self.ui.width_to_label.setText(ANGSTROMS)
 
         self.ui.estimated_bragg_edge_position_lineEdit.setText("{:.2f}".format(config[
                                                                                   'estimated_bragg_edge_position_value']))

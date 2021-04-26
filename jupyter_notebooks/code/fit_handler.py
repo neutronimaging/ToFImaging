@@ -3,7 +3,7 @@ from qtpy.QtWidgets import QApplication
 import numpy as np
 import logging
 
-from src.tofimaging.EdgeFitting import GaussianBraggEdgeFitting2D
+from src.tofimaging.EdgeFitting import GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D
 from jupyter_notebooks.code.utilities.get import Get
 
 
@@ -21,7 +21,8 @@ class FitHandler:
         self.parent.ui.setEnabled(False)
 
         # get algorithm selected
-        algorithm_selected = self.get_algorithm_selected()
+        o_get = Get(parent=self.parent)
+        algorithm_selected = o_get.algorithm_selected()
         logging.info(f"-> algorithm selected: {algorithm_selected}")
 
         # get lambda range and full array
@@ -56,26 +57,31 @@ class FitHandler:
                                     est_position,
                                     config=self.parent.step3_config)
             if result:
-                self.parent.step4_config['estimated_bragg_edge_width_value'] = result['edge_width']
-                self.parent.step4_config['estimated_bragg_edge_height_value'] = result['edge_height']
-                self.parent.step4_config['estimated_bragg_edge_position_value'] = result['edge_position']
-                edge_position = result['edge_position']
-                edge_width = result['edge_width']
-                pos_bc = [edge_position - self.BRAGG_EDGE_FIT_POSITION_TOLERANCE,
-                          edge_position + self.BRAGG_EDGE_FIT_POSITION_TOLERANCE]
-                wid_bc = [edge_width - self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE,
-                          edge_width + self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE]
-                self.parent.step4_config['estimated_bragg_edge_position_range'] = pos_bc
-                self.parent.step4_config['estimated_bragg_edge_width_range'] = wid_bc
 
-                self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
-                self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
-                logging.info("-> Result of fitting (pixel mode):")
-                logging.info(f"--> edge width: {edge_width}")
-                logging.info(f"--> edge height: {result['edge_height']}")
-                logging.info(f"--> edge position: {edge_position}")
-                logging.info(f"--> post_bc: {pos_bc}")
-                logging.info(f"--> wid_bc: {wid_bc}")
+                if algorithm_selected == 'gaussian':
+                    self.parent.step4_config['estimated_bragg_edge_width_value'] = result['edge_width']
+                    self.parent.step4_config['estimated_bragg_edge_height_value'] = result['edge_height']
+                    self.parent.step4_config['estimated_bragg_edge_position_value'] = result['edge_position']
+                    edge_position = result['edge_position']
+                    edge_width = result['edge_width']
+                    pos_bc = [edge_position - self.BRAGG_EDGE_FIT_POSITION_TOLERANCE,
+                              edge_position + self.BRAGG_EDGE_FIT_POSITION_TOLERANCE]
+                    wid_bc = [edge_width - self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE,
+                              edge_width + self.BRAGG_EDGE_FIT_WIDTH_TOLERANCE]
+                    self.parent.step4_config['estimated_bragg_edge_position_range'] = pos_bc
+                    self.parent.step4_config['estimated_bragg_edge_width_range'] = wid_bc
+
+                    self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
+                    self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
+                    logging.info("-> Result of fitting (pixel mode):")
+                    logging.info(f"--> edge width: {edge_width}")
+                    logging.info(f"--> edge height: {result['edge_height']}")
+                    logging.info(f"--> edge position: {edge_position}")
+                    logging.info(f"--> post_bc: {pos_bc}")
+                    logging.info(f"--> wid_bc: {wid_bc}")
+
+                elif algorithm_selected == 'advanced':
+                    print(f"result: {result}")
 
         if mode == 'full':
             result = self.fit_full_roi(algorithm_selected,
@@ -85,6 +91,9 @@ class FitHandler:
                                        mask,
                                        config=self.parent.step4_config)
             self.parent.full_fit_result = result
+
+            logging.info(f"-> Result of fitting (full mode)")
+            logging.info(f"--> result: {result}")
 
         self.parent.ui.setEnabled(True)
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... DONE".format(
@@ -182,19 +191,20 @@ class FitHandler:
                                                     interp_factor=interp_factor,
                                                     bool_log=bool_log)
             logging.info(f"--> done with GaussianBraggEdgeFitting2D")
+            return fit_result
 
-            print("debuging")
-            print(f"fit_result: {fit_result}")
-
+        elif algorithm_selected == 'advanced':
+            logging.info(f"--> about to run AdvancedBraggEdgeFitting2D")
+            fit_result = AdvancedBraggEdgeFitting2D(T_mavg,
+                                                    lambda_array,
+                                                    lambda_range,
+                                                    mask=mask,
+                                                    est_pos=est_position,
+                                                    smooth_w=smooth_w,
+                                                    smooth_n=smooth_n,
+                                                    debug_idx=pixel)
+            logging.info(f"--> about to run AdvancedBraggEdgeFitting2D")
             return fit_result
 
         else:
             raise NotImplementedError("algorithm selected has not been implemented yet")
-
-    def get_algorithm_selected(self):
-        if self.parent.ui.gaussian_radioButton.isChecked():
-            return 'gaussian'
-        elif self.parent.ui.advanced_radioButton.isChecked():
-            return 'advanced'
-
-        raise NotImplementedError

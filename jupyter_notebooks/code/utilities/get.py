@@ -51,6 +51,13 @@ class Get:
     def rough_peak_position(self):
         return self.parent.rough_peak_ui.pos()[0]
 
+    def algorithm_selected(self):
+        if self.parent.ui.gaussian_radioButton.isChecked():
+            return 'gaussian'
+        elif self.parent.ui.advanced_radioButton.isChecked():
+            return 'advanced'
+        raise NotImplementedError
+
     @staticmethod
     def nearest_index(array, value):
         idx = (np.abs(np.array(array) - value)).argmin()

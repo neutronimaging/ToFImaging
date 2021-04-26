@@ -625,10 +625,20 @@
                 <item>
                  <widget class="QRadioButton" name="advanced_radioButton">
                   <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Advanced (Kropff - 7iterations)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="advanced_direct_radio_button">
+                  <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>Advanced (Kropff)</string>
+                   <string>Advanced (direct)</string>
                   </property>
                  </widget>
                 </item>
