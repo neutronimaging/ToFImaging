@@ -13,7 +13,8 @@ COLOR_ROUGH_LAMBDA = [50, 255, 50]
 class Display(Parent):
 
     def prepare_data_raw_image(self):
-        live_image = np.transpose(self.parent.live_image)
+        # live_image = np.transpose(self.parent.live_image)
+        live_image = self.parent.live_image
         self.parent.ui.raw_image_view.setImage(live_image)
 
     def fit_data_tab(self):
@@ -81,7 +82,8 @@ class Display(Parent):
         self.parent.ui.process_image_view.clear()
         prepare_data = self.parent.normalize_projections
         self.parent.live_process_data = np.mean(prepare_data, axis=0)
-        live_process_image = np.transpose(self.parent.live_process_data)
+        # live_process_image = np.transpose(self.parent.live_process_data)
+        live_process_image = self.parent.live_process_data
         self.parent.ui.process_image_view.setImage(live_process_image)
 
         self.parent.ui.process_image_view.view.getViewBox().setXLink('raw image')
@@ -89,7 +91,8 @@ class Display(Parent):
 
     def image(self):
         self.parent.live_image = self.parent.o_roi.live_image
-        live_image = np.transpose(self.parent.live_image)
+        # live_image = np.transpose(self.parent.live_image)
+        live_image = self.parent.live_image
         self.parent.ui.image_view.clear()
         self.parent.ui.image_view.setImage(live_image)
 
@@ -169,8 +172,8 @@ class Display(Parent):
         x, y = self.parent.pixel_marker['x'] - MARKER_WIDTH/2, self.parent.pixel_marker['y'] - MARKER_HEIGHT/2
 
         self.parent.pixel_marker_item = pg.ROI([x, y],
-                                        [MARKER_WIDTH, MARKER_HEIGHT],
-                                        scaleSnap=True)
+                                               [MARKER_WIDTH, MARKER_HEIGHT],
+                                               scaleSnap=True)
         self.parent.ui.image_view.addItem(self.parent.pixel_marker_item)
         self.parent.pixel_marker_item.sigRegionChanged.connect(self.parent.pixel_marker_changed)
 
@@ -179,7 +182,7 @@ class Display(Parent):
             lambda_array = self.parent.o_roi.lambda_array
             nbr_lambda = len(lambda_array)
             self.parent.default_bragg_peak_range = [lambda_array[np.int(nbr_lambda / 2)],
-                                             lambda_array[np.int(nbr_lambda / 2) + 10]]
+                                                    lambda_array[np.int(nbr_lambda / 2) + 10]]
 
         self.parent.bragg_peak_range_ui = pg.LinearRegionItem(values=self.parent.default_bragg_peak_range,
                                                               orientation='vertical',
