@@ -33,3 +33,35 @@ class Export:
             o_norm.export(output_file_name, data_type='sample')
 
             self.parent.ui.statusbar.showMessage("Export to {} ... Done!".format(output_file_name), 15000)
+            self.parent.ui.statusbar.setStyleSheet("color: green")
+
+    def result(self):
+        working_dir = str(Path(self.parent.o_api.working_dir).parent)
+        export_folder = QFileDialog.getExistingDirectory(self.parent,
+                                                         caption="Select output folder",
+                                                         directory=working_dir)
+
+        QtGui.QGuiApplication.processEvents()
+
+        if export_folder:
+
+            list_sample_filename = self.parent.o_api.list_sample_projections_filename
+            sample_folder_name = str(Path(list_sample_filename[0]).parent.name)
+            output_file_name = str(Path(str(export_folder), sample_folder_name + "_results"))
+            make_or_reset_folder(output_file_name)
+
+            result_dict = self.parent.full_fit_result
+            list_key_with_data = ["edge_position",
+                                  "edge_height",
+                                  "edge_width",
+                                  "edge_slope",
+                                  "median_image"]
+            for _key in list_key_with_data:
+                _data = result_dict[_key]
+                o_data = Normalization()
+                o_data.load(data=_data)
+                o_data.data['sample']['file_name'] = _key + ".tiff"
+                o_data.export(output_file_name=output_file_name, data_type='sample')
+
+            self.parent.ui.statusbar.showMessage("Exported results to {} ... Done!".format(output_file_name), 15000)
+            self.parent.ui.statusbar.setStyleSheet("color: green")

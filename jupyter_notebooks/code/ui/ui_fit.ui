@@ -859,7 +859,38 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_14">
         <item>
-         <widget class="QWidget" name="result_widget" native="true"/>
+         <widget class="QWidget" name="result_widget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="export_results_pushButton">
+            <property name="text">
+             <string>Export ...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -975,8 +1006,8 @@
    <slot>number_of_files_to_exclude_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>354</x>
-     <y>950</y>
+     <x>395</x>
+     <y>931</y>
     </hint>
     <hint type="destinationlabel">
      <x>7</x>
@@ -991,8 +1022,8 @@
    <slot>number_of_files_to_exclude_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1489</x>
-     <y>950</y>
+     <x>1602</x>
+     <y>931</y>
     </hint>
     <hint type="destinationlabel">
      <x>1158</x>
@@ -1007,8 +1038,8 @@
    <slot>rough_lambda_peak_position_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>912</x>
-     <y>952</y>
+     <x>983</x>
+     <y>933</y>
     </hint>
     <hint type="destinationlabel">
      <x>729</x>
@@ -1167,8 +1198,8 @@
    <slot>prepare_data_button_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>749</x>
-     <y>936</y>
+     <x>761</x>
+     <y>930</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -1183,8 +1214,8 @@
    <slot>export_prepared_data_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1562</x>
-     <y>944</y>
+     <x>1689</x>
+     <y>930</y>
     </hint>
     <hint type="destinationlabel">
      <x>1708</x>
@@ -1256,6 +1287,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>export_results_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>export_results_pushButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1635</x>
+     <y>976</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1474</x>
+     <y>1039</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>apply_clicked()</slot>
@@ -1274,5 +1321,6 @@
   <slot>activate_moving_average_clicked()</slot>
   <slot>log_button_clicked()</slot>
   <slot>moving_average_size_radioButton_clicked()</slot>
+  <slot>export_results_pushButton_clicked()</slot>
  </slots>
 </ui>

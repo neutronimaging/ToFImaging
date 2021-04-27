@@ -20,8 +20,9 @@ class Initialization:
 
     def widgets(self):
 
-        # disable second tab
+        # disable all tabs except first one (prepare data)
         self.parent.ui.toolBox.setItemEnabled(1, False)
+        self.parent.ui.toolBox.setItemEnabled(2, False)
 
         # labels
         self.parent.ui.kernel_size_custom_lambda_label.setText(u"\u03BB:")

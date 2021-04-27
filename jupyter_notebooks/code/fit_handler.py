@@ -60,6 +60,7 @@ class FitHandler:
                                     config=self.parent.step3_config)
             if result:
 
+                logging.info("-> Result of fitting (pixel_mode):")
                 if algorithm_selected == 'gaussian':
                     self.parent.step4_config['estimated_bragg_edge_width_value'] = result['edge_width']
                     self.parent.step4_config['estimated_bragg_edge_height_value'] = result['edge_height']
@@ -75,7 +76,6 @@ class FitHandler:
 
                     self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
                     self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
-                    logging.info("-> Result of fitting (pixel mode):")
                     logging.info(f"--> edge width: {edge_width}")
                     logging.info(f"--> edge height: {result['edge_height']}")
                     logging.info(f"--> edge position: {edge_position}")
@@ -83,9 +83,9 @@ class FitHandler:
                     logging.info(f"--> wid_bc: {wid_bc}")
 
                 elif algorithm_selected == 'advanced':
-                    pass
+                    print(f"ressult: {result}")
 
-        if mode == 'full':
+        elif mode == 'full':
             result = self.fit_full_roi(algorithm_selected,
                                        normalize_projections,
                                        lambda_array,
@@ -93,6 +93,7 @@ class FitHandler:
                                        mask,
                                        config=self.parent.step4_config)
             self.parent.full_fit_result = result
+            self.parent.ui.toolBox.setItemEnabled(2, True)
 
             logging.info(f"result of full mode:")
             if algorithm_selected == 'gaussian':

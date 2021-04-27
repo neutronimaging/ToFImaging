@@ -335,5 +335,10 @@ class Interface(QMainWindow):
             step4_settings_ui.show()
             self.step4_settings_ui = step4_settings_ui
 
+    # result tab
+    def export_results_pushButton_clicked(self):
+        o_export = Export(parent=self)
+        o_export.result()
+
     def apply_clicked(self):
         self.close()
