@@ -2,6 +2,7 @@ from qtpy import QtGui, QtCore
 from qtpy.QtWidgets import QApplication
 import numpy as np
 import logging
+import copy
 
 from src.tofimaging.EdgeFitting import GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D
 from jupyter_notebooks.code.utilities.get import Get
@@ -81,7 +82,7 @@ class FitHandler:
                     logging.info(f"--> wid_bc: {wid_bc}")
 
                 elif algorithm_selected == 'advanced':
-                    print(f"result: {result}")
+                    pass
 
         if mode == 'full':
             result = self.fit_full_roi(algorithm_selected,
@@ -92,8 +93,16 @@ class FitHandler:
                                        config=self.parent.step4_config)
             self.parent.full_fit_result = result
 
-            logging.info(f"-> Result of fitting (full mode)")
-            logging.info(f"--> result: {result}")
+            logging.info(f"result of full mode:")
+            if algorithm_selected == 'gaussian':
+                logging.info(f"-> shape(edge_position): {np.shape(result['edge_position'])}")
+                logging.info(f"-> shape(edge_height): {np.shape(result['edge_height'])}")
+                logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
+                logging.info(f"-> shape(edge_slope): {np.shape(result['edge_slope'])}")
+                logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
+
+            elif algorithm_selected == 'advanced':
+                pass
 
         self.parent.ui.setEnabled(True)
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... DONE".format(
@@ -118,6 +127,10 @@ class FitHandler:
         logging.info(f"-> estimated bragg edge height value: {est_height}")
         logging.info(f"-> estimated bragg edge position range: {pos_bc}")
         logging.info(f"-> estimated bragg edge width range: {wid_bc}")
+
+        T_mavg = copy.deepcopy(T_mavg.transpose(2, 1, 0))  # lambda, y, x -> y, x, lambda
+        logging.info(f"-> np.shape(T_mavg): {np.shape(T_mavg)}")
+        mask = np.transpose(mask)
 
         logging.info(f"-> algorithm selected {algorithm_selected}")
         if algorithm_selected == 'gaussian':
@@ -169,8 +182,9 @@ class FitHandler:
         bool_log = config['is_cross_section_mode']
         logging.info(f"-> bool_log: {bool_log}")
 
-        T_mavg = T_mavg.transpose(2, 1, 0)  # lambda, x, y -> x, y, lambda
+        T_mavg = copy.deepcopy(T_mavg.transpose(2, 1, 0))  # lambda, y, x -> y, x, lambda
         logging.info(f"-> np.shape(T_mavg): {np.shape(T_mavg)}")
+        mask = np.transpose(mask)
 
         logging.info(f"-> algorithm selected: {algorithm_selected}")
         if algorithm_selected == 'gaussian':

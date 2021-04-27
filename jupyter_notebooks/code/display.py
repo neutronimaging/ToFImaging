@@ -4,6 +4,7 @@ import logging
 
 from jupyter_notebooks.code.parent import Parent
 from jupyter_notebooks.code.utilities.get import Get
+from jupyter_notebooks.code.event_handler import EventHandler
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20
 COLOR_LAMBDA_RANGE = [250, 128, 247]
@@ -28,6 +29,8 @@ class Display(Parent):
         self.lambda_range_to_fit()
         self.init_rough_peak_slider()
         self.rough_peak_position()
+        o_event = EventHandler(parent=self.parent)
+        o_event.check_status_of_fit_buttons()
 
     def clear_previous_items(self):
         if self.parent.bragg_peak_range_ui:

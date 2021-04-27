@@ -11,7 +11,8 @@ class EventHandler(Parent):
     def check_status_of_fit_buttons(self):
 
         # we need to make sure the pixel selected is inside one of the ROI
-        x_pixel, y_pixel = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
+        # x_pixel, y_pixel = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
+        y_pixel, x_pixel = self.parent.pixel_marker['x'], self.parent.pixel_marker['y']
 
         list_roi = self.parent.o_roi.list_roi
         for _index_roi in list_roi.keys():

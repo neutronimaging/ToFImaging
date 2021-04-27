@@ -6,6 +6,7 @@ from lmfit import Model
 import numpy.matlib
 from tqdm import tqdm
 import time
+import skimage.filters
 
 import src.tofimaging.ReductionTools as rt
 from src.tofimaging.ReductionTools import tof2l
@@ -1439,7 +1440,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
     'median_image': median Transmission image in the selected lambda range
     """
 
-    if (mask.any()):
+    if mask.any():
         mymask = mask
         plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
@@ -1451,8 +1452,8 @@ def GaussianBraggEdgeFitting2D(Ttof,
         if ([np.shape(Ttof)[0], np.shape(Ttof)[1]] !=
             [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
-    elif (auto_mask):
-        import skimage.filters
+
+    elif auto_mask:
         mymask = rt.medianimage(Ttof)
         plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
@@ -1472,20 +1473,20 @@ def GaussianBraggEdgeFitting2D(Ttof,
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
-    if (bool_log):
+    if bool_log:
         Ttof = -np.log(Ttof)
 
-    if (calibration_matrix.any()):
+    if calibration_matrix.any():
         if ((np.shape(Ttof)[0] != np.shape(calibration_matrix)[0]) |
             (np.shape(Ttof)[1] != np.shape(calibration_matrix)[1])):
             print(
                 '!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!'
             )
 
-    if (any(debug_idx)):  #testing on a single pixel
+    if any(debug_idx):  #testing on a single pixel
         signal = Ttof[debug_idx[0], debug_idx[1], :]
 
-        if (calibration_matrix.any()):
+        if calibration_matrix.any():
             lambd = rt.tof2l_t0k(
                 spectrum, calibration_matrix[debug_idx[0], debug_idx[1], 1],
                 calibration_matrix[debug_idx[0], debug_idx[1], 0])
@@ -1523,10 +1524,10 @@ def GaussianBraggEdgeFitting2D(Ttof,
             np.shape(mymask)
         [0])):  #loop for all pixel position, where the mask is equal to one
         for j in range(0, np.shape(mymask)[1]):
-            if (mymask[i, j]):
+            if mymask[i, j]:
                 signal = Ttof[i, j, :]
 
-                if (calibration_matrix.any()):
+                if calibration_matrix.any():
                     lambd = rt.tof2l_t0k(spectrum, calibration_matrix[i, j, 1],
                                          calibration_matrix[i, j, 0])
                 else:
@@ -1554,6 +1555,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
                     edge_height[i, j] = edge_fit['edge_height']
                     edge_width[i, j] = edge_fit['edge_width']
                     edge_slope[i, j] = edge_fit['edge_slope']
+
                 except:
                     # print("Unexpected error at :", i, j)
                     edge_position[i, j] = np.nan
@@ -1562,8 +1564,8 @@ def GaussianBraggEdgeFitting2D(Ttof,
                     edge_slope[i, j] = np.nan
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    if (bool_print):
-        plt.figure(figsize=(15,10))
+    if bool_print:
+        plt.figure(figsize=(15, 10))
         plt.subplot(1, 3,
                     1), plt.imshow(edge_position), plt.title('Edge position')
         plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
@@ -1571,7 +1573,8 @@ def GaussianBraggEdgeFitting2D(Ttof,
         plt.tight_layout()
         plt.show()
         plt.close()
-    if (bool_save):
+
+    if bool_save:
         np.save('edge_position.npy', edge_position)
         np.save('edge_height.npy', edge_height)
         np.save('edge_width.npy', edge_width)
@@ -1584,7 +1587,6 @@ def GaussianBraggEdgeFitting2D(Ttof,
         'edge_slope': edge_slope,
         'median_image': median_image
     }
-
 
 #------------------------------ MICROSTRUCTURE FITTING ------------------------#
 def MarchDollase(A, R, l, l_hkl, Nbeta=50, bool_plotPole=False):
