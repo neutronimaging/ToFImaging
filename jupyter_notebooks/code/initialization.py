@@ -1,5 +1,7 @@
 from qtpy.QtWidgets import QVBoxLayout
 import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.dockarea import *
 from qtpy.QtGui import QIcon
 import numpy as np
 import os
@@ -88,3 +90,38 @@ class Initialization:
         self.parent.ui.step3_fit_pixel_settings_pushButton.setIcon(QIcon(settings_icon_1))
         settings_icon_2 = os.path.abspath(os.path.join(_file_path, 'static/settings_icon.png'))
         self.parent.ui.step4_fit_roi_settings_pushButton.setIcon(QIcon(settings_icon_2))
+
+        # result tab
+        area = DockArea()
+        result_vertical_layout = QVBoxLayout()
+        result_vertical_layout.addWidget(area)
+        self.parent.ui.result_widget.setLayout(result_vertical_layout)
+
+        dock_input_image, self.parent.ui.dock_input_image_view = \
+            Initialization._set_up_dock(dock_name="Input Image")
+        dock_edge_position, self.parent.ui.dock_edge_position_view = \
+            Initialization._set_up_dock(dock_name="Edge Position")
+        dock_edge_height, self.parent.ui.dock_edge_height_view = \
+            Initialization._set_up_dock(dock_name="Edge Height")
+        dock_edge_width, self.parent.ui.dock_edge_width_view = \
+            Initialization._set_up_dock(dock_name="Edge Width")
+        dock_edge_slope, self.parent.ui.dock_edge_slope_view = \
+            Initialization._set_up_dock(dock_name="Edge Slope")
+        dock_median_image, self.parent.ui.dock_median_image = \
+            Initialization._set_up_dock(dock_name="Dock Median")
+
+        area.addDock(dock_input_image, 'left')
+        area.addDock(dock_edge_position, 'right', dock_input_image)
+        area.addDock(dock_edge_height, 'right', dock_edge_position)
+        area.addDock(dock_edge_width, 'bottom', dock_input_image)
+        area.addDock(dock_edge_slope, 'bottom', dock_edge_position)
+        area.addDock(dock_median_image, 'bottom', dock_edge_height)
+
+    @staticmethod
+    def _set_up_dock(size=(300, 300), dock_name=''):
+        dock_input_image = Dock(dock_name, size=size)
+        dock_input_image_view = pg.ImageView(view=pg.PlotItem(), name=dock_name + "_view")
+        dock_input_image_view.ui.roiBtn.hide()
+        dock_input_image_view.ui.menuBtn.hide()
+        dock_input_image.addWidget(dock_input_image_view)
+        return dock_input_image, dock_input_image_view

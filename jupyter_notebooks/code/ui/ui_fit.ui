@@ -26,7 +26,7 @@
        <enum>QFrame::StyledPanel</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page">
        <property name="geometry">
@@ -34,7 +34,7 @@
          <x>0</x>
          <y>0</y>
          <width>1689</width>
-         <height>908</height>
+         <height>874</height>
         </rect>
        </property>
        <attribute name="label">
@@ -580,7 +580,7 @@
          <x>0</x>
          <y>0</y>
          <width>1689</width>
-         <height>908</height>
+         <height>874</height>
         </rect>
        </property>
        <attribute name="label">
@@ -850,6 +850,16 @@
            </layout>
           </widget>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_3">
+       <attribute name="label">
+        <string>Results</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_14">
+        <item>
+         <widget class="QWidget" name="result_widget" native="true"/>
         </item>
        </layout>
       </widget>
