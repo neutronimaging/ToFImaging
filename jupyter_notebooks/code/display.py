@@ -206,3 +206,13 @@ class Display(Parent):
                                                     pen=COLOR_ROUGH_LAMBDA,
                                                     label='Estimated Bragg Peak')
         self.parent.ui.plot_view.addItem(self.parent.rough_peak_ui)
+
+    def result_full_mode(self, input_image=None, edge_position=None,
+                         edge_height=None, edge_width=None,
+                         edge_slope=None, image_median=None):
+        self.parent.ui.dock_input_image_view.setImage(input_image)
+        self.parent.ui.dock_edge_position_view.setImage(edge_position)
+        self.parent.ui.dock_edge_height_view.setImage(edge_height)
+        self.parent.ui.dock_edge_width_view.setImage(edge_width)
+        self.parent.ui.dock_edge_slope_view.setImage(edge_slope)
+        self.parent.ui.dock_median_image_view.setImage(image_median)

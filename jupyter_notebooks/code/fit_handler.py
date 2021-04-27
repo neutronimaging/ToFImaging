@@ -6,6 +6,7 @@ import copy
 
 from src.tofimaging.EdgeFitting import GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D
 from jupyter_notebooks.code.utilities.get import Get
+from jupyter_notebooks.code.display import Display
 
 
 class FitHandler:
@@ -43,9 +44,9 @@ class FitHandler:
         normalize_projections = self.parent.normalize_projections
         logging.info(f"-> np.shape(normalize_projections): {np.shape(normalize_projections)}")
 
+        self.parent.ui.statusbar.setStyleSheet("color: blue")
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... IN PROGRESS".format(
                 mode, algorithm_selected))
-        self.parent.ui.statusbar.setStyleSheet("color: blue")
         QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         QtGui.QGuiApplication.processEvents()
 
@@ -100,6 +101,14 @@ class FitHandler:
                 logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
                 logging.info(f"-> shape(edge_slope): {np.shape(result['edge_slope'])}")
                 logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
+
+                o_display = Display(parent=self.parent)
+                o_display.result_full_mode(input_image=self.parent.live_process_data,
+                                           edge_position=np.transpose(result['edge_position']),
+                                           edge_height=np.transpose(result['edge_height']),
+                                           edge_width=np.transpose(result['edge_width']),
+                                           edge_slope=np.transpose(result['edge_slope']),
+                                           image_median=np.transpose(result['median_image']))
 
             elif algorithm_selected == 'advanced':
                 pass

@@ -32,6 +32,7 @@ class PrepareData(Parent):
 
     def prepare_data(self):
         logging.info("Preparing data ...")
+        self.parent.ui.statusbar.setStyleSheet("color: blue")
         self.parent.ui.setEnabled(False)
 
         # collect parameters
@@ -72,6 +73,7 @@ class PrepareData(Parent):
         o_display.fit_data_tab()
 
         self.parent.ui.statusbar.showMessage("Prepare data ... Done!", 5000)
+        self.parent.ui.statusbar.setStyleSheet("color: green")
         QtGui.QGuiApplication.processEvents()
         self.parent.ui.toolBox.setItemEnabled(1, True)
         # self.parent.ui.toolBox.setCurrentIndex(1)  # switch to next tab

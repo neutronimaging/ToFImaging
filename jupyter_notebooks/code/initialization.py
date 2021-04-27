@@ -107,8 +107,8 @@ class Initialization:
             Initialization._set_up_dock(dock_name="Edge Width")
         dock_edge_slope, self.parent.ui.dock_edge_slope_view = \
             Initialization._set_up_dock(dock_name="Edge Slope")
-        dock_median_image, self.parent.ui.dock_median_image = \
-            Initialization._set_up_dock(dock_name="Dock Median")
+        dock_median_image, self.parent.ui.dock_median_image_view = \
+            Initialization._set_up_dock(dock_name="Image Median")
 
         area.addDock(dock_input_image, 'left')
         area.addDock(dock_edge_position, 'right', dock_input_image)
