@@ -111,6 +111,21 @@ class Initialization:
         dock_median_image, self.parent.ui.dock_median_image_view = \
             Initialization._set_up_dock(dock_name="Image Median")
 
+        self.parent.ui.dock_input_image_view.view.getViewBox().setXLink("Edge Position View")
+        self.parent.ui.dock_input_image_view.view.getViewBox().setYLink("Edge Position View")
+
+        self.parent.ui.dock_edge_position_view.view.getViewBox().setXLink("Edge Height View")
+        self.parent.ui.dock_edge_position_view.view.getViewBox().setYLink("Edge Height View")
+
+        self.parent.ui.dock_edge_height_view.view.getViewBox().setXLink("Edge Width View")
+        self.parent.ui.dock_edge_height_view.view.getViewBox().setYLink("Edge Width View")
+
+        self.parent.ui.dock_edge_width_view.view.getViewBox().setXLink("Edge Slope View")
+        self.parent.ui.dock_edge_width_view.view.getViewBox().setYLink("Edge Slope View")
+
+        self.parent.ui.dock_edge_slope_view.view.getViewBox().setXLink("Image Median View")
+        self.parent.ui.dock_edge_slope_view.view.getViewBox().setYLink("Image Median View")
+
         area.addDock(dock_input_image, 'left')
         area.addDock(dock_edge_position, 'right', dock_input_image)
         area.addDock(dock_edge_height, 'right', dock_edge_position)
@@ -121,7 +136,7 @@ class Initialization:
     @staticmethod
     def _set_up_dock(size=(300, 300), dock_name=''):
         dock_input_image = Dock(dock_name, size=size)
-        dock_input_image_view = pg.ImageView(view=pg.PlotItem(), name=dock_name + "_view")
+        dock_input_image_view = pg.ImageView(view=pg.PlotItem(), name=dock_name + " View")
         dock_input_image_view.ui.roiBtn.hide()
         dock_input_image_view.ui.menuBtn.hide()
         dock_input_image.addWidget(dock_input_image_view)
