@@ -22,6 +22,12 @@ class Export:
         QtGui.QGuiApplication.processEvents()
 
         if export_folder:
+            logging.info(f"Exporting prepared data to {export_folder}")
+            self.parent.ui.setEnabled(False)
+            self.parent.ui.statusbar.showMessage("Export of images ... IN PROGRESS")
+            self.parent.ui.statusbar.setStyleSheet("color: blue")
+            QtGui.QGuiApplication.processEvents()
+
             normalize_projections = self.parent.normalize_projections
             list_sample_filename = self.parent.o_api.list_sample_projections_filename
             sample_folder_name = str(Path(list_sample_filename[0]).parent.name)
@@ -33,8 +39,10 @@ class Export:
             o_norm.data['sample']['file_name'] = list_sample_filename
             o_norm.export(output_file_name, data_type='sample')
 
-            self.parent.ui.statusbar.showMessage("Export to {} ... Done!".format(output_file_name), 15000)
+            self.parent.ui.statusbar.showMessage("Export to {} - Done!".format(output_file_name), 15000)
             self.parent.ui.statusbar.setStyleSheet("color: green")
+            QtGui.QGuiApplication.processEvents()
+            self.parent.ui.setEnabled(True)
 
     def result(self):
         working_dir = str(Path(self.parent.o_api.working_dir).parent)

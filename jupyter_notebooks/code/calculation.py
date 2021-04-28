@@ -34,7 +34,7 @@ class Calculation(Parent):
             profile_y_axis.append(mean_counts_of_roi)
         self.parent.profile_y_axis = profile_y_axis
 
-  def profile_of_pixel_selected(self):
+    def profile_of_pixel_selected(self):
         pixel_marker = self.parent.pixel_marker
         x = pixel_marker['x']
         y = pixel_marker['y']
