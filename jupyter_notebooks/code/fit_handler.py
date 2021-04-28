@@ -58,6 +58,8 @@ class FitHandler:
                                     mask,
                                     est_position,
                                     config=self.parent.step3_config)
+            logging.debug(f"just after self.fit_pixel, result is {result}")
+
             if result:
 
                 logging.info("-> Result of fitting (pixel_mode):")
@@ -83,7 +85,8 @@ class FitHandler:
                     logging.info(f"--> wid_bc: {wid_bc}")
 
                 elif algorithm_selected == 'advanced':
-                    print(f"ressult: {result}")
+                    print(f"result: {result}")
+                    logging.info(f"-> result: {result}")
 
         elif mode == 'full':
             result = self.fit_full_roi(algorithm_selected,
@@ -226,8 +229,9 @@ class FitHandler:
                                                     est_pos=est_position,
                                                     smooth_w=smooth_w,
                                                     smooth_n=smooth_n,
-                                                    debug_idx=pixel)
-            logging.info(f"--> about to run AdvancedBraggEdgeFitting2D")
+                                                    debug_idx=pixel,
+                                                    bool_print=True)
+            logging.info(f"--> done with AdvancedBraggEdgeFitting2D")
             return fit_result
 
         else:

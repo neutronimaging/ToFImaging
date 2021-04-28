@@ -26,7 +26,7 @@
        <enum>QFrame::StyledPanel</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <property name="geometry">
@@ -212,7 +212,7 @@
                             </size>
                            </property>
                            <property name="text">
-                            <string>3</string>
+                            <string>20</string>
                            </property>
                           </widget>
                          </item>
@@ -259,7 +259,7 @@
                             </size>
                            </property>
                            <property name="text">
-                            <string>3</string>
+                            <string>20</string>
                            </property>
                           </widget>
                          </item>
@@ -542,6 +542,25 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>250</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Import Prepared Data ...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="prepare_data_pushButton">
             <property name="text">
              <string>Run Prepare Data</string>
@@ -628,7 +647,7 @@
                    <bool>true</bool>
                   </property>
                   <property name="text">
-                   <string>Advanced (Kropff - 7iterations)</string>
+                   <string>Advanced (Kropff - 7 iterations)</string>
                   </property>
                  </widget>
                 </item>
@@ -1303,6 +1322,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>import_prepared_data_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>219</x>
+     <y>915</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>955</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>apply_clicked()</slot>
@@ -1322,5 +1357,6 @@
   <slot>log_button_clicked()</slot>
   <slot>moving_average_size_radioButton_clicked()</slot>
   <slot>export_results_pushButton_clicked()</slot>
+  <slot>import_prepared_data_clicked()</slot>
  </slots>
 </ui>

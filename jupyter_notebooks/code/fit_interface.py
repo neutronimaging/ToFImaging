@@ -13,6 +13,7 @@ from jupyter_notebooks.code.fit_handler import FitHandler
 from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.initialization import Initialization
 from jupyter_notebooks.code.export import Export
+from jupyter_notebooks.code.import_data import Import
 from jupyter_notebooks.code.event_handler import EventHandler
 from jupyter_notebooks.code.prepare_data import PrepareData
 from jupyter_notebooks.code.step3_settings_handler import Step3SettingsHandler
@@ -170,6 +171,10 @@ class Interface(QMainWindow):
         status = self.ui.activate_moving_average_checkBox.isChecked()
         self.ui.moving_average_groupBox.setEnabled(status)
 
+    def import_prepared_data_clicked(self):
+        o_import = Import(parent=self)
+        o_import.run()
+
     def export_prepared_data_clicked(self):
         o_export = Export(parent=self)
         o_export.run()
@@ -208,6 +213,10 @@ class Interface(QMainWindow):
         x = pixel_marker['x']
         y = pixel_marker['y']
         normalize_projections = self.normalize_projections
+
+        logging.info("calculate profile of pixel selected")
+        logging.info(f"-> x:{x}, y:{y}")
+        logging.info(f"np.shape(normalize_projections): {np.shape(normalize_projections)}")
 
         profile = normalize_projections[:, y, x]
         self.profile_of_pixel_selected = profile
@@ -342,3 +351,6 @@ class Interface(QMainWindow):
 
     def apply_clicked(self):
         self.close()
+
+    def closeEvent(self, c):
+        logging.info("*** Ending session ***")

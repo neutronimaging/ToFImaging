@@ -7,6 +7,7 @@ import numpy.matlib
 from tqdm import tqdm
 import time
 import skimage.filters
+import logging
 
 import src.tofimaging.ReductionTools as rt
 from src.tofimaging.ReductionTools import tof2l
@@ -52,6 +53,7 @@ def AdvancedBraggEdgeFitting(signal,
     'pos_extrema' = extrema of the bragg edges
     'height' = fitted height of the bragg edge
     """
+    logging.info("==== in AdvancedBraggEdgeFitting")
 
     #----------------- FITTING FUNCTIONS---------------#
     # def term0(t,a2,a6):
@@ -115,22 +117,22 @@ def AdvancedBraggEdgeFitting(signal,
     #-----------------FITTING PART---------------#
     t = spectrum  #renamed to t for convenience but could be lambda or bin index
     #get the part of the spectrum that I want to fit
-    if (spectrum_range):
+    if spectrum_range:
         idx_low = find_nearest(spectrum, spectrum_range[0])
         idx_high = find_nearest(spectrum, spectrum_range[1])
         signal = signal[idx_low:idx_high]
         t = t[idx_low:idx_high]
 
-    if (bool_smooth):
+    if bool_smooth:
         signal = SG_filter(signal, smooth_w, smooth_n)
 
-    if (est_pos == 0):
+    if est_pos == 0:
         est_pos = np.argmax(SG_filter(np.diff(signal)))
     else:
         est_pos = find_nearest(t, est_pos)
     t0_f = t[est_pos]  # this is the actual estimated first position in TOF [s]
 
-    if (bool_print):
+    if bool_print:
         plt.figure()
         plt.plot(t, signal)
         plt.plot(t0_f, signal[est_pos], 'x', markeredgewidth=3, c='orange')
@@ -140,6 +142,7 @@ def AdvancedBraggEdgeFitting(signal,
         plt.close()
         #plt.savefig('step1_fitting.pdf')
 
+    logging.info("==== position #1")
     t_before = t[0:est_pos]
     bragg_before = signal[0:est_pos]
     t_after = t[est_pos + int(est_pos * 0.2):-1]
@@ -153,9 +156,12 @@ def AdvancedBraggEdgeFitting(signal,
     a5_f = interception_before
     a6_f = slope_before
     a1_f = interception_after
-    if (bool_linear):
+    logging.info("==== position #2")
+
+    if bool_linear:
+        logging.info("==== position #3")
         gmodel = Model(BraggEdgeLinear)
-        if (bool_print):
+        if bool_print:
             plt.figure()
             plt.plot(t_before, bragg_before, '.g')
             plt.plot(t_after, bragg_after, '.r')
@@ -168,14 +174,18 @@ def AdvancedBraggEdgeFitting(signal,
             plt.show()
             plt.close()
     else:
+        logging.info("===> fitting #1")
         exp_model_after = Model(exp_after)
         params = exp_model_after.make_params(a1=a1_f, a2=a2_f)
+        logging.info(f"===== before fit: a1:{a1_f}, a2:{a2_f}")
         result_exp_model_after = exp_model_after.fit(bragg_after,
                                                      params,
                                                      t=t_after)
         a1_f = result_exp_model_after.best_values.get('a1')
         a2_f = result_exp_model_after.best_values.get('a2')
+        logging.info(f"===== after fit: a1:{a1_f}, a2:{a2_f}")
 
+        logging.info("===> fitting #2")
         exp_model_before = Model(exp_combined)
         params = exp_model_before.make_params(a1=a1_f,
                                               a2=a2_f,
@@ -183,14 +193,17 @@ def AdvancedBraggEdgeFitting(signal,
                                               a6=a6_f)
         params['a1'].vary = False
         params['a2'].vary = False
+        logging.info(f"===== before fit: a1:{a1_f}, a2:{a2_f}, a5:{a5_f}, a6:{a6_f}")
         result_exp_model_before = exp_model_before.fit(bragg_before,
                                                        params,
                                                        t=t_before)
         a5_f = result_exp_model_before.best_values.get('a5')
         a6_f = result_exp_model_before.best_values.get('a6')
+        logging.info(f"===== after fit: a1:{a1_f}, a2:{a2_f}, a5:{a5_f}, a6:{a6_f}")
+
         gmodel = Model(BraggEdgeExponential)
 
-        if (bool_print):
+        if bool_print:
             plt.figure()
             plt.plot(t_before, bragg_before, '.r', label='int point')
             plt.plot(t_after, bragg_after, '.g', label='int point')
@@ -221,6 +234,8 @@ def AdvancedBraggEdgeFitting(signal,
             plt.show()
             plt.close()
 
+    logging.info("==== position #5")
+
     sigma_f = est_sigma
     alpha_f = est_alpha
 
@@ -232,6 +247,7 @@ def AdvancedBraggEdgeFitting(signal,
     method = 'least_squares'  # default and it implements the Levenberg-Marquardt
 
     # 1st round to fit a1 and a6 (intercept of before and slope of after)
+    logging.info("==== position #6")
     params = gmodel.make_params(t0=t0_f,
                                 sigma=sigma_f,
                                 alpha=alpha_f,
@@ -254,6 +270,7 @@ def AdvancedBraggEdgeFitting(signal,
                          nan_policy='propagate')
     a1_f = result1.best_values.get('a1')
     a6_f = result1.best_values.get('a6')
+    logging.info("==== position #7")
 
     #2nd round to fit a2 and a5 (slope of before and intercept of after)
     params = gmodel.make_params(t0=t0_f,
@@ -276,6 +293,7 @@ def AdvancedBraggEdgeFitting(signal,
                          nan_policy='propagate')
     a2_f = result2.best_values.get('a2')
     a5_f = result2.best_values.get('a5')
+    logging.info("==== position #8")
 
     #3rd round to fit t0 (position)
     params = gmodel.make_params(t0=t0_f,
@@ -300,6 +318,7 @@ def AdvancedBraggEdgeFitting(signal,
                          method=method,
                          nan_policy='propagate')
     t0_f = result3.best_values.get('t0')
+    logging.info("==== position #9")
 
     # 4th round to fit sigma, alpha and t0 (broadening, decay and position)
     params = gmodel.make_params(t0=t0_f,
@@ -328,6 +347,7 @@ def AdvancedBraggEdgeFitting(signal,
     sigma_f = result4.best_values.get('sigma')
     alpha_f = result4.best_values.get('alpha')
     t0_f = result4.best_values.get('t0')
+    logging.info("==== position #10")
 
     #5th round to fit a1 a2 a5 and a6 (slope of intercepts of before and after)
     params = gmodel.make_params(t0=t0_f,
@@ -350,6 +370,7 @@ def AdvancedBraggEdgeFitting(signal,
     a2_f = result5.best_values.get('a2')
     a5_f = result5.best_values.get('a5')
     a6_f = result5.best_values.get('a6')
+    logging.info("==== position #11")
 
     #6th round to fit sigma alpha and t0 (broadening, decay and position)
     params = gmodel.make_params(t0=t0_f,
@@ -378,6 +399,7 @@ def AdvancedBraggEdgeFitting(signal,
     sigma_f = result6.best_values.get('sigma')
     alpha_f = result6.best_values.get('alpha')
     t0_f = result6.best_values.get('t0')
+    logging.info("==== position #12")
 
     #7th round to fit sigma alpha and t0 a1 a2 a5 a6 (all)
     params = gmodel.make_params(t0=t0_f,
@@ -406,6 +428,7 @@ def AdvancedBraggEdgeFitting(signal,
     a2_f = result7.best_values.get('a2')
     a5_f = result7.best_values.get('a5')
     a6_f = result7.best_values.get('a6')
+    logging.info("==== position #13")
 
     if (bool_print):
         print(result7.fit_report())
@@ -427,6 +450,7 @@ def AdvancedBraggEdgeFitting(signal,
         fit_after = exp_after(t, a1_f, a2_f)
 
     index_t0 = find_nearest(t, t0_f)
+    logging.info("==== position #14")
 
     # This plots the fitted edge and the sides
     # if (bool_print):
@@ -453,13 +477,13 @@ def AdvancedBraggEdgeFitting(signal,
     ## Attempt n.3 ------ This approach is based on the difference between the fit before and after the edge and the fitted data itself. so far, it gives the nicest results on the calibration sample, however the value used as threshold is not general and should probably be adjusted from case to case. So again it is not yet the final solution
     for i in range(0, len(fitted_data)):
         #print(i,(fitted_data[i]-fit_before[i]))
-        if (np.abs(fitted_data[i] - fit_before[i]) > 1e-4):
+        if np.abs(fitted_data[i] - fit_before[i]) > 1e-4:
             pos_extrema.append(i - 1)
             break
 
     for i in range(len(fitted_data) - 1, 0, -1):  # here I am moving backwards
         #print(i,(fitted_data[i]-fit_after[i]))
-        if (np.abs(fitted_data[i] - fit_after[i]) > 1e-3):
+        if np.abs(fitted_data[i] - fit_after[i]) > 1e-3:
             pos_extrema.append(i)
             break
 
@@ -508,6 +532,8 @@ def AdvancedBraggEdgeFitting(signal,
             'Edge fitting with intermediate steps and estimated edge position')
         plt.show()
         plt.close()
+
+    logging.info("==== position #15")
 
     return {
         't0': t0_f,
@@ -569,7 +595,9 @@ def AdvancedBraggEdgeFitting2D(Ttof,
     'median_image': median Transmission image in the selected lambda range
     """
 
-    if (mask.any()):
+    logging.info("== inside EdgeFitting.AdvancedBraggEdgeFitting2D ==")
+    if mask.any():
+        logging.info("=== mask.any()")
         mymask = mask
         plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
@@ -579,10 +607,11 @@ def AdvancedBraggEdgeFitting2D(Ttof,
         if ([np.shape(Ttof)[0], np.shape(Ttof)[1]] !=
             [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
-    elif (auto_mask):
-        import skimage.filters
+
+    elif auto_mask:
+        logging.info("=== auto mask")
         mymask = rt.medianimage(Ttof)
-        plt.figure(figsize=(15,10))
+        plt.figure(figsize=(15, 10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
         mymask[mymask > mask_thresh[1]] = 0.0
@@ -595,20 +624,24 @@ def AdvancedBraggEdgeFitting2D(Ttof,
         mymask[mymask > 0] = 1.0
         plt.subplot(1, 3, 3), plt.imshow(mymask), plt.title('Mask - gauss')
         plt.show(), plt.close()
+
     else:
+        logging.info("=== neither mask.any() nor auto.mask")
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
-    if (calibration_matrix.any()):
+    if calibration_matrix.any():
         if ((np.shape(Ttof)[0] != np.shape(calibration_matrix)[0]) |
             (np.shape(Ttof)[1] != np.shape(calibration_matrix)[1])):
             print(
                 '!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!'
             )
 
-    if (any(debug_idx)):  #testing on a single pixel
+    if any(debug_idx):  #testing on a single pixel
+        logging.info("=== any(debug_idx)")
+
         signal = Ttof[debug_idx[0], debug_idx[1], :]
 
-        if (calibration_matrix.any()):
+        if calibration_matrix.any():
             lambd = rt.tof2l_t0k(
                 spectrum, calibration_matrix[debug_idx[0], debug_idx[1], 1],
                 calibration_matrix[debug_idx[0], debug_idx[1], 0])
@@ -625,7 +658,7 @@ def AdvancedBraggEdgeFitting2D(Ttof,
                                           smooth_w=smooth_w,
                                           smooth_n=smooth_n,
                                           bool_linear=bool_linear,
-                                          bool_print=True)
+                                          bool_print=bool_print)
 
         # return {
         #     't0'          : t0_f,
