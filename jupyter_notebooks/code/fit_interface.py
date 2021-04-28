@@ -21,6 +21,7 @@ from jupyter_notebooks.code.step4_settings_handler import Step4SettingsHandler
 from jupyter_notebooks.code.display import Display
 from jupyter_notebooks.code.log_launcher import LogLauncher
 from jupyter_notebooks.code.gui_handler import GuiHandler
+from jupyter_notebooks.code.calculation import Calculation
 
 # warnings.filterwarnings('ignore')
 
@@ -209,46 +210,12 @@ class Interface(QMainWindow):
         o_event.check_status_of_fit_buttons()
 
     def calculate_profile_of_pixel_selected(self):
-        pixel_marker = self.pixel_marker
-        x = pixel_marker['x']
-        y = pixel_marker['y']
-        normalize_projections = self.normalize_projections
-
-        logging.info("calculate profile of pixel selected")
-        logging.info(f"-> x:{x}, y:{y}")
-        logging.info(f"np.shape(normalize_projections): {np.shape(normalize_projections)}")
-
-        profile = normalize_projections[:, y, x]
-        self.profile_of_pixel_selected = profile
+        o_calculation = Calculation(parent=self)
+        o_calculation.profile_of_pixel_selected()
 
     def calculate_profile_of_roi(self):
-        # normalize_projections_lambda_x_y = self.normalize_projections.transpose(2, 0, 1)
-        normalize_projections_lambda_x_y = self.normalize_projections
-        list_roi = self.o_roi.list_roi
-        profile_y_axis = []
-        total_number_of_pixels_in_rois = 0
-        for _index_roi in list_roi.keys():
-            _roi = list_roi[_index_roi]
-            _x0 = _roi['x0']
-            _y0 = _roi['y0']
-            _x1 = _roi['x1']
-            _y1 = _roi['y1']
-            total_number_of_pixels_in_rois += (_y1 - _y0 + 1) * (_x1 - _x0 + 1)
-        for _projection in normalize_projections_lambda_x_y:
-
-            total_counts_of_roi = 0
-            for _index_roi in list_roi.keys():
-                _roi = list_roi[_index_roi]
-                _x0 = _roi['x0']
-                _y0 = _roi['y0']
-                _x1 = _roi['x1']
-                _y1 = _roi['y1']
-#                total_counts_of_roi += np.sum(_projection[_y0: _y1 + 1, _x0: _x1 + 1])
-                total_counts_of_roi += np.sum(_projection[_x0: _x1 + 1, _y0: _y1 + 1])
-
-            mean_counts_of_roi = total_counts_of_roi / total_number_of_pixels_in_rois
-            profile_y_axis.append(mean_counts_of_roi)
-        self.profile_y_axis = profile_y_axis
+        o_calculation = Calculation(parent=self)
+        o_calculation.profile_of_roi()
 
     def number_of_files_to_exclude_slider_changed(self, value):
         left_number = np.int(str(self.ui.left_number_of_files_to_exclude_slider.value()))
@@ -296,10 +263,6 @@ class Interface(QMainWindow):
         p = inflect.engine()
         message = "{} ".format(nbr_of_roi) + p.plural("ROI", nbr_of_roi) + " selected!"
         self.ui.normalization_message_label.setText(message)
-
-    def calculate_mask(self):
-        o_event = EventHandler(parent=self)
-        o_event.calculate_mask()
 
     def normalization_radioButton_clicked(self):
         state = self.ui.normal_normalization_radioButton.isChecked()
