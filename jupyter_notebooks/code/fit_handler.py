@@ -77,8 +77,6 @@ class FitHandler:
                     self.parent.step4_config['estimated_bragg_edge_position_range'] = pos_bc
                     self.parent.step4_config['estimated_bragg_edge_width_range'] = wid_bc
 
-                    self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
-                    self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
                     logging.info(f"--> edge width: {edge_width}")
                     logging.info(f"--> edge height: {result['edge_height']}")
                     logging.info(f"--> edge position: {edge_position}")
@@ -93,8 +91,21 @@ class FitHandler:
                     self.parent.step4_config['a2'] = result['a2']
                     self.parent.step4_config['a5'] = result['a5']
                     self.parent.step4_config['a6'] = result['a6']
-                    self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
-                    self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
+
+                elif algorithm_selected == 'advanced direct':
+                    logging.info(f"-> result: {result}")
+                    self.parent.step4_config['alpha'] = result['alpha']
+                    self.parent.step4_config['sigma'] = result['sigma']
+                    self.parent.step4_config['a1'] = result['a1']
+                    self.parent.step4_config['a2'] = result['a2']
+                    self.parent.step4_config['a5'] = result['a5']
+                    self.parent.step4_config['a6'] = result['a6']
+
+                else:
+                    raise NotImplementedError("algorithm has not been implemented yet!")
+
+                self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
+                self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
 
         elif mode == 'full':
 
@@ -127,6 +138,35 @@ class FitHandler:
                                            image_median=np.transpose(result['median_image']))
 
             elif algorithm_selected == 'advanced':
+                alpha = self.parent.step4_config['alpha']
+                sigma = self.parent.step4_config['sigma']
+
+                result = self.fit_full_roi(algorithm_selected,
+                                           normalize_projections,
+                                           lambda_array,
+                                           lambda_range,
+                                           mask,
+                                           alpha=alpha,
+                                           sigma=sigma,
+                                           config=self.parent.step4_config)
+
+                logging.info(f"result of full mode")
+                logging.info(f"-> shape(edge_position): {np.shape(result['edge_position'])}")
+                logging.info(f"-> shape(edge_height): {np.shape(result['edge_height'])}")
+                logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
+                logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
+
+                self.parent.advanced_full_fit_result = result
+                self.parent.ui.toolBox.setItemEnabled(2, True)
+
+                o_display = Display(parent=self.parent)
+                o_display.result_full_mode(algorithm_selected=algorithm_selected,
+                                           input_image=self.parent.live_process_data,
+                                           edge_position=np.transpose(result['edge_position']),
+                                           edge_height=np.transpose(result['edge_height']),
+                                           edge_width=np.transpose(result['edge_width']))
+
+            elif algorithm_selected == 'advanced direct':
                 alpha = self.parent.step4_config['alpha']
                 sigma = self.parent.step4_config['sigma']
 
@@ -221,6 +261,24 @@ class FitHandler:
                                                     smooth_n=1,
                                                     )
             logging.info(f"--> done with AdvancedBraggEdgeFitting2D")
+            return fit_result
+
+        elif algorithm_selected == 'advanced direct':
+
+            logging.info(f"--> about to run AdvancedDirectBraggEdgeFitting2D")
+            fit_result = AdvancedBraggEdgeFitting2D(T_mavg,
+                                                    lambda_array,
+                                                    lambda_range,
+                                                    mask=mask,
+                                                    est_pos=est_position,
+                                                    est_alpha=alpha,
+                                                    est_sigma=sigma,
+                                                    bool_smooth=True,
+                                                    smooth_w=5,
+                                                    smooth_n=1,
+                                                    bool_print=True,
+                                                    )
+            logging.info(f"--> done with AdvancedDirectBraggEdgeFitting2D")
             return fit_result
 
         else:

@@ -1158,22 +1158,23 @@ def AdvancedDirectBraggEdgeFitting2D(Ttof,
         else:
             lambd = spectrum
 
-        AdvancedDirectBraggEdgeFitting(signal=signal,
-                                       spectrum=lambd,
-                                       spectrum_range=spectrum_range,
-                                       est_pos=est_pos,
-                                       est_sigma=est_sigma,
-                                       est_alpha=est_alpha,
-                                       pos_BC=pos_BC,
-                                       sigma_BC=sigma_BC,
-                                       alpha_BC=alpha_BC,
-                                       est_w=est_w,
-                                       bool_smooth=bool_smooth,
-                                       smooth_w=smooth_w,
-                                       smooth_n=smooth_n,
-                                       bool_linear=bool_linear,
-                                       bool_print=True)
-        return
+        result = AdvancedDirectBraggEdgeFitting(signal=signal,
+                                                spectrum=lambd,
+                                                spectrum_range=spectrum_range,
+                                                est_pos=est_pos,
+                                                est_sigma=est_sigma,
+                                                est_alpha=est_alpha,
+                                                pos_BC=pos_BC,
+                                                sigma_BC=sigma_BC,
+                                                alpha_BC=alpha_BC,
+                                                est_w=est_w,
+                                                bool_smooth=bool_smooth,
+                                                smooth_w=smooth_w,
+                                                smooth_n=smooth_n,
+                                                bool_linear=bool_linear,
+                                                bool_print=True)
+
+        return result
 
     median_image = rt.medianimage(Ttof)
     edge_position = np.nan * np.zeros(np.shape(mymask))
