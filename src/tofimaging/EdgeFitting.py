@@ -374,7 +374,6 @@ def AdvancedBraggEdgeFitting(signal,
     a2_f = result5.best_values.get('a2')
     a5_f = result5.best_values.get('a5')
     a6_f = result5.best_values.get('a6')
-    logging.info("==== position #11")
 
     #6th round to fit sigma alpha and t0 (broadening, decay and position)
     params = gmodel.make_params(t0=t0_f,
@@ -533,8 +532,6 @@ def AdvancedBraggEdgeFitting(signal,
             'Edge fitting with intermediate steps and estimated edge position')
         plt.show()
         plt.close()
-
-    logging.info("==== position #15")
 
     return {
         't0': t0_f,
@@ -866,9 +863,9 @@ def AdvancedDirectBraggEdgeFitting(signal,
     a2_f = slope_after
     a5_f = interception_before
     a6_f = slope_before
-    if (bool_linear):
+    if bool_linear:
         gmodel = Model(BraggEdgeLinear)
-        if (bool_print):
+        if bool_print:
             plt.figure()
             plt.plot(t_before, bragg_before, '.g')
             plt.plot(t_after, bragg_after, '.r')
@@ -885,7 +882,8 @@ def AdvancedDirectBraggEdgeFitting(signal,
         params = exp_model_after.make_params(a1=a1_f, a2=a2_f)
         result_exp_model_after = exp_model_after.fit(bragg_after,
                                                      params,
-                                                     t=t_after)
+                                                     t=t_after,
+                                                     nan_policy='propagate')
         a1_f = result_exp_model_after.best_values.get('a1')
         a2_f = result_exp_model_after.best_values.get('a2')
 
@@ -1115,7 +1113,7 @@ def AdvancedDirectBraggEdgeFitting2D(Ttof,
     'median_image': median Transmission image in the selected lambda range
     """
 
-    if (mask.any()):
+    if mask.any():
         mymask = mask
         plt.figure(figsize=(15,10))
         plt.subplot(1, 2, 1), plt.imshow(np.median(
@@ -1125,8 +1123,7 @@ def AdvancedDirectBraggEdgeFitting2D(Ttof,
         if ([np.shape(Ttof)[0], np.shape(Ttof)[1]] !=
             [np.shape(mymask)[0], np.shape(mymask)[1]]):
             print('WARNING: Mask size does not match frames size')
-    elif (auto_mask):
-        import skimage.filters
+    elif auto_mask:
         mymask = rt.medianimage(Ttof)
         plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
@@ -1144,17 +1141,17 @@ def AdvancedDirectBraggEdgeFitting2D(Ttof,
     else:
         mymask = np.ones([np.shape(Ttof)[0], np.shape(Ttof)[1]])
 
-    if (calibration_matrix.any()):
+    if calibration_matrix.any():
         if ((np.shape(Ttof)[0] != np.shape(calibration_matrix)[0]) |
             (np.shape(Ttof)[1] != np.shape(calibration_matrix)[1])):
             print(
                 '!!!!!!! WARNING CALIBRATION MATRIX HAS NOT SAME SIZE OF IMAGE !!!!!!!!!!!!!!'
             )
 
-    if (any(debug_idx)):  #testing on a single pixel
+    if any(debug_idx):  #testing on a single pixel
         signal = Ttof[debug_idx[0], debug_idx[1], :]
 
-        if (calibration_matrix.any()):
+        if calibration_matrix.any():
             lambd = rt.tof2l_t0k(
                 spectrum, calibration_matrix[debug_idx[0], debug_idx[1], 1],
                 calibration_matrix[debug_idx[0], debug_idx[1], 0])
