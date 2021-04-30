@@ -106,6 +106,25 @@ class FitHandler:
                                            mask,
                                            config=self.parent.step4_config)
 
+                self.parent.full_fit_result = result
+                self.parent.ui.toolBox.setItemEnabled(2, True)
+
+                logging.info(f"result of full mode:")
+                logging.info(f"-> shape(edge_position): {np.shape(result['edge_position'])}")
+                logging.info(f"-> shape(edge_height): {np.shape(result['edge_height'])}")
+                logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
+                logging.info(f"-> shape(edge_slope): {np.shape(result['edge_slope'])}")
+                logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
+
+                o_display = Display(parent=self.parent)
+                o_display.result_full_mode(algorithm_selected=algorithm_selected,
+                                           input_image=self.parent.live_process_data,
+                                           edge_position=np.transpose(result['edge_position']),
+                                           edge_height=np.transpose(result['edge_height']),
+                                           edge_width=np.transpose(result['edge_width']),
+                                           edge_slope=np.transpose(result['edge_slope']),
+                                           image_median=np.transpose(result['median_image']))
+
             elif algorithm_selected == 'advanced':
                 alpha = self.parent.step4_config['alpha']
                 sigma = self.parent.step4_config['sigma']
@@ -119,26 +138,24 @@ class FitHandler:
                                            sigma=sigma,
                                            config=self.parent.step4_config)
 
+                logging.info(f"result of full mode")
+                logging.info(f"-> shape(edge_position): {np.shape(result['edge_position'])}")
+                logging.info(f"-> shape(edge_height): {np.shape(result['edge_height'])}")
+                logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
+                logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
+
+                self.parent.advanced_full_fit_result = result
+                self.parent.ui.toolBox.setItemEnabled(2, True)
+
+                o_display = Display(parent=self.parent)
+                o_display.result_full_mode(algorithm_selected=algorithm_selected,
+                                           input_image=self.parent.live_process_data,
+                                           edge_position=np.transpose(result['edge_position']),
+                                           edge_height=np.transpose(result['edge_height']),
+                                           edge_width=np.transpose(result['edge_width']))
+
             else:
                 raise NotImplementedError("algorithm selected has not been implemented yet")
-
-            self.parent.full_fit_result = result
-            self.parent.ui.toolBox.setItemEnabled(2, True)
-
-            logging.info(f"result of full mode:")
-            logging.info(f"-> shape(edge_position): {np.shape(result['edge_position'])}")
-            logging.info(f"-> shape(edge_height): {np.shape(result['edge_height'])}")
-            logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
-            logging.info(f"-> shape(edge_slope): {np.shape(result['edge_slope'])}")
-            logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
-
-            o_display = Display(parent=self.parent)
-            o_display.result_full_mode(input_image=self.parent.live_process_data,
-                                       edge_position=np.transpose(result['edge_position']),
-                                       edge_height=np.transpose(result['edge_height']),
-                                       edge_width=np.transpose(result['edge_width']),
-                                       edge_slope=np.transpose(result['edge_slope']),
-                                       image_median=np.transpose(result['median_image']))
 
         self.parent.ui.setEnabled(True)
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... DONE".format(

@@ -22,7 +22,6 @@ class Import:
         import_folder = QFileDialog.getExistingDirectory(self.parent,
                                                          caption="Select input folder",
                                                          directory=working_dir)
-
         QtGui.QGuiApplication.processEvents()
 
         if import_folder:

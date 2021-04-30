@@ -93,6 +93,8 @@ class Initialization:
         self.parent.ui.step4_fit_roi_settings_pushButton.setIcon(QIcon(settings_icon_2))
 
         # result tab
+
+        # gaussian fitting
         area = DockArea()
         result_vertical_layout = QVBoxLayout()
         result_vertical_layout.addWidget(area)
@@ -132,6 +134,35 @@ class Initialization:
         area.addDock(dock_edge_width, 'bottom', dock_input_image)
         area.addDock(dock_edge_slope, 'bottom', dock_edge_position)
         area.addDock(dock_median_image, 'bottom', dock_edge_height)
+
+        # advanced fitting
+        area1 = DockArea()
+        result_vertical_layout1 = QVBoxLayout()
+        result_vertical_layout1.addWidget(area1)
+        self.parent.ui.advanced_result_widget.setLayout(result_vertical_layout1)
+
+        dock_input_image1, self.parent.ui.advanced_dock_input_image_view = \
+            Initialization._set_up_dock(dock_name="Input Image")
+        dock_edge_position1, self.parent.ui.advanced_dock_edge_position_view = \
+            Initialization._set_up_dock(dock_name="Edge Position")
+        dock_edge_height1, self.parent.ui.advanced_dock_edge_height_view = \
+            Initialization._set_up_dock(dock_name="Edge Height")
+        dock_edge_width1, self.parent.ui.advanced_dock_edge_width_view = \
+            Initialization._set_up_dock(dock_name="Edge Width")
+
+        self.parent.ui.advanced_dock_input_image_view.view.getViewBox().setXLink("Edge Position View")
+        self.parent.ui.advanced_dock_input_image_view.view.getViewBox().setYLink("Edge Position View")
+
+        self.parent.ui.advanced_dock_edge_position_view.view.getViewBox().setXLink("Edge Height View")
+        self.parent.ui.advanced_dock_edge_position_view.view.getViewBox().setYLink("Edge Height View")
+
+        self.parent.ui.advanced_dock_edge_height_view.view.getViewBox().setXLink("Edge Width View")
+        self.parent.ui.advanced_dock_edge_height_view.view.getViewBox().setYLink("Edge Width View")
+
+        area1.addDock(dock_input_image1, 'left')
+        area1.addDock(dock_edge_position1, 'right', dock_input_image1)
+        area1.addDock(dock_edge_height1, 'right', dock_edge_position1)
+        area1.addDock(dock_edge_width1, 'bottom', dock_input_image1)
 
     @staticmethod
     def _set_up_dock(size=(300, 300), dock_name=''):
