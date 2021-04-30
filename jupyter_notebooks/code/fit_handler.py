@@ -85,37 +85,60 @@ class FitHandler:
                     logging.info(f"--> wid_bc: {wid_bc}")
 
                 elif algorithm_selected == 'advanced':
-                    print(f"result: {result}")
                     logging.info(f"-> result: {result}")
+                    self.parent.step4_config['alpha'] = result['alpha']
+                    self.parent.step4_config['sigma'] = result['sigma']
+                    self.parent.step4_config['a1'] = result['a1']
+                    self.parent.step4_config['a2'] = result['a2']
+                    self.parent.step4_config['a5'] = result['a5']
+                    self.parent.step4_config['a6'] = result['a6']
+                    self.parent.ui.step4_fit_roi_pushButton.setEnabled(True)
+                    self.parent.ui.step4_fit_roi_settings_pushButton.setEnabled(True)
 
         elif mode == 'full':
-            result = self.fit_full_roi(algorithm_selected,
-                                       normalize_projections,
-                                       lambda_array,
-                                       lambda_range,
-                                       mask,
-                                       config=self.parent.step4_config)
+
+            if algorithm_selected == 'gaussian':
+
+                result = self.fit_full_roi(algorithm_selected,
+                                           normalize_projections,
+                                           lambda_array,
+                                           lambda_range,
+                                           mask,
+                                           config=self.parent.step4_config)
+
+            elif algorithm_selected == 'advanced':
+                alpha = self.parent.step4_config['alpha']
+                sigma = self.parent.step4_config['sigma']
+
+                result = self.fit_full_roi(algorithm_selected,
+                                           normalize_projections,
+                                           lambda_array,
+                                           lambda_range,
+                                           mask,
+                                           alpha=alpha,
+                                           sigma=sigma,
+                                           config=self.parent.step4_config)
+
+            else:
+                raise NotImplementedError("algorithm selected has not been implemented yet")
+
             self.parent.full_fit_result = result
             self.parent.ui.toolBox.setItemEnabled(2, True)
 
             logging.info(f"result of full mode:")
-            if algorithm_selected == 'gaussian':
-                logging.info(f"-> shape(edge_position): {np.shape(result['edge_position'])}")
-                logging.info(f"-> shape(edge_height): {np.shape(result['edge_height'])}")
-                logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
-                logging.info(f"-> shape(edge_slope): {np.shape(result['edge_slope'])}")
-                logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
+            logging.info(f"-> shape(edge_position): {np.shape(result['edge_position'])}")
+            logging.info(f"-> shape(edge_height): {np.shape(result['edge_height'])}")
+            logging.info(f"-> shape(edge_width): {np.shape(result['edge_width'])}")
+            logging.info(f"-> shape(edge_slope): {np.shape(result['edge_slope'])}")
+            logging.info(f"-> shape(median_image): {np.shape(result['median_image'])}")
 
-                o_display = Display(parent=self.parent)
-                o_display.result_full_mode(input_image=self.parent.live_process_data,
-                                           edge_position=np.transpose(result['edge_position']),
-                                           edge_height=np.transpose(result['edge_height']),
-                                           edge_width=np.transpose(result['edge_width']),
-                                           edge_slope=np.transpose(result['edge_slope']),
-                                           image_median=np.transpose(result['median_image']))
-
-            elif algorithm_selected == 'advanced':
-                pass
+            o_display = Display(parent=self.parent)
+            o_display.result_full_mode(input_image=self.parent.live_process_data,
+                                       edge_position=np.transpose(result['edge_position']),
+                                       edge_height=np.transpose(result['edge_height']),
+                                       edge_width=np.transpose(result['edge_width']),
+                                       edge_slope=np.transpose(result['edge_slope']),
+                                       image_median=np.transpose(result['median_image']))
 
         self.parent.ui.setEnabled(True)
         self.parent.ui.statusbar.showMessage("Fitting {} using {} algorithm ... DONE".format(
@@ -124,7 +147,9 @@ class FitHandler:
         self.parent.ui.statusbar.setStyleSheet("color: green")
         QApplication.restoreOverrideCursor()
 
-    def fit_full_roi(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, config):
+    def fit_full_roi(self, algorithm_selected, T_mavg, lambda_array, lambda_range, mask, config,
+                     alpha=None,
+                     sigma=None):
 
         logging.info(f"fitting full roi")
         logging.debug("entering fit_full_roi")
@@ -161,6 +186,23 @@ class FitHandler:
                                                     pos_BC=pos_bc,
                                                     )
             logging.info(f"--> done with GaussianBraggEdgeFitting2D")
+            return fit_result
+
+        elif algorithm_selected == 'advanced':
+
+            logging.info(f"--> about to run AdvancedBraggEdgeFitting2D")
+            fit_result = AdvancedBraggEdgeFitting2D(T_mavg,
+                                                    lambda_array,
+                                                    lambda_range,
+                                                    mask=mask,
+                                                    est_pos=est_position,
+                                                    est_alpha=alpha,
+                                                    est_sigma=sigma,
+                                                    bool_smooth=True,
+                                                    smooth_w=5,
+                                                    smooth_n=1,
+                                                    )
+            logging.info(f"--> done with AdvancedBraggEdgeFitting2D")
             return fit_result
 
         else:

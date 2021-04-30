@@ -2,10 +2,12 @@ from qtpy.QtWidgets import QFileDialog
 from qtpy import QtGui
 from pathlib import Path
 import logging
-from jupyter_notebooks.code.display import Display
 import numpy as np
 
 from NeuNorm.normalization import Normalization
+
+from jupyter_notebooks.code.display import Display
+from jupyter_notebooks.code.prepare_data import PrepareData
 
 from jupyter_notebooks.code.utilities.file import make_or_reset_folder
 
@@ -45,6 +47,9 @@ class Import:
             o_display = Display(parent=self.parent)
             o_display.prepare_data_preview_image()
             o_display.fit_data_tab()
+
+            o_prepare = PrepareData(parent=self.parent)
+            o_prepare.calculate_mask()
 
             QtGui.QGuiApplication.processEvents()
             self.parent.ui.toolBox.setItemEnabled(1, True)
