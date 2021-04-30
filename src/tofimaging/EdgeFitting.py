@@ -20,6 +20,10 @@ def AdvancedBraggEdgeFitting(signal,
                              est_pos=0,
                              est_sigma=1,
                              est_alpha=1,
+                             pos_BC=0,
+                             sigma_BC=0,
+                             alpha_BC=0,
+                             est_w=0,
                              bool_smooth=False,
                              smooth_w=5,
                              smooth_n=1,
@@ -139,10 +143,13 @@ def AdvancedBraggEdgeFitting(signal,
         plt.close()
         #plt.savefig('step1_fitting.pdf')
 
-    t_before = t[0:est_pos]
-    bragg_before = signal[0:est_pos]
-    t_after = t[est_pos + int(est_pos * 0.2):-1]
-    bragg_after = signal[est_pos + int(est_pos * 0.2):-1]
+    if(est_w==0):
+        est_w = est_p*0.2   
+    est_w = est_w / 2
+    t_before = t[0:find_nearest(t, est_pos - est_w)]
+    bragg_before = signal[0:find_nearest(t, est_pos - est_w)]
+    t_after = t[find_nearest(t, est_pos + est_w):-1]
+    bragg_after = signal[find_nearest(t, est_pos + est_w):-1]
 
     #first step: estimate the linear or exponential function before and after the Bragg Edge
     [slope_before, interception_before] = np.polyfit(t_before, bragg_before, 1)
@@ -171,6 +178,7 @@ def AdvancedBraggEdgeFitting(signal,
         params = exp_model_after.make_params(a1=a1_f, a2=a2_f)
         result_exp_model_after = exp_model_after.fit(bragg_after,
                                                      params,
+                                                     nan_policy='propagate',
                                                      t=t_after)
         a1_f = result_exp_model_after.best_values.get('a1')
         a2_f = result_exp_model_after.best_values.get('a2')
@@ -184,6 +192,7 @@ def AdvancedBraggEdgeFitting(signal,
         params['a2'].vary = False
         result_exp_model_before = exp_model_before.fit(bragg_before,
                                                        params,
+                                                       nan_policy='propagate',
                                                        t=t_before)
         a5_f = result_exp_model_before.best_values.get('a5')
         a6_f = result_exp_model_before.best_values.get('a6')
@@ -229,6 +238,26 @@ def AdvancedBraggEdgeFitting(signal,
     # method='basinhopping' # not bad
     # method='lmsquare' # this should implement the Levemberq-Marquardt but it says Nelder-Mead method (which should be Amoeba)
     method = 'least_squares'  # default and it implements the Levenberg-Marquardt
+
+    #Boundary Conditions
+    if (pos_BC):
+        params['t0'].min = pos_BC[0]
+        params['t0'].max = pos_BC[1]
+    else:
+        params['t0'].min = t[0]
+        params['t0'].max = t[-1]
+    if (alpha_BC):
+        params['alpha'].min = alpha_BC[0]
+        params['alpha'].max = alpha_BC[1]
+    else:
+        params['alpha'].min = 0.0
+        params['alpha'].max = 1.5
+    if (sigma_BC):
+        params['sigma'].min = sigma_BC[0]
+        params['sigma'].max = sigma_BC[1]
+    else:
+        params['sigma'].min = 0.0
+        params['sigma'].max = 1.5
 
     # 1st round to fit a1 and a6 (intercept of before and slope of after)
     params = gmodel.make_params(t0=t0_f,
@@ -533,6 +562,10 @@ def AdvancedBraggEdgeFitting2D(Ttof,
                                est_pos=0,
                                est_sigma=1,
                                est_alpha=1,
+                               pos_BC=0,
+                               sigma_BC=0,
+                               alpha_BC=0,
+                               est_w=0,
                                bool_smooth=False,
                                smooth_w=5,
                                smooth_n=1,
@@ -802,6 +835,9 @@ def AdvancedDirectBraggEdgeFitting(signal,
         est_pos_idx = find_nearest(t, est_pos)
     t0_f = t[
         est_pos_idx]  # this is the actual estimated first position in TOF [s]
+
+    if(est_w==0):
+        est_w = est_p*0.2       
     est_w = est_w / 2
     t_before = t[0:find_nearest(t, est_pos - est_w)]
     bragg_before = signal[0:find_nearest(t, est_pos - est_w)]
@@ -835,6 +871,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
         params = exp_model_after.make_params(a1=a1_f, a2=a2_f)
         result_exp_model_after = exp_model_after.fit(bragg_after,
                                                      params,
+                                                     nan_policy='propagate',
                                                      t=t_after)
         a1_f = result_exp_model_after.best_values.get('a1')
         a2_f = result_exp_model_after.best_values.get('a2')
@@ -848,6 +885,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
         params['a2'].vary = False
         result_exp_model_before = exp_model_before.fit(bragg_before,
                                                        params,
+                                                       nan_policy='propagate',
                                                        t=t_before)
         a5_f = result_exp_model_before.best_values.get('a5')
         a6_f = result_exp_model_before.best_values.get('a6')
