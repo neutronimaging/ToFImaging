@@ -898,7 +898,8 @@ def AdvancedDirectBraggEdgeFitting(signal,
         params['a2'].vary = False
         result_exp_model_before = exp_model_before.fit(bragg_before,
                                                        params,
-                                                       t=t_before)
+                                                       t=t_before,
+                                                       nan_policy='propagate')
         a5_f = result_exp_model_before.best_values.get('a5')
         a6_f = result_exp_model_before.best_values.get('a6')
         gmodel = Model(BraggEdgeExponential)

@@ -4,7 +4,8 @@ import numpy as np
 import logging
 import copy
 
-from src.tofimaging.EdgeFitting import GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D
+from src.tofimaging.EdgeFitting import (GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D,
+                                        AdvancedDirectBraggEdgeFitting2D)
 from jupyter_notebooks.code.utilities.get import Get
 from jupyter_notebooks.code.display import Display
 
@@ -291,6 +292,21 @@ class FitHandler:
                                                     debug_idx=pixel,
                                                     bool_print=True)
             logging.info(f"--> done with AdvancedBraggEdgeFitting2D")
+            return fit_result
+
+        elif algorithm_selected == 'advanced direct':
+            logging.info(f"--> about to run AdvancedDirectBraggEdgeFitting2D")
+            fit_result = AdvancedDirectBraggEdgeFitting2D(T_mavg,
+                                                          lambda_array,
+                                                          lambda_range,
+                                                          mask=mask,
+                                                          est_pos=est_position,
+                                                          bool_smooth=True,
+                                                          smooth_w=smooth_w,
+                                                          smooth_n=smooth_n,
+                                                          debug_idx=pixel,
+                                                          bool_print=True)
+            logging.info(f"--> done with AdvancedDirectBraggEdgeFitting2D")
             return fit_result
 
         else:

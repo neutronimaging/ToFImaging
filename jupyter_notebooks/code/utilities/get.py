@@ -56,6 +56,8 @@ class Get:
             return 'gaussian'
         elif self.parent.ui.advanced_radioButton.isChecked():
             return 'advanced'
+        elif self.parent.ui.advanced_direct_radio_button.isChecked():
+            return 'advanced direct'
         raise NotImplementedError
 
     @staticmethod
