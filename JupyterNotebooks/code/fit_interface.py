@@ -6,19 +6,19 @@ import copy
 import inflect
 import logging
 
-from JupyterNotebooks.code import wait_cursor
-from JupyterNotebooks.code import FitHandler
-from JupyterNotebooks.code.utilities import Get
-from JupyterNotebooks.code import Initialization
-from JupyterNotebooks.code import Export
-from JupyterNotebooks.code import Import
+from JupyterNotebooks.code.decorators import wait_cursor
+from JupyterNotebooks.code.fit_handler import FitHandler
+from JupyterNotebooks.code.utilities.get import Get
+from JupyterNotebooks.code.initialization import Initialization
+from JupyterNotebooks.code.export import Export
+from JupyterNotebooks.code.import_data import Import
 from JupyterNotebooks.code.event_handler import EventHandler
-from JupyterNotebooks.code import PrepareData
-from JupyterNotebooks.code import Step3SettingsHandler
-from JupyterNotebooks.code import Step4SettingsHandler
-from JupyterNotebooks.code import Display
-from JupyterNotebooks.code import LogLauncher
-from JupyterNotebooks.code import GuiHandler
+from JupyterNotebooks.code.prepare_data import PrepareData
+from JupyterNotebooks.code.step3_settings_handler import Step3SettingsHandler
+from JupyterNotebooks.code.step4_settings_handler import Step4SettingsHandler
+from JupyterNotebooks.code.display import Display
+from JupyterNotebooks.code.log_launcher import LogLauncher
+from JupyterNotebooks.code.gui_handler import GuiHandler
 from JupyterNotebooks.code.calculation import Calculation
 
 # warnings.filterwarnings('ignore')

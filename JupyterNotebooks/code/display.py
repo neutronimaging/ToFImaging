@@ -2,8 +2,8 @@ import numpy as np
 import pyqtgraph as pg
 import logging
 
-from JupyterNotebooks.code import Parent
-from JupyterNotebooks.code.utilities import Get
+from JupyterNotebooks.code.parent import Parent
+from JupyterNotebooks.code.utilities.get import Get
 from JupyterNotebooks.code.event_handler import EventHandler
 
 MARKER_HEIGHT, MARKER_WIDTH = 20, 20

@@ -6,8 +6,8 @@ import numpy as np
 
 from NeuNorm.normalization import Normalization
 
-from JupyterNotebooks.code import Display
-from JupyterNotebooks.code import PrepareData
+from JupyterNotebooks.code.display import Display
+from JupyterNotebooks.code.prepare_data import PrepareData
 
 
 class Import:

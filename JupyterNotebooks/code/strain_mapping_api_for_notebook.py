@@ -19,10 +19,10 @@ from JupyterNotebooks.code.neutronimaging.detector_correction import merge_meta_
 from JupyterNotebooks.code.neutronimaging.detector_correction import load_images
 from JupyterNotebooks.code.neutronimaging.detector_correction import correct_images
 from JupyterNotebooks.code.neutronimaging.detector_correction import skipping_meta_data
-from JupyterNotebooks.code.utilities import Get
+from JupyterNotebooks.code.utilities.get import Get
 from JupyterNotebooks.code.utilities import file as file_utilities
 
-from ToFImaging import reduction_tools
+from src.tofimaging import ReductionTools as reduction_tools
 
 DEBUG = True
 DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-strain-mapping/corrected/"

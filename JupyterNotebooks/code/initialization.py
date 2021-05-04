@@ -5,7 +5,7 @@ from qtpy.QtGui import QIcon
 import numpy as np
 import os
 
-from JupyterNotebooks.code import ConfigHandler
+from JupyterNotebooks.code.config_handler import ConfigHandler
 
 
 class Initialization:

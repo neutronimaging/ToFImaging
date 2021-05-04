@@ -5,7 +5,7 @@ import logging
 
 from NeuNorm.normalization import Normalization
 
-from JupyterNotebooks.code.utilities import make_or_reset_folder
+from JupyterNotebooks.code.utilities.file import make_or_reset_folder
 
 
 class Export:

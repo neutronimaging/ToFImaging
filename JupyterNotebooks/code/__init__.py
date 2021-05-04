@@ -1,4 +1,4 @@
-from JupyterNotebooks.code import get_versions
+from JupyterNotebooks.code._version import get_versions
 from qtpy.uic import loadUi
 import os
 

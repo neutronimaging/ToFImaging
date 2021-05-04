@@ -1,4 +1,4 @@
-from JupyterNotebooks.code import Parent
+from JupyterNotebooks.code.parent import Parent
 
 
 class GuiHandler(Parent):

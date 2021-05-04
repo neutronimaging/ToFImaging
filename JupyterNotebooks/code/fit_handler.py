@@ -6,8 +6,8 @@ import copy
 
 from src.tofimaging.EdgeFitting import (GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D,
                                         AdvancedDirectBraggEdgeFitting2D)
-from JupyterNotebooks.code.utilities import Get
-from JupyterNotebooks.code import Display
+from JupyterNotebooks.code.utilities.get import Get
+from JupyterNotebooks.code.display import Display
 
 
 class FitHandler:

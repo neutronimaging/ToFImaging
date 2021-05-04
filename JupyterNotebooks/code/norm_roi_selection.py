@@ -2,7 +2,7 @@ import os
 from JupyterNotebooks.code import load_ui
 import numpy as np
 
-from JupyterNotebooks.code import Interface as RoiInterface
+from JupyterNotebooks.code.roi_selection import Interface as RoiInterface
 
 
 class NormRoiSelection(RoiInterface):
