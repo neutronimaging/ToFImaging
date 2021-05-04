@@ -4,9 +4,15 @@ import matplotlib.pyplot as plt
 from lmfit import Model
 from tqdm import tqdm
 
-import src.tofimaging.ReductionTools as rt
-from src.tofimaging.ReductionTools import find_nearest
-from src.tofimaging.ReductionTools import savitzky_golay as SG_filter
+# <<<<<<< HEAD
+# import src.tofimaging.ReductionTools as rt
+# from src.tofimaging.ReductionTools import find_nearest
+# from src.tofimaging.ReductionTools import savitzky_golay as SG_filter
+# =======
+import tofimaging.ReductionTools as rt
+from tofimaging.ReductionTools import find_nearest
+from tofimaging.ReductionTools import savitzky_golay as SG_filter
+# >>>>>>> master
 
 
 def PhaseRatioLinearCombination(lac,

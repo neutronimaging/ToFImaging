@@ -11,7 +11,6 @@ class KernelType:
     box = 0
     gaussian = 1
 
-
 #Unit Conversions
 def Ang2meV(Angstrom):
     return 81.82 / (Angstrom**2)
@@ -404,6 +403,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
             return outsignal
 
     return
+
 
 def spatial_image_rebinning(image, new_shape, operation='sum'):
     """

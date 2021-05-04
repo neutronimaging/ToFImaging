@@ -6,7 +6,7 @@ import pytest
 
 from NeuNorm.normalization import Normalization
 
-from ToFImaging import reduction_tools
+from src.tofimaging import ReductionTools as reduction_tools
 
 
 class TestReductionTools:

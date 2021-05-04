@@ -1,14 +1,13 @@
-# Runtime dependencies for ToFImaging
-
 astropy
-lmfit==1.0.0
+lmfit
 matplotlib
 numpy
 scikit-image
 scipy
-tqdm==4.36.1  
+tqdm==4.36.1
 ipywe
 NeuNorm==1.4.5
 neutronbraggedge==2.0.3
 qtpy
 pyqtgraph
+tqdm
