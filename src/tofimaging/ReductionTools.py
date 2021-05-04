@@ -4,30 +4,31 @@ import matplotlib.pyplot as plt
 import scipy.ndimage
 import scipy.signal
 
-h = 6.62607004e-34  #Planck constant [m^2 kg / s]
-m = 1.674927471e-27  #Neutron mass [kg]
+h = 6.62607004e-34  # Planck constant [m^2 kg / s]
+m = 1.674927471e-27  # Neutron mass [kg]
 
 
 class KernelType:
     box = 0
     gaussian = 1
 
-#Unit Conversions
+
+# Unit Conversions
 def Ang2meV(Angstrom):
-    return 81.82 / (Angstrom**2)
+    return 81.82 / (Angstrom ** 2)
 
 
 def meV2Ang(meV):
     return np.sqrt(81.82 / meV)
 
 
-#Calibration functions
+# Calibration functions
 def tof2l(tof, L, lambda_0=0, tof_0=0):
     if lambda_0:
         l = lambda_0 + h / m * (tof) / (L) / 1e-10
     if tof_0:
         l = 0.3956 * (tof * 1e6 + tof_0) / (
-            L * 100)  #converts L to cm and tof0 must be in ns
+                L * 100)  # converts L to cm and tof0 must be in ns
     return l
 
 
@@ -40,7 +41,7 @@ def tof2l_t0k(t, t0, k):
     return t0 + k * t
 
 
-#Multiple frame merging tools, useful when an acquisition is split into sub-acquisitions (axis=2)
+# Multiple frame merging tools, useful when an acquisition is split into sub-acquisitions (axis=2)
 # def averageimage(imgs):
 #     img = imgs.mean(axis=2)
 #     return img
@@ -135,9 +136,9 @@ def weighted_average_image(images, size=5):
 #     return img
 
 
-#Rebinning/averaging tools
+# Rebinning/averaging tools
 def binning_ndarray(mysignal, newsize):
-    #Remnant from Chiara's code: Rebins an ndarray into the newsize.
+    # Remnant from Chiara's code: Rebins an ndarray into the newsize.
     binned_signal = np.zeros(newsize)
     bin_size = int(len(mysignal) / newsize)
     for i in range(0, newsize):
@@ -157,9 +158,9 @@ def spectral_binning_resolution(mysignal, spectrum, d_spectrum):
         if (len(spectrum) != np.shape(mysignal)[2]):
             print('WARNING: Length of spectrum does not match signal size')
         binned_signal = np.zeros(
-            [np.shape(mysignal)[0],
-             np.shape(mysignal)[1],
-             len(new_spectrum)])
+                [np.shape(mysignal)[0],
+                 np.shape(mysignal)[1],
+                 len(new_spectrum)])
         for i in range(0, np.shape(mysignal)[0]):
             for j in range(0, np.shape(mysignal)[1]):
                 binned_signal[i, j, :] = np.interp(new_spectrum, spectrum,
@@ -408,7 +409,7 @@ def data_filtering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, 
     # TOF data (3D), 2D kernel
     if len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
         print(
-            'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
+                'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
         )
         outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1],
                               np.shape(mysignal)[2]))
@@ -418,14 +419,14 @@ def data_filtering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, 
             kernel = kernel / np.sum(np.ravel(kernel))
             for i in tqdm(range(0, np.shape(mysignal)[2])):
                 outsignal[:, :, i] = scipy.ndimage.convolve(
-                    mysignal[:, :, i], kernel)
+                        mysignal[:, :, i], kernel)
             display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
 
         elif kernel_type == KernelType.gaussian:
             for i in tqdm(range(0, np.shape(mysignal)[2])):
                 outsignal[:, :, i] = scipy.ndimage.gaussian_filter(
-                    mysignal[:, :, i], kernel)
+                        mysignal[:, :, i], kernel)
 
             display_output_signal(signal=outsignal, bool_print=bool_print)
             return outsignal
@@ -436,7 +437,7 @@ def data_filtering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, 
     # TOF data (3D), 3D kernel
     elif len(np.shape(mysignal)) == 3 and (len(kernel) == 3):
         print(
-            'Data and filtering kernel are 3D. Applying 3D filter convolution.'
+                'Data and filtering kernel are 3D. Applying 3D filter convolution.'
         )
 
         if kernel_type == KernelType.box:
@@ -457,7 +458,7 @@ def data_filtering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, 
     # image data (2D), 2D kernel
     elif len(np.shape(mysignal)) == 2 and (len(kernel) == 2):
         print(
-            'Data and filtering kernel are 2D. Applying 2D filter convolution.'
+                'Data and filtering kernel are 2D. Applying 2D filter convolution.'
         )
 
         if kernel_type == KernelType.box:
@@ -497,7 +498,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
         plt.subplot(1, 2, 1),
         if (len(np.shape(mysignal)) == 3):
             plt.imshow(np.nanmean(
-                mysignal, axis=2)), plt.title('Input image'), plt.colorbar()
+                    mysignal, axis=2)), plt.title('Input image'), plt.colorbar()
         else:
             plt.imshow(mysignal), plt.title('Input image'), plt.colorbar()
 
@@ -505,7 +506,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
     if (len(np.shape(mysignal)) == 3
             and (len(BoxKernel) == 2 or len(GaussianKernel) == 2)):
         print(
-            'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
+                'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
         )
         outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1],
                               np.shape(mysignal)[2]))
@@ -514,7 +515,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
             kernel = kernel / np.sum(np.ravel(kernel))
             for i in tqdm(range(0, np.shape(mysignal)[2])):
                 outsignal[:, :, i] = scipy.ndimage.convolve(
-                    mysignal[:, :, i], kernel)
+                        mysignal[:, :, i], kernel)
 
             if (bool_print):
                 plt.subplot(1, 2, 2),
@@ -525,7 +526,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
         if (any(GaussianKernel)):
             for i in tqdm(range(0, np.shape(mysignal)[2])):
                 outsignal[:, :, i] = scipy.ndimage.gaussian_filter(
-                    mysignal[:, :, i], GaussianKernel)
+                        mysignal[:, :, i], GaussianKernel)
 
             if (bool_print):
                 plt.subplot(1, 2, 2),
@@ -538,7 +539,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
     if (len(np.shape(mysignal)) == 3
             and (len(BoxKernel) == 3 or len(GaussianKernel) == 3)):
         print(
-            'Data and filtering kernel are 3D. Applying 3D filter convolution.'
+                'Data and filtering kernel are 3D. Applying 3D filter convolution.'
         )
         if (any(BoxKernel)):
             kernel = np.ones((BoxKernel[0], BoxKernel[1], BoxKernel[2]))
@@ -563,7 +564,7 @@ def DataFiltering(mysignal, BoxKernel=[], GaussianKernel=[], bool_print=False):
     if (len(np.shape(mysignal)) == 2
             and (len(BoxKernel) == 2 or len(GaussianKernel) == 2)):
         print(
-            'Data and filtering kernel are 2D. Applying 2D filter convolution.'
+                'Data and filtering kernel are 2D. Applying 2D filter convolution.'
         )
         if (any(BoxKernel)):
             kernel = np.ones((BoxKernel[0], BoxKernel[1]))
@@ -611,7 +612,7 @@ def spatial_image_rebinning(image, new_shape, operation='sum'):
         raise ValueError("Operation not supported.")
     if image.ndim != len(new_shape):
         raise ValueError("Shape mismatch: {} -> {}".format(
-            image.shape, new_shape))
+                image.shape, new_shape))
     compression_pairs = [(d, c // d) for d, c in zip(new_shape, image.shape)]
     flattened = [l for p in compression_pairs for l in p]
     image = image.reshape(flattened)
@@ -636,12 +637,12 @@ def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
              np.int(np.shape(image)[0] / rebinning_order))
     if ((np.shape(image)[0] % rebinning_order) != 0):
         print(
-            'WARNING: the rebinning order does not divide the image dimension, please use a different function.'
+                'WARNING: the rebinning order does not divide the image dimension, please use a different function.'
         )
 
     if (
             len(np.shape(image)) == 3
-    ):  #if finds 3d matrix assume it's ToF data and apply to each tof frame
+    ):  # if finds 3d matrix assume it's ToF data and apply to each tof frame
         outsignal = np.zeros((f_dim[0], f_dim[1], np.int(np.shape(image)[2])))
         for i in tqdm(range(0, np.shape(image)[2])):
             outsignal[:, :, i] = rebin(image[:, :, i], f_dim, operation)
@@ -658,20 +659,20 @@ def tof_image_rebinning(image, spectrum, rebinning_order, operation='mean'):
     for i in tqdm(range(0, tof_n_new)):
         if (operation == 'sum'):
             image_out[:, :, i] = np.nansum(
-                image[:, :, rebinning_order * i:rebinning_order * i +
-                      rebinning_order],
-                axis=2)
+                    image[:, :, rebinning_order * i:rebinning_order * i +
+                                                    rebinning_order],
+                    axis=2)
             spectrum_out[i] = np.nansum(
-                spectrum[rebinning_order * i:rebinning_order * i +
-                         rebinning_order])
+                    spectrum[rebinning_order * i:rebinning_order * i +
+                                                 rebinning_order])
         elif (operation == 'mean'):
             image_out[:, :, i] = np.nanmean(
-                image[:, :, rebinning_order * i:rebinning_order * i +
-                      rebinning_order],
-                axis=2)
+                    image[:, :, rebinning_order * i:rebinning_order * i +
+                                                    rebinning_order],
+                    axis=2)
             spectrum_out[i] = np.nanmean(
-                spectrum[rebinning_order * i:rebinning_order * i +
-                         rebinning_order])
+                    spectrum[rebinning_order * i:rebinning_order * i +
+                                                 rebinning_order])
     return (image_out, spectrum_out)
 
 
@@ -738,9 +739,9 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     order_range = range(order + 1)
     half_window = (window_size - 1) // 2
     # precompute coefficients
-    b = np.mat([[k**i for i in order_range]
+    b = np.mat([[k ** i for i in order_range]
                 for k in range(-half_window, half_window + 1)])
-    m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
+    m = np.linalg.pinv(b).A[deriv] * rate ** deriv * factorial(deriv)
     # pad the signal at the extremes with
     # values taken from the signal itself
     firstvals = y[0] - np.abs(y[1:half_window + 1][::-1] - y[0])
@@ -749,21 +750,21 @@ def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
     return np.convolve(m[::-1], y, mode='valid')
 
 
-#Normalization tools
+# Normalization tools
 def transmission_normalization(I, I0, mask_dose=np.ndarray([0])):
-    #Normalization to transmission, with dose correction if mask_dose is given. negative transmission and negative attenuation (T>1) are replaced with NaNs.
+    # Normalization to transmission, with dose correction if mask_dose is given. negative transmission and negative attenuation (T>1) are replaced with NaNs.
     from skimage import io
     if (np.shape(I) != np.shape(I0)):
         print('The size of I and I0 does not match. Check input data')
     if (len(np.shape(I)) != 2):
         print(
-            'The input data is not an image. Assuming is a TOF stack of images.'
+                'The input data is not an image. Assuming is a TOF stack of images.'
         )
 
     dose = 1
     if (mask_dose.any()):
         dose = np.median(np.multiply(I0, mask_dose), axis=(1, 0)) / np.median(
-            np.multiply(I, mask_dose), axis=(1, 0))
+                np.multiply(I, mask_dose), axis=(1, 0))
 
     T = np.divide(I * dose, I0)
     T[T > 1] = 1
@@ -772,16 +773,16 @@ def transmission_normalization(I, I0, mask_dose=np.ndarray([0])):
     return T
 
 
-#Index seeking functions
+# Index seeking functions
 def find_nearest(array, value):
-    #finds the nearest index to the value in the array
+    # finds the nearest index to the value in the array
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return (idx)
 
 
 def find_first(array, value):
-    #finds the first index where the array is higher than the value from the start
+    # finds the first index where the array is higher than the value from the start
     for idx in range(0, len(array)):
         if array[idx] >= value:
             break
@@ -789,7 +790,7 @@ def find_first(array, value):
 
 
 def find_last(array, value):
-    #finds the last index where the array is higher than the value from the start
+    # finds the last index where the array is higher than the value from the start
     for idx in range(0, len(array)):
         if idx > 1:
             if ((array[idx] - array[idx - 1]) >= value + 0.005):
@@ -798,7 +799,7 @@ def find_last(array, value):
 
 
 def rotatedata(x, y, a):
-    #rotates x,y by a(rad)
+    # rotates x,y by a(rad)
     cosa = np.cos(a)
     sina = np.sin(a)
     x = x * cosa - y * sina
@@ -806,24 +807,24 @@ def rotatedata(x, y, a):
     return x, y
 
 
-#Quick image plotting functions
+# Quick image plotting functions
 def fullspectrum_T(path_sample, path_ob, cut_last=0):
-    #load rawdata
+    # load rawdata
     I = load_fits(path_sample, cut_last)
     I0 = load_fits(path_ob, cut_last)
-    #normalize
+    # normalize
     T = transmission_normalization(I.sum(axis=2), I0.sum(axis=2))
     return (T)
 
 
 def fullspectrum_im(path_data, cut_last=0):
-    #load rawdata
+    # load rawdata
     I = load_fits(path_data, cut_last)
     T = I.sum(axis=2)
     return (T)
 
 
-#Segmentation tools
+# Segmentation tools
 def SpectralSegmentation(T_tof,
                          clusters,
                          spectrum=[],
@@ -838,15 +839,15 @@ def SpectralSegmentation(T_tof,
         spectrum = spectrum[idx_low:idx_high]
 
     Tarray = np.reshape(
-        T_tof, [np.shape(T_tof)[0] * np.shape(T_tof)[1],
-                np.shape(T_tof)[2]])
+            T_tof, [np.shape(T_tof)[0] * np.shape(T_tof)[1],
+                    np.shape(T_tof)[2]])
     Tarray[np.isnan(Tarray)] = 0
     Tarray[np.isinf(Tarray)] = 0
     kmeans = KMeans(n_clusters=clusters, random_state=0).fit(Tarray)
 
     T_segmented = np.reshape(
-        kmeans.labels_,
-        [np.shape(T_tof)[0], np.shape(T_tof)[1]])
+            kmeans.labels_,
+            [np.shape(T_tof)[0], np.shape(T_tof)[1]])
     spectra = kmeans.cluster_centers_
 
     if (bool_print):
@@ -866,7 +867,7 @@ def SpectralSegmentation(T_tof,
     return {'T_segmented': T_segmented, 'spectra': spectra}
 
 
-#Loading routines
+# Loading routines
 def load_fits(pathdata, cut_last=0, bool_wavg=False):
     # Load stacks of TOF into 3D matrix (x,y,TOF). Requires subfolders in the pathdata with a subfolder for each repetition that is merged.
     # It is often the case that a long acquisition is split into multiple shorter acquisition to be merged (e.g. 4 hours = 4x1 hour)
@@ -876,9 +877,9 @@ def load_fits(pathdata, cut_last=0, bool_wavg=False):
 
     subfolders = sorted(listdir(pathdata))
 
-    #load 1st subfolder and image to figure det shape and number of frames
+    # load 1st subfolder and image to figure det shape and number of frames
     files = sorted(
-        fnmatch.filter(listdir(pathdata + '\\' + subfolders[0]), '*.fits'))
+            fnmatch.filter(listdir(pathdata + '\\' + subfolders[0]), '*.fits'))
     testim = fits.getdata(pathdata + '\\' + subfolders[0] + '\\' + files[0])
     det_shape = np.shape(testim)
     n_tof = len(files)
@@ -902,8 +903,8 @@ def load_fits(pathdata, cut_last=0, bool_wavg=False):
     for i in tqdm(range(0, len(files) - cut_last)):
         for j in range(0, len(subfolders)):
             files = sorted(
-                fnmatch.filter(listdir(pathdata + '\\' + subfolders[j]),
-                               '*.fits'))
+                    fnmatch.filter(listdir(pathdata + '\\' + subfolders[j]),
+                                   '*.fits'))
             data_t[:, :, j] = fits.getdata(pathdata + '\\' + subfolders[j] +
                                            '\\' + files[i])
         if (bool_wavg):
@@ -926,13 +927,13 @@ def load_routine(path_sample,
                  tofrebin_order=0):
     # Full loading routine. Load sample and open beam and normalize to TOF transmission T=(x,y,TOF). The tof spectrum is loaded as well and converted to lambda, when asked.
 
-    #load rawdata
+    # load rawdata
     I = load_fits(path_sample, cut_last, bool_wavg)
     I0 = load_fits(path_ob, cut_last, bool_wavg)
     spectrum = np.loadtxt(path_spectrum, usecols=0)
     if (bool_lambda):
         spectrum = tof2l(spectrum, L, lambda_0, tof_0)
-    #rebinning
+    # rebinning
     if (tofrebin_order):
         sp = spectrum
         I = tof_image_rebinning(I, sp, tofrebin_order)
@@ -941,7 +942,7 @@ def load_routine(path_sample,
         for i in range(0, np.shape(I)[2]):
             spectrum[i] = sp[i * tofrebin_order]
 
-    #normalize
+    # normalize
     T = transmission_normalization(I, I0, dose_mask)
 
     return {'T': T, 'spectrum': spectrum}

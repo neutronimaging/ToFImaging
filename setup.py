@@ -86,7 +86,7 @@ if __name__ == "__main__":
         maintainer_email=find_meta("email"),
         keywords=KEYWORDS,
         long_description=read("README.md"),
-        packages=find_packages(exclude=['tests', 'tests.*']),
+        packages=find_packages(exclude=['test', 'test.*']),
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=install_requires,
