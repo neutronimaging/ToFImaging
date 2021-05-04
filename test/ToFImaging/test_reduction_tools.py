@@ -61,7 +61,7 @@ class TestReductionTools:
     #     assert np.shape(weighted_image) == np.shape(self.image1)
     #     assert (weighted_image == self.image1).all()
     #
-    #     weighted_image = weighted_image(self.image123_3d)
+    #     weighted_image = reduction_tools.weighted_average_image(self.image123_3d)
     #     assert np.shape(weighted_image) == np.shape(self.image123_3d)
 
     def test_combine_images(self):
@@ -288,25 +288,29 @@ class TestDataFiltering:
         box_kernel = np.array([1])
         with pytest.raises(ValueError):
             reduction_tools.data_filtering(input_array,
-                                           box_kernel=box_kernel)
+                                           kernel_type=reduction_tools.KernelType.box,
+                                           kernel=box_kernel)
 
         input_array = np.array([[1, 2, 3], [4, 5, 6]])
         gaussian_kernel = np.array([1])
         with pytest.raises(ValueError):
             reduction_tools.data_filtering(input_array,
-                                           gaussian_kernel=gaussian_kernel)
+                                           kernel_type=reduction_tools.KernelType.gaussian,
+                                           kernel=gaussian_kernel)
 
         input_array = np.array([[1, 2, 3], [4, 5, 6]])
         box_kernel = np.array([1, 2, 3])
         with pytest.raises(ValueError):
             reduction_tools.data_filtering(input_array,
-                                           box_kernel=box_kernel)
+                                           kernel_type=reduction_tools.KernelType.box,
+                                           kernel=box_kernel)
 
         input_array = np.array([[1, 2, 3], [4, 5, 6]])
         gaussian_kernel = np.array([1, 2, 3])
         with pytest.raises(ValueError):
             reduction_tools.data_filtering(input_array,
-                                           gaussian_kernel=gaussian_kernel)
+                                           kernel_type=reduction_tools.KernelType.gaussian,
+                                           kernel=gaussian_kernel)
 
     # def test_3d_input_array_with_2d_box_kernel(self):
     #     input_array = np.array([[[1, 10, 11], [9, 2, 1], [1, 30, 15]],
@@ -320,8 +324,10 @@ class TestDataFiltering:
 
     def test_2d_input_array_with_2d_box_kernel(self):
         input_array = np.array([[1, 10, 11], [9, 2, 1], [1, 30, 15]])
-        output_array = reduction_tools.data_filtering(input_array, box_kernel=[2, 2])
-        expected_array = [[22, 24, 12], [42, 48, 16], [31, 45, 15]]
+        output_array = reduction_tools.data_filtering(input_array,
+                                                      kernel_type=reduction_tools.KernelType.box,
+                                                      kernel=[2, 2])
+        expected_array = [[5, 6, 6], [10, 12, 8], [15, 22, 15]]
         for expected_row, output_row in zip(expected_array, output_array):
             for expected_value, output_value in zip(expected_row, output_row):
                 assert expected_value == output_value

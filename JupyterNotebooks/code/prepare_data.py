@@ -2,10 +2,10 @@ from qtpy import QtGui
 import numpy as np
 import logging
 
-from JupyterNotebooks.code import Normalization as LocalNormalization
-from JupyterNotebooks.code.utilities import Get
-from JupyterNotebooks.code import Parent
-from JupyterNotebooks.code import Display
+from JupyterNotebooks.code.normalization import Normalization as LocalNormalization
+from JupyterNotebooks.code.utilities.get import Get
+from JupyterNotebooks.code.parent import Parent
+from JupyterNotebooks.code.display import Display
 from src.tofimaging import ReductionTools
 
 

@@ -2,6 +2,7 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import scipy.ndimage
+import scipy.signal
 
 h = 6.62607004e-34  #Planck constant [m^2 kg / s]
 m = 1.674927471e-27  #Neutron mass [kg]
@@ -22,9 +23,9 @@ def meV2Ang(meV):
 
 #Calibration functions
 def tof2l(tof, L, lambda_0=0, tof_0=0):
-    if (lambda_0):
+    if lambda_0:
         l = lambda_0 + h / m * (tof) / (L) / 1e-10
-    if (tof_0):
+    if tof_0:
         l = 0.3956 * (tof * 1e6 + tof_0) / (
             L * 100)  #converts L to cm and tof0 must be in ns
     return l
@@ -40,36 +41,98 @@ def tof2l_t0k(t, t0, k):
 
 
 #Multiple frame merging tools, useful when an acquisition is split into sub-acquisitions (axis=2)
-def averageimage(imgs):
-    img = imgs.mean(axis=2)
+# def averageimage(imgs):
+#     img = imgs.mean(axis=2)
+#     return img
+
+
+def average_image(images):
+    """
+    Calculate the mean of the 3D images array provided
+    Parameters
+    ----------
+    images: 3D array [x, y, tof]
+    Returns
+    -------
+    the mean 2D numpy array [x, y]
+    """
+    if len(np.shape(images)) == 2:
+        return images
+
+    img = images.mean(axis=2)
     return img
 
 
-def medianimage(imgs):
-    img = np.median(imgs, axis=2)
+def median_image(images):
+    """
+    Calculate the median of the 3D images array provided
+    Parameters
+    ----------
+    images: 3D array [x, y, tof]
+    Returns
+    -------
+    the median 2D numpy array [x, y]
+    """
+    if len(np.shape(images)) == 2:
+        return images
+
+    img = np.median(images, axis=2)
     return img
 
 
-def weightedaverageimage(imgs, size=5):
-    import scipy.ndimage
-    dims = imgs.shape
-    w = np.zeros(imgs.shape)
-    M = size**2
+def weighted_average_image(images, size=5):
+    """
+    Parameters
+    ----------
+    images: 3D array [x, y, tof]
+    size: default 5
+    Returns
+    -------
+    2D array [x, y]
+    """
+    if len(np.shape(images)) == 2:
+        return images
+
+    dims = images.shape
+    weight = np.zeros(images.shape)
+    M = size ** 2
     for i in np.arange(dims[2]):
-        f = scipy.ndimage.uniform_filter(imgs[:, :, i], size=size) * M
-        f2 = scipy.ndimage.uniform_filter(imgs[:, :, i]**2, size=size) * M
-        sigma = np.sqrt(1 / (M - 1) * (f2 - (f**2) / M))
+        f = scipy.ndimage.uniform_filter(images[:, :, i], size=size) * M
+        f2 = scipy.ndimage.uniform_filter(images[:, :, i] ** 2, size=size) * M
+        sigma = np.sqrt(1 / (M - 1) * (f2 - (f ** 2) / M))
 
-        w[:, :, i] = 1.0 / sigma
+        weight[:, :, i] = 1.0 / sigma
 
-    wsum = w.sum(axis=2)
+    wsum = weight.sum(axis=2)
     for i in np.arange(dims[2]):
-        w[:, :, i] = w[:, :, i] / wsum
+        weight[:, :, i] = weight[:, :, i] / wsum
 
-    imgs = w * imgs
+    imgs = weight * images
     img = imgs.sum(axis=2)
 
     return img
+
+
+# def weightedaverageimage(imgs, size=5):
+#     import scipy.ndimage
+#     dims = imgs.shape
+#     w = np.zeros(imgs.shape)
+#     M = size**2
+#     for i in np.arange(dims[2]):
+#         f = scipy.ndimage.uniform_filter(imgs[:, :, i], size=size) * M
+#         f2 = scipy.ndimage.uniform_filter(imgs[:, :, i]**2, size=size) * M
+#         sigma = np.sqrt(1 / (M - 1) * (f2 - (f**2) / M))
+#
+#         w[:, :, i] = 1.0 / sigma
+#
+#     wsum = w.sum(axis=2)
+#     for i in np.arange(dims[2]):
+#         w[:, :, i] = w[:, :, i] / wsum
+#
+#     imgs = w * imgs
+#     img = imgs.sum(axis=2)
+#
+#     return img
 
 
 #Rebinning/averaging tools
@@ -118,65 +181,167 @@ def spectral_binning_resolution(mysignal, spectrum, d_spectrum):
     return (binned_signal, new_spectrum)
 
 
-def moving_average_1D(mysignal, kernel_size=3, custom_kernel=np.ndarray([0])):
+def moving_average_1D(input_array=None, kernel_size=3, custom_kernel=np.ndarray([0])):
+    """
+    Program will first look at the custom_kernel. If there is one defined, the kernel size will be ignored
+    Parameters
+    ----------
+    input_array (mandatory): 1D array
+    kernel_size: size of kernel to use (default 3)
+    custom_kernel: custom kernel (default [0])
+    Raises
+    ------
+    ValueError if input array is not a 1D array
+    Returns
+    -------
+    array of the same size as input array
+    """
+
     # Moving average by kernel convolution to a ndarray
-    if (len(np.shape(mysignal)) != 1):
-        print('Data size is not 1D')
-    if (custom_kernel.any()):
-        K = custom_kernel
+    if len(np.shape(input_array)) != 1:
+        raise ValueError("Input array must be of dimension 1!")
+
+    if input_array is None:
+        raise ValueError("Please provide a 1D input array!")
+
+    if custom_kernel.any():
+        kernel = custom_kernel
     else:
-        K = np.ones((kernel_size))
-    K = K / np.sum(K)
-    outsignal = np.convolve(mysignal, K, 'same')
+        kernel = np.ones((kernel_size))
+
+    kernel = kernel / np.sum(kernel)
+    outsignal = np.convolve(input_array, kernel, 'same')
+
     return outsignal
 
 
-def moving_average_2D(mysignal, box_kernel=[], custom_kernel=np.ndarray([0])):
-    # Moving average by kernel convolution to an image (2D)
-    # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
-    import scipy.signal
+# def moving_average_1D(mysignal, kernel_size=3, custom_kernel=np.ndarray([0])):
+#     # Moving average by kernel convolution to a ndarray
+#     if (len(np.shape(mysignal)) != 1):
+#         print('Data size is not 1D')
+#     if (custom_kernel.any()):
+#         K = custom_kernel
+#     else:
+#         K = np.ones((kernel_size))
+#     K = K / np.sum(K)
+#     outsignal = np.convolve(mysignal, K, 'same')
+#     return outsignal
 
-    if (len(np.shape(mysignal)) != 3 | len(np.shape(mysignal)) != 2):
-        print('Data size is not either a 2D or ToF 2D')
-    if (custom_kernel.any()):
-        K = custom_kernel
-    elif (any(box_kernel)):
-        M = np.max(box_kernel)
-        m = np.min(box_kernel)
+
+def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0])):
+    """
+    Moving average by kernel convolution to an image (2D)
+    !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
+    Program will first look at the custom kernel. If there is one, the box_kernel will be
+    ignored.
+    Parameters
+    ----------
+    input_array
+    box_kernel
+    custom_kernel
+    Returns
+    -------
+    array of the same size as input array
+    """
+
+    input_array = input_array.transpose(1, 2, 0)
+
+    if not len(np.shape(input_array)) in [2, 3]:
+        raise ValueError("Input array must be a 2 or 3D array!")
+
+    if custom_kernel.any():
+        kernel = custom_kernel
+
+    elif not (box_kernel is None):
+
+        if len(box_kernel) != 2:
+            raise ValueError("Box kernel should be a 2 element list!")
+
+        max_kernel = np.max(box_kernel)
+        min_kernel = np.min(box_kernel)
         d = np.argmin(box_kernel)
-        K = np.zeros((M, M))
-        if (M % 2 == 0):
-            if (m % 2 == 0):
-                K[np.int(M / 2 - m / 2):np.int(M / 2 + m / 2), :] = 1
-            else:
-                K[np.int(M / 2 -
-                         np.floor(m / 2)):np.int(M / 2 +
-                                                 np.floor(m / 2)), :] = 1
-                K[np.int(M / 2 - np.floor(m / 2)) - 1, :] = 0.5
-                K[np.int(M / 2 + np.floor(m / 2)), :] = 0.5
-        else:
-            if (m % 2 == 0):
-                K[np.int(M / 2 - (m - 1) / 2):np.int(M / 2 +
-                                                     (m - 1) / 2), :] = 1
-                K[np.int(M / 2 - (m - 1) / 2) - 1, :] = 0.5
-                K[np.int(M / 2 + (m - 1) / 2), :] = 0.5
-            else:
-                K[np.int(M / 2 - m / 2):np.int(M / 2 + m / 2), :] = 1
-        if (d == 1):
-            K = np.transpose(K)
-    K = K / np.sum(K)
+        kernel = np.zeros((max_kernel, min_kernel))
 
-    if (
-            len(np.shape(mysignal)) == 3
-    ):  #if finds 3d matrix assume it's ToF data and apply to each tof frame
-        outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1],
-                              np.shape(mysignal)[2]))
-        for i in tqdm(range(0, np.shape(mysignal)[2])):
-            outsignal[:, :, i] = scipy.signal.convolve2d(
-                mysignal[:, :, i], K, 'same')
+        if max_kernel % 2 == 0:
+            if min_kernel % 2 == 0:
+                kernel[np.int(max_kernel / 2 - min_kernel / 2):np.int(max_kernel / 2 + min_kernel / 2), :] = 1
+            else:
+                kernel[np.int(max_kernel / 2 - np.floor(min_kernel / 2)):np.int(max_kernel / 2 +
+                                                                                np.floor(min_kernel / 2)), :] = 1
+                kernel[np.int(max_kernel / 2 - np.floor(min_kernel / 2)) - 1, :] = 0.5
+                kernel[np.int(max_kernel / 2 + np.floor(min_kernel / 2)), :] = 0.5
+        else:
+            if min_kernel % 2 == 0:
+                kernel[np.int(max_kernel / 2 - (min_kernel - 1) / 2):np.int(max_kernel / 2 + (min_kernel - 1) / 2),
+                :] = 1
+                kernel[np.int(max_kernel / 2 - (min_kernel - 1) / 2) - 1, :] = 0.5
+                kernel[np.int(max_kernel / 2 + (min_kernel - 1) / 2), :] = 0.5
+            else:
+                kernel[np.int(max_kernel / 2 - min_kernel / 2):np.int(max_kernel / 2 + min_kernel / 2), :] = 1
+
+        if d == 1:
+            kernel = np.transpose(kernel)
+
+    kernel = kernel / np.sum(kernel)
+
+    if len(np.shape(input_array)) == 3:  # if finds 3d matrix assume it's ToF data and apply to each tof frame
+        output_array = np.zeros((np.shape(input_array)[0], np.shape(input_array)[1], np.shape(input_array)[2]))
+        for i in tqdm(range(0, np.shape(input_array)[2])):
+            output_array[:, :, i] = scipy.signal.convolve2d(input_array[:, :, i], kernel, 'same')
     else:
-        outsignal = scipy.signal.convolve2d(mysignal, K, 'same')
-    return outsignal
+        output_array = scipy.signal.convolve2d(input_array, kernel, 'same')
+
+    output_array = output_array.transpose(2, 0, 1)
+
+    return output_array
+
+
+# def moving_average_2D(mysignal, box_kernel=[], custom_kernel=np.ndarray([0])):
+#     # Moving average by kernel convolution to an image (2D)
+#     # !! If it finds 3d matrix assume it's ToF data and apply to each tof frame !!
+#     import scipy.signal
+#
+#     if (len(np.shape(mysignal)) != 3 | len(np.shape(mysignal)) != 2):
+#         print('Data size is not either a 2D or ToF 2D')
+#     if (custom_kernel.any()):
+#         K = custom_kernel
+#     elif (any(box_kernel)):
+#         M = np.max(box_kernel)
+#         m = np.min(box_kernel)
+#         d = np.argmin(box_kernel)
+#         K = np.zeros((M, M))
+#         if (M % 2 == 0):
+#             if (m % 2 == 0):
+#                 K[np.int(M / 2 - m / 2):np.int(M / 2 + m / 2), :] = 1
+#             else:
+#                 K[np.int(M / 2 -
+#                          np.floor(m / 2)):np.int(M / 2 +
+#                                                  np.floor(m / 2)), :] = 1
+#                 K[np.int(M / 2 - np.floor(m / 2)) - 1, :] = 0.5
+#                 K[np.int(M / 2 + np.floor(m / 2)), :] = 0.5
+#         else:
+#             if (m % 2 == 0):
+#                 K[np.int(M / 2 - (m - 1) / 2):np.int(M / 2 +
+#                                                      (m - 1) / 2), :] = 1
+#                 K[np.int(M / 2 - (m - 1) / 2) - 1, :] = 0.5
+#                 K[np.int(M / 2 + (m - 1) / 2), :] = 0.5
+#             else:
+#                 K[np.int(M / 2 - m / 2):np.int(M / 2 + m / 2), :] = 1
+#         if (d == 1):
+#             K = np.transpose(K)
+#     K = K / np.sum(K)
+#
+#     if (
+#             len(np.shape(mysignal)) == 3
+#     ):  #if finds 3d matrix assume it's ToF data and apply to each tof frame
+#         outsignal = np.zeros((np.shape(mysignal)[0], np.shape(mysignal)[1],
+#                               np.shape(mysignal)[2]))
+#         for i in tqdm(range(0, np.shape(mysignal)[2])):
+#             outsignal[:, :, i] = scipy.signal.convolve2d(
+#                 mysignal[:, :, i], K, 'same')
+#     else:
+#         outsignal = scipy.signal.convolve2d(mysignal, K, 'same')
+#     return outsignal
 
 
 def display_input_signal(signal=None, bool_print=False):
@@ -204,6 +369,21 @@ def display_output_signal(signal=None, bool_print=False):
 
 
 def data_filtering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, bool_print=False):
+    """
+    if both box_kernel and gaussian_kernel are provided, box_kernel will be used by default
+    Parameters
+    ----------
+    input_array: if 3D, dimensions must be given as followed (x, y, tof)
+    box_kernel
+    gaussian_kernel
+    bool_print
+    bool_log: display log messages (default False)
+    Raises
+    ------
+    ValueError if input_array is not a 2 or 3D array
+    Returns
+    -------
+    """
 
     if mysignal is None:
         raise ValueError("Provide a signal")
@@ -226,7 +406,7 @@ def data_filtering(mysignal=None, kernel_type=KernelType.gaussian, kernel=None, 
     display_input_signal(signal=mysignal, bool_print=bool_print)
 
     # TOF data (3D), 2D kernel
-    if  len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
+    if len(np.shape(mysignal)) == 3 and (len(kernel) == 2):
         print(
             'Data is 3D but filtering kernel is 2D. Applying filter to each slice of the data (third dimension).'
         )
@@ -727,9 +907,9 @@ def load_fits(pathdata, cut_last=0, bool_wavg=False):
             data_t[:, :, j] = fits.getdata(pathdata + '\\' + subfolders[j] +
                                            '\\' + files[i])
         if (bool_wavg):
-            data[:, :, i] = weightedaverageimage(data_t)
+            data[:, :, i] = weighted_average_image(data_t)
         else:
-            data[:, :, i] = medianimage(data_t)
+            data[:, :, i] = median_image(data_t)
     return data
 
 
@@ -765,3 +945,24 @@ def load_routine(path_sample,
     T = transmission_normalization(I, I0, dose_mask)
 
     return {'T': T, 'spectrum': spectrum}
+
+
+def combine_images(images=None, algorithm='mean'):
+    """
+    Combine a 3D array according to the algorithm name provided
+    Parameters
+    ----------
+    images: 3D array [x, y, tof]
+    algorithm: default 'mean', but can be 'weighted_mean', 'median'
+    Returns
+    -------
+    2D array [x, y]
+    """
+    if algorithm == 'mean':
+        return average_image(images)
+    if algorithm == 'median':
+        return median_image(images)
+
+
+def mean_of_tof_arrays(list_array_3d=None):
+    return np.mean(list_array_3d, axis=0)
