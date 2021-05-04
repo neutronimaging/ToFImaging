@@ -4,7 +4,7 @@ from collections import Counter
 import os
 from os.path import expanduser
 
-from src.tofimaging.ReductionTools import KernelType
+from tofimaging.ReductionTools import KernelType
 
 
 class Get:

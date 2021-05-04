@@ -6,7 +6,7 @@ from JupyterNotebooks.code.normalization import Normalization as LocalNormalizat
 from JupyterNotebooks.code.utilities.get import Get
 from JupyterNotebooks.code.parent import Parent
 from JupyterNotebooks.code.display import Display
-from src.tofimaging import ReductionTools
+from tofimaging import ReductionTools
 
 
 class PrepareData(Parent):

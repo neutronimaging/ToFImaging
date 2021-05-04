@@ -4,10 +4,10 @@ from qtpy.QtGui import QIcon
 from qtpy import QtGui
 import logging
 
-from . import load_ui
-from .utilities.get import Get
-from .utilities.file import read_ascii, write_ascii
-from . import refresh_image
+from JupyterNotebooks.code import load_ui
+from JupyterNotebooks.code.utilities.get import Get
+from JupyterNotebooks.code.utilities.file import read_ascii, write_ascii
+from JupyterNotebooks.code import refresh_image
 
 
 class LogLauncher:

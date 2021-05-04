@@ -9,15 +9,11 @@ import time
 import skimage.filters
 import logging
 
-import src.tofimaging.ReductionTools as rt
-from src.tofimaging.ReductionTools import tof2l
-from src.tofimaging.ReductionTools import find_nearest
-from src.tofimaging.ReductionTools import savitzky_golay as SG_filter
+import tofimaging.ReductionTools as rt
+from tofimaging.ReductionTools import tof2l
+from tofimaging.ReductionTools import find_nearest
+from tofimaging.ReductionTools import savitzky_golay as SG_filter
 
-# import tofimaging.ReductionTools as rt
-# from tofimaging.ReductionTools import tof2l
-# from tofimaging.ReductionTools import find_nearest
-# from tofimaging.ReductionTools import savitzky_golay as SG_filter
 
 #------------------------------ SINGLE EDGE FITTING ------------------------#
 def AdvancedBraggEdgeFitting(signal,
@@ -1519,7 +1515,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
             print('WARNING: Mask size does not match frames size')
 
     elif auto_mask:
-        mymask = rt.medianimage(Ttof)
+        mymask = rt.median_image(Ttof)
         plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
@@ -1577,7 +1573,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
 
         return result
 
-    median_image = rt.medianimage(Ttof)
+    median_image = rt.median_image(Ttof)
     edge_position = np.nan * np.zeros(np.shape(mymask))
     edge_width = np.nan * np.zeros(np.shape(mymask))
     edge_height = np.nan * np.zeros(np.shape(mymask))
@@ -1985,7 +1981,7 @@ def TextureFitting2D(Ttof,
             print('WARNING: Mask size does not match frames size')
     elif (auto_mask):
         import skimage.filters
-        mymask = rt.medianimage(Ttof)
+        mymask = rt.median_image(Ttof)
         plt.figure(figsize=(15,10))
         plt.subplot(1, 3,
                     1), plt.imshow(mymask), plt.title('Full-spectrum Image')
@@ -2050,7 +2046,7 @@ def TextureFitting2D(Ttof,
                        bool_print=True)
         return
 
-    median_image = rt.medianimage(Ttof)
+    median_image = rt.median_image(Ttof)
     A1_map = np.zeros(np.shape(mymask))
     R1_map = np.zeros(np.shape(mymask))
     A2_map = np.zeros(np.shape(mymask))

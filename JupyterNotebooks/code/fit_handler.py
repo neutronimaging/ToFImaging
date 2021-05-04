@@ -4,7 +4,7 @@ import numpy as np
 import logging
 import copy
 
-from src.tofimaging.EdgeFitting import (GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D,
+from tofimaging.EdgeFitting import (GaussianBraggEdgeFitting2D, AdvancedBraggEdgeFitting2D,
                                         AdvancedDirectBraggEdgeFitting2D)
 from JupyterNotebooks.code.utilities.get import Get
 from JupyterNotebooks.code.display import Display

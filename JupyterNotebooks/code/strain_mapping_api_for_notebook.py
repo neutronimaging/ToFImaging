@@ -22,7 +22,7 @@ from JupyterNotebooks.code.neutronimaging.detector_correction import skipping_me
 from JupyterNotebooks.code.utilities.get import Get
 from JupyterNotebooks.code.utilities import file as file_utilities
 
-from src.tofimaging import ReductionTools as reduction_tools
+from tofimaging import ReductionTools as reduction_tools
 
 DEBUG = True
 DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-strain-mapping/corrected/"
