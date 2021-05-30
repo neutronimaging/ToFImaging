@@ -39,4 +39,4 @@ __OUTPUTS__: dictionary with the following
 <img width="400" alt="Edge sample" src="Figures/reduction_tools-SpectralSegmentation_example.png"><br />
 
 ## savitzky_golay
-Advance smoothing of a signal. For documentation see [here](https://scipy-cookbook.readthedocs.io/items/SavitzkyGolay.html).
+Advanced smoothing of a 1darray signal. For documentation see [here](https://scipy-cookbook.readthedocs.io/items/SavitzkyGolay.html).
