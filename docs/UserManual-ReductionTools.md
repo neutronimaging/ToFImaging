@@ -1,6 +1,6 @@
 [Return to table of contents](index.md)<br/>
 # Reduction Tools
-The reduction_tools.py module contains various functions for the data processing/reduction/filtering.
+The ReductionTools.py module contains various functions for the data processing/reduction/filtering.
 Please inspect the file for the full list of the functions. Here we report on a few key functions.
 
 ## DataFiltering
