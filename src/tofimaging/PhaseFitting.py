@@ -28,7 +28,7 @@ def PhaseRatioLinearCombination(lac,
     spectrum = spectrum, length of this ndarray must correspond to size of lac_tof(lambda)
     phase1lac = lac of the phase 1
     phase2lac = lac of the phase 2
-    spectrum_phase = spectrum corresponding to phase 1 and 2
+    phase_spectrum = spectrum corresponding to phase 1 and 2
     lambda_range_norm = lambda range where to normalize spectra
     lambda_range_edges = lambda range where to do the fitting
     est_phi = estimate phase 1 weight
@@ -115,7 +115,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
                                   spectrum,
                                   phase1lac,
                                   phase2lac,
-                                  spectrum_phase,
+                                  phase_spectrum,
                                   lambda_range_norm,
                                   lambda_range_edges,
                                   calibration_matrix=np.ndarray([0]),
@@ -136,7 +136,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
     spectrum = spectrum, length of this ndarray must correspond to size of lac_tof(lambda)
     phase1lac = lac of the phase 1
     phase2lac = lac of the phase 2
-    spectrum_phase = spectrum corresponding to phase 1 and 2
+    phase_spectrum = spectrum corresponding to phase 1 and 2
     lambda_range_norm = lambda range where to normalize spectra
     lambda_range_edges = lambda range where to do the fitting
     calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]);
@@ -212,7 +212,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
                                     lambd,
                                     phase1lac,
                                     phase2lac,
-                                    spectrum_phase,
+                                    phase_spectrum,
                                     lambda_range_norm,
                                     lambda_range_edges,
                                     est_phi=est_phi,
@@ -240,7 +240,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
                                                           lambd,
                                                           phase1lac,
                                                           phase2lac,
-                                                          spectrum_phase,
+                                                          phase_spectrum,
                                                           lambda_range_norm,
                                                           lambda_range_edges,
                                                           est_phi=est_phi,
@@ -287,7 +287,7 @@ def PhaseRatioLinearCombination3(lac,
     phase1lac = lac of the phase 1
     phase2lac = lac of the phase 2
     phase3lac = lac of the phase 3
-    spectrum_phase = spectrum corresponding to phase 1 and 2
+    phase_spectrum = spectrum corresponding to phase 1 and 2
     lambda_range_norm = lambda range where to normalize spectra
     lambda_range_edges = lambda range where to do the fitting
     est_f1 = estimate phase 1 weight
@@ -401,7 +401,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
                                    phase1lac,
                                    phase2lac,
                                    phase3lac,
-                                   spectrum_phase,
+                                   phase_spectrum,
                                    lambda_range_norm,
                                    lambda_range_edges,
                                    calibration_matrix=np.ndarray([0]),
@@ -424,7 +424,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
     spectrum = spectrum, length of this ndarray must correspond to size of lac_tof(lambda)
     phase1lac = lac of the phase 1
     phase2lac = lac of the phase 2
-    spectrum_phase = spectrum corresponding to phase 1 and 2
+    phase_spectrum = spectrum corresponding to phase 1 and 2
     lambda_range_norm = lambda range where to normalize spectra
     lambda_range_edges = lambda range where to do the fitting
     calibration_matrix = calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]);
@@ -506,7 +506,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
                                      phase1lac,
                                      phase2lac,
                                      phase3lac,
-                                     spectrum_phase,
+                                     phase_spectrum,
                                      lambda_range_norm,
                                      lambda_range_edges,
                                      est_f1=est_f1,
@@ -538,7 +538,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
                                                            phase1lac,
                                                            phase2lac,
                                                            phase3lac,
-                                                           spectrum_phase,
+                                                           phase_spectrum,
                                                            lambda_range_norm,
                                                            lambda_range_edges,
                                                            est_f1=est_f1,
