@@ -144,7 +144,7 @@ def AdvancedBraggEdgeFitting(signal,
         #plt.savefig('step1_fitting.pdf')
 
     if(est_w==0):
-        est_w = est_p*0.2   
+        est_w = est_pos*0.2   
     est_w = est_w / 2
     t_before = t[0:find_nearest(t, est_pos - est_w)]
     bragg_before = signal[0:find_nearest(t, est_pos - est_w)]
@@ -845,7 +845,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
         est_pos_idx]  # this is the actual estimated first position in TOF [s]
 
     if(est_w==0):
-        est_w = est_p*0.2       
+        est_w = est_pos*0.2       
     est_w = est_w / 2
     t_before = t[0:find_nearest(t, est_pos - est_w)]
     bragg_before = signal[0:find_nearest(t, est_pos - est_w)]
