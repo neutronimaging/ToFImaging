@@ -265,20 +265,20 @@ def moving_average_2D(input_array, box_kernel=None, custom_kernel=np.ndarray([0]
 
         if max_kernel % 2 == 0:
             if min_kernel % 2 == 0:
-                kernel[np.int(max_kernel / 2 - min_kernel / 2):np.int(max_kernel / 2 + min_kernel / 2), :] = 1
+                kernel[int(max_kernel / 2 - min_kernel / 2):int(max_kernel / 2 + min_kernel / 2), :] = 1
             else:
-                kernel[np.int(max_kernel / 2 - np.floor(min_kernel / 2)):np.int(max_kernel / 2 +
-                                                                                np.floor(min_kernel / 2)), :] = 1
-                kernel[np.int(max_kernel / 2 - np.floor(min_kernel / 2)) - 1, :] = 0.5
-                kernel[np.int(max_kernel / 2 + np.floor(min_kernel / 2)), :] = 0.5
+                kernel[int(max_kernel / 2 - np.floor(min_kernel / 2)):int(max_kernel / 2 +
+                                                                          np.floor(min_kernel / 2)), :] = 1
+                kernel[int(max_kernel / 2 - np.floor(min_kernel / 2)) - 1, :] = 0.5
+                kernel[int(max_kernel / 2 + np.floor(min_kernel / 2)), :] = 0.5
         else:
             if min_kernel % 2 == 0:
-                kernel[np.int(max_kernel / 2 - (min_kernel - 1) / 2):np.int(max_kernel / 2 + (min_kernel - 1) / 2),
+                kernel[int(max_kernel / 2 - (min_kernel - 1) / 2):int(max_kernel / 2 + (min_kernel - 1) / 2),
                 :] = 1
-                kernel[np.int(max_kernel / 2 - (min_kernel - 1) / 2) - 1, :] = 0.5
-                kernel[np.int(max_kernel / 2 + (min_kernel - 1) / 2), :] = 0.5
+                kernel[int(max_kernel / 2 - (min_kernel - 1) / 2) - 1, :] = 0.5
+                kernel[int(max_kernel / 2 + (min_kernel - 1) / 2), :] = 0.5
             else:
-                kernel[np.int(max_kernel / 2 - min_kernel / 2):np.int(max_kernel / 2 + min_kernel / 2), :] = 1
+                kernel[int(max_kernel / 2 - min_kernel / 2):int(max_kernel / 2 + min_kernel / 2), :] = 1
 
         if d == 1:
             kernel = np.transpose(kernel)
