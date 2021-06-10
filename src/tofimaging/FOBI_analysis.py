@@ -199,7 +199,8 @@ def interp_noreadoutgaps(y, t, tmax, nrep=0):
     t_merged: tof spectrum in the interpolated signal dimension
     """
     nrep = np.int(nrep)
-
+    t = np.squeeze(t)
+    
     #dt = np.nanmean(np.diff(t),axis=0)
     #t_tot = np.arange(t[0],tmax+dt,dt)
     #app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
@@ -216,7 +217,7 @@ def interp_noreadoutgaps(y, t, tmax, nrep=0):
     for i in range(0, nrep):
         y_overlap[:, i] = y_int[replen * i:replen * (i + 1)]
 
-    y_merged = np.nanmedian(y_overlap, axis=1)
+    y_merged = np.nanmean(y_overlap, axis=1)
     y_extended = y_merged
     for i in range(0, nrep - 1):
         y_extended = np.concatenate((y_extended, y_merged))
