@@ -4,9 +4,8 @@
 * [Jupyter Notebooks](UserManual-jupyter.md)
 * [Python Modules](UserManual-PythonModules.md)
 	* [Reduction Tools](UserManual-ReductionTools.md)
-	* [Single Bragg Edge Fitting](UserManual-SingleBEfit.md)
-	* [Phase Fitting](UserManual-PhaseFitting.md)
-	* [Rietveld Bragg Pattern Fitting](UserManual-RietveldFitting.md)
+	* [Bragg Edge Fitting](UserManual-EdgeFitting.md)
+	* [Crystalline Phase fraction Fitting](UserManual-PhaseFitting.md)
 
 # Related publications
-If you use the results in a publication. The following publication should be cited: <br/>
+If you use the results in a publication. The following publication should be cited: Busi, Matteo, et al. "Nondestructive characterization of laser powder bed fusion parts with neutron Bragg edge imaging." Additive Manufacturing 39 (2021): 101848.<br/>.

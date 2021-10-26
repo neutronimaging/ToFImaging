@@ -22,11 +22,11 @@ Currently implemented are:
 
 # FUNCTION LIST:
 
-## edgefitting_1D.py: 
-Functions for edge fitting of 1D-arrays.
+## EdgeFitting.py: 
+Module containing the fucntions for the Bragg edge fitting. 
 
 ### AdvancedBraggEdgeFitting
-Advanced Bragg Edge Fitting. Printout example:
+Advanced Bragg Edge Fitting (7 iterations) for a 1d array. Printout example:
 
 <img width="400" alt="Edge sample" src="Figures/edgefitting_1D-AdvancedEdgeFitting_example.png"><br />
 
@@ -40,6 +40,10 @@ __INPUTS__:
 | est_pos | estimated bragg edge position (in spectrum_range dimension) [Default = 0]|
 | est_sigma | expected Gaussian broadening [Default = 1]|
 | est_alpha | expected decay constant, a moderator property [Default = 1]|
+| pos_BC | boundary conditions for the Bragg edge position fit ([lambda1, lambda2]) [Default = 0]|
+| sigma_BC | boundary conditions for the Gaussian broadening ([sigma1, sigma2]) [Default = 0]|
+| alpha_BC | boundary conditions for the decay constant ([alpha1, alpha2]) [Default = 0]|
+| est_w | expected edge width [Default = 0]|
 | bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
 | smooth_w | window size of S-G filter [Default = 5]|
 | smooth_n | order of S-G filter [Default = 1]|
@@ -59,8 +63,125 @@ __OUTPUTS__: dictionary with the following fit in the dimension of the mask
 | 'pos_extrema' | extrema of the Bragg edges |
 | 'height' | fitted height of the Bragg edge |
 
+### AdvancedBraggEdgeFitting2D 
+Advanced Bragg Edge Fitting (7 iterations) for a 2D stack of TOF data in the form of 3D array (x,y,lambda). 
+
+__INPUTS__:
+
+|Parameter| Description|
+|----------|------------|
+| Ttof | 3darray of the image TOF stack containing the Bragg edge (x,y,lambda) [REQUIRED] |
+| spectrum | spectrum range corresponding to Ttof third dimension (1darray) [REQUIRED]|
+| spectrum_range | range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]|
+| calibration_matrix | calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]). Will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y) [Default = np.ndarray([0])]|
+| mask | mask of where to perform the fit (x,y) [Default = np.ndarray([0])]|
+| auto_mask | if True and mask is not given will automatically mask the region based on the mask_thresh thresholds [Default = True]|
+| mask_thresh | low and high threshold for the automatic mask ([thresh_low, thresh_high]) [Default = np.ndarray([0])]|
+| est_pos | estimated bragg edge position (in spectrum_range dimension) [Default = 0]|
+| est_sigma | expected Gaussian broadening [Default = 1]|
+| est_alpha | expected decay constant, a moderator property [Default = 1]|
+| pos_BC | boundary conditions for the Bragg edge position fit ([lambda1, lambda2]) [Default = 0]|
+| sigma_BC | boundary conditions for the Gaussian broadening ([sigma1, sigma2]) [Default = 0]|
+| alpha_BC | boundary conditions for the decay constant ([alpha1, alpha2]) [Default = 0]|
+| est_w | expected edge width [Default = 0]|
+| bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
+| smooth_w | window size of S-G filter [Default = 5]|
+| smooth_n | order of S-G filter [Default = 1]|
+| bool_linear | flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]|
+| bool_save | set to True to save output [Default = False]|
+| bool_print | set to True to print output [Default = False]|
+| debug_idx | pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]|
+
+__OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
+|Parameter| Description|
+|----------|------------|
+| 'edge_position' | edge position |
+| 'edge_height'| edge height |
+| 'edge_width'| edge width  |
+| 'median_image'| median Transmission image in the selected lambda range |
+
+### AdvancedDirectBraggEdgeFitting
+Advanced Bragg Edge Fitting (direct fit of all parameters) for a 1d array. Printout example:
+
+<img width="400" alt="Edge sample" src="Figures/edgefitting_1D-AdvancedEdgeFitting_example.png"><br />
+
+__INPUTS__:
+
+|Parameter| Description|
+|----------|------------|
+| signal   | 1darray of the signal containing the Bragg edge (1darray) [REQUIRED]|
+| spectrum | spectrum range corresponding to signal (1darray) [REQUIRED]|
+| spectrum_range | range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]|
+| est_pos | estimated bragg edge position (in spectrum_range dimension) [Default = 0]|
+| est_sigma | expected Gaussian broadening [Default = 1]|
+| est_alpha | expected decay constant, a moderator property [Default = 1]|
+| pos_BC | boundary conditions for the Bragg edge position fit ([lambda1, lambda2]) [Default = 0]|
+| sigma_BC | boundary conditions for the Gaussian broadening ([sigma1, sigma2]) [Default = 0]|
+| alpha_BC | boundary conditions for the decay constant ([alpha1, alpha2]) [Default = 0]|
+| est_w | expected edge width [Default = 0]|
+| bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
+| smooth_w | window size of S-G filter [Default = 5]|
+| smooth_n | order of S-G filter [Default = 1]|
+| bool_linear | flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]|
+| bool_print | flag to activate printing of figures [Default = False]|
+
+__OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
+|Parameter| Description|
+|----------|------------|
+| 't0' | fitted bragg edge position |
+| 'sigma' | fitted Gaussian broadening |
+| 'alpha' | fitted decay constant (moderator property) |
+| 'a1, a2, a5, a6' | parameters for spectrum besides the edge: a1 and a2 before, a5 and a6 after the edge |
+| 'final_result' | fitting result after 7th iteration |
+| 'fitted_data' | final fitted spectrum |
+| 'pos_extrema' | extrema of the Bragg edges |
+| 'height' | fitted height of the Bragg edge |
+
+
+
+
+### AdvancedDirectBraggEdgeFitting2D 
+Advanced Bragg Edge Fitting (direct fit of all parameters) for a 2D stack of TOF data in the form of 3D array (x,y,lambda).
+
+__INPUTS__:
+
+|Parameter| Description|
+|----------|------------|
+| Ttof | 3darray of the image TOF stack containing the Bragg edge (x,y,lambda) [REQUIRED] |
+| spectrum | spectrum range corresponding to Ttof third dimension (1darray) [REQUIRED]|
+| spectrum_range | range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]|
+| calibration_matrix | calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]). Will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y) [Default = np.ndarray([0])]|
+| mask | mask of where to perform the fit (x,y) [Default = np.ndarray([0])]|
+| auto_mask | if True and mask is not given will automatically mask the region based on the mask_thresh thresholds [Default = True]|
+| mask_thresh | low and high threshold for the automatic mask ([thresh_low, thresh_high]) [Default = np.ndarray([0])]|
+| est_pos | estimated bragg edge position (in spectrum_range dimension) [Default = 0]|
+| est_sigma | expected Gaussian broadening [Default = 1]|
+| est_alpha | expected decay constant, a moderator property [Default = 1]|
+| pos_BC | boundary conditions for the Bragg edge position fit ([lambda1, lambda2]) [Default = 0]|
+| sigma_BC | boundary conditions for the Gaussian broadening ([sigma1, sigma2]) [Default = 0]|
+| alpha_BC | boundary conditions for the decay constant ([alpha1, alpha2]) [Default = 0]|
+| est_w | expected edge width [Default = 0]|
+| bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
+| smooth_w | window size of S-G filter [Default = 5]|
+| smooth_n | order of S-G filter [Default = 1]|
+| bool_linear | flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]|
+| bool_save | set to True to save output [Default = False]|
+| bool_print | set to True to print output [Default = False]|
+| debug_idx | pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]|
+
+__OUTPUTS__: dictionary with the following fit in the dimension of the mask
+
+|Parameter| Description|
+|----------|------------|
+| 'edge_position' | edge position |
+| 'edge_height'| edge height |
+| 'edge_width'| edge width  |
+| 'median_image'| median Transmission image in the selected lambda range |
+
 ### GaussianBraggEdgeFitting
-Gaussian Bragg Edge Fitting. Printout example:
+Gaussian Bragg Edge Fitting for a 1d array. Printout example:
 
 <img width="400" alt="Edge sample" src="Figures/edgefitting_1D-BraggEdgeFitting_example.png"><br />
 
@@ -81,7 +202,7 @@ __INPUTS__:
 | bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
 | smooth_w | window size of S-G filter [Default = 5]|
 | smooth_n | order of S-G filter [Default = 1]|
-| bool_linear | flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]|
+| interp_factor |  if set, this is the factor by which the number of bins are multiplied by interpolation [Default = 0]|
 | bool_print | flag to activate printing of figures [Default = False]|
 
 __OUTPUTS__: dictionary with the following fits
@@ -94,45 +215,9 @@ __OUTPUTS__: dictionary with the following fits
 | 'edge_slope' | edge slope |
 | 'median_image' | median Transmission image in the selected lambda range|
 
-## edgefitting_2D.py: 
-Functions for bragg edge fitting of 2D stack of TOF data in the form of 3Darray (x,y,lambda).
 
-### AdvancedBraggEdgeFitting_2D 
-Advanced Bragg Edge Fitting for all pixels in an image.
-
-__INPUTS__:
-
-|Parameter| Description|
-|----------|------------|
-| Ttof | 3darray of the image TOF stack containing the Bragg edge (x,y,lambda) [REQUIRED] |
-| spectrum | spectrum range corresponding to Ttof third dimension (1darray) [REQUIRED]|
-| spectrum_range | range corresponding to lambda where to perform the fitting ([lambda1, lambda2]) [Default = []]|
-| calibration_matrix | calibration matrix with the coefficients to convert from spectrum to lambda size (x,y,[X0,k]). Will convert to lambda using formula Y = X0 + kX where X is spectrum for each pixel (x,y) [Default = np.ndarray([0])]|
-| mask | mask of where to perform the fit (x,y) [Default = np.ndarray([0])]|
-| auto_mask | if True and mask is not given will automatically mask the region based on the mask_thresh thresholds [Default = True]|
-| mask_thresh | low and high threshold for the automatic mask ([thresh_low, thresh_high]) [Default = np.ndarray([0])]|
-| est_pos | estimated bragg edge position (in spectrum_range dimension) [Default = 0]|
-| est_sigma | expected Gaussian broadening [Default = 1]|
-| est_alpha | expected decay constant, a moderator property [Default = 1]|
-| bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
-| smooth_w | window size of S-G filter [Default = 5]|
-| smooth_n | order of S-G filter [Default = 1]|
-| bool_linear | flag to activate linear spectrum assumptions at the sides of the edge (otherwise exponential) [Default = False]|
-| bool_save | set to True to save output [Default = False]|
-| bool_print | set to True to print output [Default = False]|
-| debug_idx | pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]|
-
-__OUTPUTS__: dictionary with the following fit in the dimension of the mask
-
-|Parameter| Description|
-|----------|------------|
-| 'edge_position' | edge position |
-| 'edge_height'| edge height |
-| 'edge_width'| edge width  |
-| 'median_image'| median Transmission image in the selected lambda range |
-
-### GaussianBraggEdgeFitting_2D: 
-Gaussian Bragg Edge Fitting for all pixels in an image.
+### GaussianBraggEdgeFitting2D: 
+Gaussian Bragg Edge Fitting for a 2D stack of TOF data in the form of 3D array (x,y,lambda).
 
 <img width="400" alt="Edge sample" src="Figures/edgefitting_2D-BraggEdgeFitting_2D_example.png"><br />
 
@@ -157,6 +242,7 @@ __INPUTS__:
 | bool_smooth | set to True to perform Savitzky-Golay filtering of the transmission derivative [Default = False]|
 | smooth_w | window size of S-G filter [Default = 5]|
 | smooth_n | order of S-G filter [Default = 1]|
+| interp_factor |  if set, this is the factor by which the number of bins are multiplied by interpolation [Default = 0]|
 | bool_save | set to True to save output [Default = False]|
 | bool_print | set to True to print output [Default = False]|
 | debug_idx | pixel coordinates where to test the single pixel fitting ([pixel_x, pixel_y]) [Default = []]|

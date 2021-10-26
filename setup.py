@@ -6,12 +6,11 @@ from shutil import rmtree
 # import tofimaging
 
 NAME = 'TofImaging'
-DESCRIPTION = "description here"
+DESCRIPTION = "Library for neutron ToF imaging"
 LONGDESCRIPTION = "See the README.md file on GitHub for more information"
-URL = ""
-EMAIL = ""
-AUTHOR = ""
-#VERSION = tofimaging.__version__
+URL = "https://github.com/neutronimaging/ToFImaging"
+EMAIL = "mbusi2691@gmail.com, bilheuxjm@ornl.gov"
+AUTHOR = "Matteo Busi, Jean Bilheux"
 VERSION = "0.0.1"
 KEYWORDS = ""
 
@@ -22,6 +21,7 @@ REQUIRED = ['numpy',
             'matplotlib',
             'scikit-image',
             'scipy',
+            'tqdm',
             ]
 
 here = os.path.abspath('./')

@@ -10,4 +10,3 @@ NeuNorm==1.4.5
 neutronbraggedge==2.0.3
 qtpy
 pyqtgraph
-tqdm
