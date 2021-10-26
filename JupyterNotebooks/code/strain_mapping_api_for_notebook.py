@@ -26,7 +26,7 @@ from JupyterNotebooks.code.utilities import file as file_utilities
 from tofimaging import ReductionTools as reduction_tools
 
 DEBUG = True
-DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-strain-mapping/corrected/"
+DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-26171-testing_ibeatles/"
 
 
 class StrainMappingAPIForNotebook:

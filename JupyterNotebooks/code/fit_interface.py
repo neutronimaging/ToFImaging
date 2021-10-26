@@ -56,6 +56,7 @@ class Interface(QMainWindow):
 
     sample_projections = None
     ob_projections = None
+    normalize_projections = None
 
     default_kernel_size = {'y': 3, 'x': 3, 'lambda': 3}
     kernel_size = copy.deepcopy(default_kernel_size)

@@ -37,17 +37,17 @@ class Normalization:
 
                 list_roi = self.parent.o_roi.list_roi
                 normalize_projections = Normalization.normalization_by_roi(list_roi,
-                                                                                       working_ob_projections,
-                                                                                       working_sample_projections)
+                                                                           working_ob_projections,
+                                                                           working_sample_projections)
 
             elif self.parent.ui.normal_normalization_radioButton.isChecked():
 
                 list_roi = self.parent.ob_list_roi
                 normalize_projections = Normalization.normalization_by_roi_of_ob(list_roi,
-                                                                                             working_ob_projections,
-                                                                                             working_sample_projections)
+                                                                                 working_ob_projections,
+                                                                                 working_sample_projections)
 
-            self.normalize_projections = normalize_projections.transpose(2, 1, 0)  # x, y, lambda
+            self.parent.normalize_projections = normalize_projections.transpose(2, 1, 0)  # x, y, lambda
 
         else:  # no normalization
             self.parent.normalize_projections = copy.deepcopy(self.parent.sample_projections)
