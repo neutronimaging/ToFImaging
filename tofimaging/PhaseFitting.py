@@ -151,7 +151,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
     SG_n = order of S-G filter
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_idx = pixel coordinates where to test the single pixel fitting
+    debug_idx = pixel coordinates where to tests the single pixel fitting
 
     OUTPUTS:
     dictionary with the following fit in the dimension of the mask
@@ -441,7 +441,7 @@ def PhaseRatioLinearCombination32D(lac_tof,
     SG_n = order of S-G filter
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_idx = pixel coordinates where to test the single pixel fitting
+    debug_idx = pixel coordinates where to tests the single pixel fitting
 
     OUTPUTS:
     dictionary with the following fit in the dimension of the mask
@@ -666,7 +666,7 @@ def WavelengthSelectiveRatio2D(lac_tof,
     mask_thresh = low and high threshold for the automatic mask
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_idx = pixel coordinates where to test the single pixel fitting
+    debug_idx = pixel coordinates where to tests the single pixel fitting
 
     OUTPUTS:
     dictionary with the following fit in the dimension of the mask

@@ -148,13 +148,13 @@ if __name__ == "__main__":
     df_meta = merge_meta_data(df_shutter_count, df_shutter_time, df_spectra)
     print(df_meta)
 
-    # test load images
+    # tests load images
     img_dir = test_data_dir
     o_norm = load_images(img_dir)
     print(type(o_norm))
 
-    # test calculate pixel occupancy probability
+    # tests calculate pixel occupancy probability
     pop = calc_pixel_occupancy_probability(o_norm, df_meta)
 
-    # test image correction
+    # tests image correction
     imgs = correct_images(o_norm, df_meta)

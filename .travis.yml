@@ -31,7 +31,7 @@ install:
   - python setup.py install
 
 script:
-  - pytest -v --cov-report term --cov=test/
+  - pytest -v --cov-report term --cov=tests/
 
 after_success:
   - codecov

@@ -608,7 +608,7 @@ def AdvancedBraggEdgeFitting2D(Ttof,
     smooth_n = order of S-G filter
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_idx = pixel coordinates where to test the single pixel fitting
+    debug_idx = pixel coordinates where to tests the single pixel fitting
 
     OUTPUTS:
     Dictionary with the following fit in the dimension of the mask
@@ -1131,7 +1131,7 @@ def AdvancedDirectBraggEdgeFitting2D(Ttof,
     smooth_n = order of S-G filter
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_idx = pixel coordinates where to test the single pixel fitting
+    debug_idx = pixel coordinates where to tests the single pixel fitting
 
     OUTPUTS:
     Dictionary with the following fit in the dimension of the mask
@@ -1490,7 +1490,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
     interp_factor = if set, this is the factor by which the number of bins are multiplied by interpolation
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_idx = pixel coordinates where to test the single pixel fitting
+    debug_idx = pixel coordinates where to tests the single pixel fitting
 
     OUTPUTS:
     Dictionary with the following fit in the dimension of the mask
@@ -1956,7 +1956,7 @@ def TextureFitting2D(Ttof,
     smooth_n = order of S-G filter
     bool_save = set to True to save output
     bool_print = set to True to print output
-    debug_idx = pixel coordinates where to test the single pixel fitting
+    debug_idx = pixel coordinates where to tests the single pixel fitting
 
     OUTPUTS:
     Dictionary with the following fit in the dimension of the mask

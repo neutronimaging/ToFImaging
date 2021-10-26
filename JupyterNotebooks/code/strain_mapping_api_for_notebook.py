@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path, PurePath
 import shutil
+import logging
 
 import ipywe.fileselector
 import ipywe.fileselector
@@ -277,9 +278,13 @@ class StrainMappingAPIForNotebook:
             _short_input_folder = str(PurePath(_input_folder).name) + "_corrected"
             _output_folder = str(Path(_input_folder).parent / _short_input_folder)
             file_utilities.make_or_reset_folder(_output_folder)
-            _shutter_count_file = glob.glob(_input_folder + "/*_ShutterCount.txt")[0]
-            _shutter_time_file = glob.glob(_input_folder + "/*_ShutterTimes.txt")[0]
-            _spectra_file = glob.glob(_input_folder + '/*_Spectra.txt')[0]
+            try:
+                _shutter_count_file = glob.glob(_input_folder + "/*_ShutterCount.txt")[0]
+                _shutter_time_file = glob.glob(_input_folder + "/*_ShutterTimes.txt")[0]
+                _spectra_file = glob.glob(_input_folder + '/*_Spectra.txt')[0]
+            except IndexError:
+                raise IndexError(f"Unable to find _ShutterCount and/or _ShutterTimes files in {_input_folder}")
+
             df_meta = merge_meta_data(read_shutter_count(_shutter_count_file),
                                       read_shutter_time(_shutter_time_file),
                                       read_spectra(_spectra_file))
