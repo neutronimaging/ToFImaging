@@ -13,6 +13,7 @@ import ipywe.fileselector
 import ipywe.fileselector
 from NeuNorm.normalization import Normalization
 from neutronbraggedge.experiment_handler import TOF, Experiment
+
 from JupyterNotebooks.code.neutronimaging.detector_correction import read_shutter_count
 from JupyterNotebooks.code.neutronimaging.detector_correction import read_shutter_time
 from JupyterNotebooks.code.neutronimaging.detector_correction import read_spectra
@@ -21,12 +22,13 @@ from JupyterNotebooks.code.neutronimaging.detector_correction import load_images
 from JupyterNotebooks.code.neutronimaging.detector_correction import correct_images
 from JupyterNotebooks.code.neutronimaging.detector_correction import skipping_meta_data
 from JupyterNotebooks.code.utilities.get import Get
+from JupyterNotebooks.code.utilities.file import validate_path
 from JupyterNotebooks.code.utilities import file as file_utilities
 
 from tofimaging import ReductionTools as reduction_tools
 
 DEBUG = True
-DEBUG_PATH = "/Volumes/G-DRIVE 1/IPTS/IPTS-25793_bragg_edge_Si"
+DEBUG_PATH = "/Volumes/G-DRIVE 1/IPTS/IPTS-26171-testing_ibeatles/"
 
 
 class StrainMappingAPIForNotebook:
@@ -177,7 +179,7 @@ class StrainMappingAPIForNotebook:
             display(HTML('<span style="font-size: 15px; color:blue">Spectra file has been loaded successfully!</span>'))
 
     def select_projections(self, next_method=None, instruction='Select data folder ...'):
-        self.working_dir =
+        self.working_dir = validate_path(self.working_dir)
         fsel_ui = ipywe.fileselector.FileSelectorPanel(instruction=instruction,
                                                        start_dir=self.working_dir,
                                                        type='directory',
