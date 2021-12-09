@@ -1,7 +1,7 @@
 import os
 import shutil
 import ntpath
-
+from pathlib import Path
 
 def make_or_reset_folder(folder_name):
     if os.path.exists(folder_name):
@@ -29,3 +29,12 @@ def write_ascii(text="", filename=''):
 def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
+
+
+def validate_path(path):
+    """this method will check to see if the path exists, if it doesn't it will recursively check the parent"""
+    path = Path(path)
+    if os.path.exists(path):
+        return path
+    else:
+        return validate_path(path.parent)
