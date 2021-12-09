@@ -7,7 +7,7 @@ m = 1.674927471e-27  #Neutron mass [kg]
 
 
 #Unit Conversions
-def Ang2meV(Angstrom):
+def Ang2MeV(Angstrom):
     return 81.82 / (Angstrom**2)
 
 

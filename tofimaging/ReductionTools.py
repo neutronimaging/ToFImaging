@@ -14,11 +14,11 @@ class KernelType:
 
 
 # Unit Conversions
-def Ang2meV(Angstrom):
+def Ang2MeV(Angstrom):
     return 81.82 / (Angstrom ** 2)
 
 
-def meV2Ang(meV):
+def MeV2Ang(meV):
     return np.sqrt(81.82 / meV)
 
 
