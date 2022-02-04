@@ -46,3 +46,10 @@ efit.GaussianBraggEdgeFitting2D(ToFdata,spectrum)
 ```
 
 For the software documentation please visit https://neutronimaging.github.io/ToFImaging/ 
+
+# To run Notebook via repo
+```python
+$ pip install -e .
+$ jupyter notebook
+```
+Then launch the JupyterNotebook/StrainMapping_UI.ipynb notebook

@@ -354,6 +354,12 @@ class FitHandler:
 
         elif algorithm_selected == 'advanced direct':
             logging.info(f"--> about to run AdvancedDirectBraggEdgeFitting2D")
+
+            print(f"T_mavg: {T_mavg}")
+            print(f"lambda_array: {lambda_array}")
+            print(f"lambda_range: {lambda_range}")
+            print(f"pixel: {pixel}")
+
             fit_result = AdvancedDirectBraggEdgeFitting2D(T_mavg,
                                                           lambda_array,
                                                           lambda_range,

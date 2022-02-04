@@ -28,7 +28,7 @@ from JupyterNotebooks.code.utilities import file as file_utilities
 from tofimaging import ReductionTools as reduction_tools
 
 DEBUG = True
-DEBUG_PATH = "/Volumes/G-DRIVE 1/IPTS/IPTS-26171-testing_ibeatles/"
+DEBUG_PATH = "/Volumes/G-DRIVE/IPTS/IPTS-26171-testing_ibeatles/"
 
 
 class StrainMappingAPIForNotebook:
@@ -74,13 +74,13 @@ class StrainMappingAPIForNotebook:
 
         box3 = widgets.HBox([widgets.Label("distance source-detector",
                                            layout=widgets.Layout(width="200px")),
-                             widgets.Text(str(16.08),
+                             widgets.Text(str(18.5),
                                           layout=widgets.Layout(width='10%')),
                              widgets.Label("m")])
 
         box4 = widgets.HBox([widgets.Label("detector offset",
                                            layout=widgets.Layout(width="200px")),
-                             widgets.Text(str(3700),
+                             widgets.Text(str(9600),
                                           layout=widgets.Layout(width='10%')),
                              widgets.Label(u"\u00B5s")])
         vertical_box = widgets.VBox([box3, box4])
@@ -324,3 +324,4 @@ class StrainMappingAPIForNotebook:
             clear_output(wait=False)
             print(f"MCP detector correction with folder {_index_folder + 1}/{len(input_folders)} ... DONE")
         return new_input_folders
+
