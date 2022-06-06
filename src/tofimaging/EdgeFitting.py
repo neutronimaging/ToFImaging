@@ -557,7 +557,7 @@ def AdvancedBraggEdgeFitting2D(Ttof,
                                spectrum_range=[],
                                calibration_matrix=np.ndarray([0]),
                                mask=np.ndarray([0]),
-                               auto_mask=True,
+                               auto_mask=False,
                                mask_thresh=[0.05, 0.95],
                                est_pos=0,
                                est_sigma=1,
@@ -1066,7 +1066,7 @@ def AdvancedDirectBraggEdgeFitting2D(Ttof,
                                       spectrum_range=[],
                                       calibration_matrix=np.ndarray([0]),
                                       mask=np.ndarray([0]),
-                                      auto_mask=True,
+                                      auto_mask=False,
                                       mask_thresh=[0.05, 0.95],
                                       est_pos=0,
                                       est_sigma=1,
@@ -1253,6 +1253,7 @@ def GaussianBraggEdgeFitting(signal,
                              pos_BC=0,
                              wid_BC=0,
                              h_BC=0,
+                             est_slope=0,
                              est_off=0,
                              bool_log=False,
                              bool_smooth=False,
@@ -1286,8 +1287,8 @@ def GaussianBraggEdgeFitting(signal,
     'edge_slope': edge slope 
     'median_image': median Transmission image in the selected lambda range
     """
-    def gaussian(x, amp, cen, wid, off):
-        return amp * np.exp(-((x - cen) / wid)**2) + off
+    def gaussian(x, amp, cen, wid, slope, off):
+        return amp * np.exp(-((x - cen) / wid)**2) + slope*x + off
 
     if (spectrum_range):
         idx_low = find_nearest(spectrum, spectrum_range[0])
@@ -1326,6 +1327,7 @@ def GaussianBraggEdgeFitting(signal,
     params = gmodel.make_params(cen=est_pos,
                                 amp=est_h,
                                 wid=est_wid,
+                                slope=est_slope,
                                 off=est_off)
 
     if (pos_BC):
@@ -1365,6 +1367,7 @@ def GaussianBraggEdgeFitting(signal,
         print('pos fit = ', t0)
         print('h fit = ', edge_slope)
         print('wid fit = ', edge_width)
+        print('slope fit = ', result.best_values.get('slope'))
         print('off fit = ', result.best_values.get('off'))
         print('idx_low = ', id_low, 'idx_high = ', id_high)
 
@@ -1382,7 +1385,7 @@ def GaussianBraggEdgeFitting(signal,
         plt.subplot(2, 1, 2),
         plt.plot(d_spectrum, d_signal, label='data'),
         plt.plot(d_spectrum,
-                 gaussian(d_spectrum, est_h, est_pos, est_wid, est_off),
+                 gaussian(d_spectrum, est_h, est_pos, est_wid, est_slope, est_off),
                  '--',
                  label='Initial guess')
         plt.plot(d_spectrum, fitted_data, label='Fit')
@@ -1418,7 +1421,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
                                spectrum_range=[],
                                calibration_matrix=np.ndarray([0]),
                                mask=np.ndarray([0]),
-                               auto_mask=True,
+                               auto_mask=False,
                                mask_thresh=[0.05, 0.95],
                                est_pos=0,
                                est_wid=0,
@@ -1426,6 +1429,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
                                pos_BC=0,
                                wid_BC=0,
                                h_BC=0,
+                               est_slope=0,
                                est_off=0,
                                bool_log=False,
                                bool_smooth=False,
@@ -1531,6 +1535,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
                                  pos_BC=pos_BC,
                                  wid_BC=wid_BC,
                                  h_BC=h_BC,
+                                 est_slope=est_slope,
                                  est_off=est_off,
                                  interp_factor=interp_factor,
                                  bool_log=bool_log,
@@ -1572,6 +1577,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
                         pos_BC=pos_BC,
                         wid_BC=wid_BC,
                         h_BC=h_BC,
+                        est_slope=est_slope,
                         est_off=est_off,
                         interp_factor=interp_factor,
                         bool_log=bool_log,
@@ -1593,8 +1599,7 @@ def GaussianBraggEdgeFitting2D(Ttof,
 
     if (bool_print):
         plt.figure(figsize=(15,10))
-        plt.subplot(1, 3,
-                    1), plt.imshow(edge_position), plt.title('Edge position')
+        plt.subplot(1, 3, 1), plt.imshow(edge_position), plt.title('Edge position')
         plt.subplot(1, 3, 2), plt.imshow(edge_width), plt.title('Edge width')
         plt.subplot(1, 3, 3), plt.imshow(edge_height), plt.title('Edge height')
         plt.tight_layout()
