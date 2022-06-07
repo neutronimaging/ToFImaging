@@ -127,6 +127,14 @@ def AdvancedBraggEdgeFitting(signal,
     if (bool_smooth):
         signal = SG_filter(signal, smooth_w, smooth_n)
 
+    if(est_w==0):
+        est_w = est_pos*0.05
+    est_w = est_w / 2
+    t_before = t[0:find_nearest(t, est_pos - est_w)]
+    bragg_before = signal[0:find_nearest(t, est_pos - est_w)]
+    t_after = t[find_nearest(t, est_pos + est_w):-1]
+    bragg_after = signal[find_nearest(t, est_pos + est_w):-1]
+
     if (est_pos == 0):
         est_pos = np.argmax(SG_filter(np.diff(signal)))
     else:
@@ -142,14 +150,6 @@ def AdvancedBraggEdgeFitting(signal,
         plt.show()
         plt.close()
         #plt.savefig('step1_fitting.pdf')
-
-    if(est_w==0):
-        est_w = est_pos*0.2   
-    est_w = est_w / 2
-    t_before = t[0:find_nearest(t, est_pos - est_w)]
-    bragg_before = signal[0:find_nearest(t, est_pos - est_w)]
-    t_after = t[find_nearest(t, est_pos + est_w):-1]
-    bragg_after = signal[find_nearest(t, est_pos + est_w):-1]
 
     #first step: estimate the linear or exponential function before and after the Bragg Edge
     [slope_before, interception_before] = np.polyfit(t_before, bragg_before, 1)
@@ -239,6 +239,16 @@ def AdvancedBraggEdgeFitting(signal,
     # method='lmsquare' # this should implement the Levemberq-Marquardt but it says Nelder-Mead method (which should be Amoeba)
     method = 'least_squares'  # default and it implements the Levenberg-Marquardt
 
+    # 1st round to fit a1 and a6 (intercept of before and slope of after)
+    params = gmodel.make_params(t0=t0_f,
+                                sigma=sigma_f,
+                                alpha=alpha_f,
+                                a1=a1_f,
+                                a2=a2_f,
+                                a5=a5_f,
+                                a6=a6_f)
+    # first_guess = gmodel.eval(params, t=t)
+
     #Boundary Conditions
     if (pos_BC):
         params['t0'].min = pos_BC[0]
@@ -258,16 +268,6 @@ def AdvancedBraggEdgeFitting(signal,
     else:
         params['sigma'].min = 0.0
         params['sigma'].max = 1.5
-
-    # 1st round to fit a1 and a6 (intercept of before and slope of after)
-    params = gmodel.make_params(t0=t0_f,
-                                sigma=sigma_f,
-                                alpha=alpha_f,
-                                a1=a1_f,
-                                a2=a2_f,
-                                a5=a5_f,
-                                a6=a6_f)
-    # first_guess = gmodel.eval(params, t=t)
 
     params['alpha'].vary = False
     params['sigma'].vary = False
@@ -830,27 +830,29 @@ def AdvancedDirectBraggEdgeFitting(signal,
     if (bool_smooth):
         signal = SG_filter(signal, smooth_w, smooth_n)
 
-    if (est_pos == 0):
-        est_pos_idx = np.argmax(SG_filter(np.diff(signal)))
-    else:
-        est_pos_idx = find_nearest(t, est_pos)
-    t0_f = t[
-        est_pos_idx]  # this is the actual estimated first position in TOF [s]
-
-    if (est_pos == 0):
-        est_pos_idx = np.argmax(SG_filter(np.diff(signal)))
-    else:
-        est_pos_idx = find_nearest(t, est_pos)
-    t0_f = t[
-        est_pos_idx]  # this is the actual estimated first position in TOF [s]
-
     if(est_w==0):
-        est_w = est_pos*0.2       
+        est_w = est_pos*0.05
     est_w = est_w / 2
     t_before = t[0:find_nearest(t, est_pos - est_w)]
     bragg_before = signal[0:find_nearest(t, est_pos - est_w)]
     t_after = t[find_nearest(t, est_pos + est_w):-1]
     bragg_after = signal[find_nearest(t, est_pos + est_w):-1]
+
+    if (est_pos == 0):
+        est_pos = np.argmax(SG_filter(np.diff(signal)))
+    else:
+        est_pos = find_nearest(t, est_pos)
+    t0_f = t[est_pos]  # this is the actual estimated first position in TOF [s]
+
+    if (bool_print):
+        plt.figure()
+        plt.plot(t, signal)
+        plt.plot(t0_f, signal[est_pos], 'x', markeredgewidth=3, c='orange')
+        plt.title('Bragg edge pattern and initial guess'), plt.xlabel(
+            'Wavelength [Å]'), plt.ylabel('Transmission I/I$_{0}$')
+        plt.show()
+        plt.close()
+        #plt.savefig('step1_fitting.pdf')
 
     #first step: estimate the linear or exponential function before and after the Bragg Edge
     [slope_before, interception_before] = np.polyfit(t_before, bragg_before, 1)
@@ -937,7 +939,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
         print('a6 = ', a6_f)
         plt.figure()
         plt.plot(t, signal, label='signal')
-        plt.plot(t0_f, signal[est_pos_idx], 'x', markeredgewidth=3, c='orange')
+        plt.plot(t0_f, signal[find_nearest(t,t0_f)], 'x', markeredgewidth=3, c='orange')
         plt.plot(t,
                  BraggEdgeExponential(t, t0_f, est_alpha, est_sigma, a1_f,
                                       a2_f, a5_f, a6_f),
@@ -1007,7 +1009,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
         print('a6 = ', a6_f)
         plt.figure()
         plt.plot(t, signal, label='signal')
-        plt.plot(t0_f, signal[est_pos_idx], 'x', markeredgewidth=3, c='orange')
+        plt.plot(t0_f, signal[find_nearest(t,t0_f)], 'x', markeredgewidth=3, c='orange')
         plt.plot(t,
                  BraggEdgeExponential(t, t0_f, alpha_f, sigma_f, a1_f, a2_f,
                                       a5_f, a6_f),

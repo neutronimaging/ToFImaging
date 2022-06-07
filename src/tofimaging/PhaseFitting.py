@@ -98,14 +98,15 @@ def PhaseRatioLinearCombination(lac,
     phi = result.best_values.get('f')
 
     if (bool_print):
-        print('phase fraction (ph1 %) = ', 100 * phi, '%')
-        plt.figure(figsize=(15,10))
+        print('Phase fraction (ph1 %) = ', 100 * phi, '%')
+        plt.figure(dpi=100)
         plt.plot(sp0, lac0, label='LAC')
         plt.plot(spectrum, lac, label='LAC (normalization)')
         plt.plot(spectrum, phase1lac, '--', label='Phase 1')
         plt.plot(spectrum, phase2lac, '--', label='Phase 2')
         plt.plot(l_cut, two_phases(ph1, ph2, phi), label='Fitted ratio')
         plt.title('Bragg pattern'), plt.xlabel('Wavelength [Å]')
+        plt.grid()
         plt.legend(), plt.show(), plt.close()
 
     return {'phi': phi}
@@ -160,7 +161,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
 
     if (mask.any()):
         mymask = mask
-        plt.figure(figsize=(15,10))
+        plt.figure(dpi=150,)
         plt.subplot(1, 2, 1), plt.imshow(np.median(
             lac_tof, axis=2)), plt.title('Full-spectrum Image')
         plt.subplot(1, 2, 2), plt.imshow(mymask), plt.title('Mask')
@@ -190,6 +191,8 @@ def PhaseRatioLinearCombination2D(lac_tof,
         plt.close()
     else:
         mymask = np.ones([np.shape(lac_tof)[0], np.shape(lac_tof)[1]])
+        # plt.figure(dpi=150)
+        # plt.imshow(np.nanmean(lac_tof,axis=2),vmin=0,vmax=0.9)
 
     if (calibration_matrix.any()):
         if ((np.shape(lac_tof)[0] != np.shape(calibration_matrix)[0]) |
@@ -255,7 +258,7 @@ def PhaseRatioLinearCombination2D(lac_tof,
                     phase_ratio[i, j] = -2.0
 
     if (bool_print):
-        plt.figure(figsize=(15,10))
+        plt.figure(dpi=150)
         plt.imshow(phase_ratio, cmap='jet'), plt.title('Phase ratio (%)')
         plt.colorbar()
         plt.show(), plt.close()

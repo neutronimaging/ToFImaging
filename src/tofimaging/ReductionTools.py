@@ -346,6 +346,43 @@ def spatial_discrete_rebinning(image, rebinning_order=2, operation='sum'):
     return outsignal
 
 
+def SpatialRebin(data_in,rows,columns,flag_medfilt=0):
+    import scipy.signal
+    Nx = np.shape(data_in)[0]
+    Ny = np.shape(data_in)[1]
+    Nx_out = int(np.floor(Nx/rows))
+    Ny_out = int(np.floor(Ny/columns))
+    if(len(np.shape(data_in))==3):
+        data_out = np.zeros((Nx_out,Ny_out,np.shape(data_in)[2]))
+    if(len(np.shape(data_in))==2):
+        data_out = np.zeros((Nx_out,Ny_out))
+    data_mf = np.zeros(np.shape(data_in))
+
+    # to get rid of bad pixels
+    if(flag_medfilt):    
+        if(len(np.shape(data_in))==3):
+            for kk in range(np.shape(data_in)[2]):
+                data_mf[:,:,kk] = scipy.signal.medfilt2d(data_in[:,:,kk],3)
+        if(len(np.shape(data_in))==2):
+            data_mf = scipy.signal.medfilt2d(data_in,3)
+    else:
+        data_mf=data_in
+
+    if(rows>1 or columns>1):
+        for i in range(Nx_out):
+            for j in range(Ny_out):
+                if(len(np.shape(data_in))==3):
+                    window = data_mf[i*rows:i*rows+1,j*columns:j*columns+1,:]
+                    data_out[i,j,:] = np.nanmean(window,axis=(1,0))
+                if(len(np.shape(data_in))==2):
+                    window = data_mf[i*rows:i*rows+1,j*columns:j*columns+1]
+                    data_out[i,j] = np.nanmean(window,axis=(1,0))
+    else:
+        data_out=data_mf
+
+    return(data_out)
+
+
 def tof_image_rebinning(image, spectrum, rebinning_order, operation='mean'):
     tof_n = np.shape(image)[2]
     tof_n_new = np.int(np.round(tof_n / rebinning_order))
