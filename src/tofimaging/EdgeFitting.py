@@ -137,6 +137,7 @@ def AdvancedBraggEdgeFitting(signal,
 
     if (est_pos == 0):
         est_pos = np.argmax(SG_filter(np.diff(signal)))
+        est_pos = find_nearest(t, est_pos)
     else:
         est_pos = find_nearest(t, est_pos)
     t0_f = t[est_pos]  # this is the actual estimated first position in TOF [s]
@@ -840,6 +841,7 @@ def AdvancedDirectBraggEdgeFitting(signal,
 
     if (est_pos == 0):
         est_pos = np.argmax(SG_filter(np.diff(signal)))
+        est_pos = find_nearest(t, est_pos)
     else:
         est_pos = find_nearest(t, est_pos)
     t0_f = t[est_pos]  # this is the actual estimated first position in TOF [s]
