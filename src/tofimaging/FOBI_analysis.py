@@ -2,6 +2,78 @@ import numpy as np
 import tofimaging.ReductionTools as rt
 from tqdm import tqdm
 
+def savitzky_golay(y, window_size=5, order=1, deriv=0, rate=1):
+    """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    The Savitzky-Golay filter removes high frequency noise from data.
+    It has the advantage of preserving the original shape and
+    features of the signal better than other types of filtering
+    approaches, such as moving averages techniques.
+    Parameters
+    ----------
+    y : array_like, shape (N,)
+        the values of the time history of the signal.
+    window_size : int
+        the length of the window. Must be an odd integer number.
+    order : int
+        the order of the polynomial used in the filtering.
+        Must be less then `window_size` - 1.
+    deriv: int
+        the order of the derivative to compute (default = 0 means only smoothing)
+    Returns
+    -------
+    ys : ndarray, shape (N)
+        the smoothed signal (or it's n-th derivative).
+    Notes
+    -----
+    The Savitzky-Golay is a type of low-pass filter, particularly
+    suited for smoothing noisy data. The main idea behind this
+    approach is to make for each point a least-square fit with a
+    polynomial of high order over a odd-sized window centered at
+    the point.
+    Examples
+    --------
+    t = np.linspace(-4, 4, 500)
+    y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
+    ysg = savitzky_golay(y, window_size=31, order=4)
+    import matplotlib.pyplot as plt
+    plt.plot(t, y, label='Noisy signal')
+    plt.plot(t, np.exp(-t**2), 'k', lw=1.5, label='Original signal')
+    plt.plot(t, ysg, 'r', label='Filtered signal')
+    plt.legend()
+    plt.show()
+    References
+    ----------
+    .. [1] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
+       Data by Simplified Least Squares Procedures. Analytical
+       Chemistry, 1964, 36 (8), pp 1627-1639.
+    .. [2] Numerical Recipes 3rd Edition: The Art of Scientific Computing
+       W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+       Cambridge University Press ISBN-13: 9780521880688
+    """
+    import numpy as np
+    from math import factorial
+
+    try:
+        window_size = np.abs(np.int(window_size))
+        order = np.abs(np.int(order))
+    except ValueError:
+        raise ValueError("window_size and order have to be of type int")
+    if window_size % 2 != 1 or window_size < 1:
+        raise TypeError("window_size size must be a positive odd number")
+    if window_size < order + 2:
+        raise TypeError("window_size is too small for the polynomials order")
+    order_range = range(order + 1)
+    half_window = (window_size - 1) // 2
+    # precompute coefficients
+    b = np.mat([[k**i for i in order_range]
+                for k in range(-half_window, half_window + 1)])
+    m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
+    # pad the signal at the extremes with
+    # values taken from the signal itself
+    firstvals = y[0] - np.abs(y[1:half_window + 1][::-1] - y[0])
+    lastvals = y[-1] + np.abs(y[-half_window - 1:-1][::-1] - y[-1])
+    y = np.concatenate((firstvals, y, lastvals))
+    return np.convolve(m[::-1], y, mode='valid')
 
 def chopper_time_delays_generator(time,
                                   nslits=8,
@@ -148,6 +220,33 @@ def time_delays_5x8(time):
     return D
 
 
+def time_delays_3x14(time):
+    """
+    Generates time delays for the 4x10 disk chopper:
+    
+    INPUTS:
+    time = time-of-flight bins
+    
+    OUTPUT:
+    D =  array with discretized dirac deltas at the chopper time delays.
+    """
+    Nt = int(np.shape(time)[0])
+    angles = np.array([0.8958 10.4775 21.1331 32.2086 37.0404 43.7625 59.2190 65.4966 75.5918 85.4641 91.0146 98.9699 108.2814 113.3630])
+    angles = angles - angles[0]
+    angles = angles/120
+    shifts = Nt * angles
+    D = np.zeros((Nt, 1))
+    for i in range(0, np.shape(shifts)[0]):
+        sfloor = np.floor(shifts[i])
+        rest = shifts[i] - sfloor
+        sfloor = np.int(sfloor + 1)
+        D[sfloor] = 1 - rest
+        D[sfloor + 1] = rest
+
+    D = np.squeeze(D)
+    return D
+
+
 def wiener_decorrelation(f, g, c=1e-1):
     """
     Perform the decorrelation of FOBI overlap patterns
@@ -186,45 +285,35 @@ def wiener_deconvolution(f, g, c=1e-1):
     return H
 
 
-def interp_noreadoutgaps(y, t, tmax, nrep=0):
-    """ Merge multislit chopper data interpolating readout gaps (in this case only at each chopper full rotation) then repeat the signal for the chopper pattern repetitions
-    INPUTS:
-    y = spectrum
-    t = time-of-flight bins
-    tmax = maximum time of flight (this parameter is dependent on the chopper frequency: tmax = 1/f  with f = chopper frequency)
-    nrep = number of times the pattern is repeated (chopper)
-    
-    OUTPUTS:
-    y_extended: interpolated signal
-    t_merged: tof spectrum in the interpolated signal dimension
-    """
-    nrep = np.int(nrep)
+def interpolate_noreadoutgaps(y, t, tmax, nrep, plot_flag):
+    # Reformat arrays
+    y = np.squeeze(y)
+    if y.shape[1] > 1:
+        y = y.T
     t = np.squeeze(t)
-    
-    #dt = np.nanmean(np.diff(t),axis=0)
-    #t_tot = np.arange(t[0],tmax+dt,dt)
-    #app = np.nan*np.ones((np.shape(t_tot)[0]-np.shape(t)[0]))
-    #y[0] = np.nan
-    #y[-1] = np.nan
-    #y_int = np.concatenate((y,app))
-    #replen = np.int(np.floor(np.shape(y)[0]/nrep))
+    if t.shape[1] > 1:
+        t = t.T
 
-    replen = np.int(np.ceil(np.shape(y)[0] / nrep))
+    # Get tof bin width, figure length, and merge overlaps
+    replen = int(np.ceil(len(y) / nrep))
     t_tot = np.linspace(t[0], tmax, nrep * replen)
-    y_int = np.interp(t_tot, t, y, left=np.nan, right=np.nan)
-
+    y_int = np.interp(t_tot, t, y)
     y_overlap = np.zeros((replen, nrep))
-    for i in range(0, nrep):
+
+    for i in range(nrep):
         y_overlap[:, i] = y_int[replen * i:replen * (i + 1)]
-
+    
     y_merged = np.nanmean(y_overlap, axis=1)
-    y_extended = y_merged
-    for i in range(0, nrep - 1):
-        y_extended = np.concatenate((y_extended, y_merged))
+    t_merged = t_tot[:replen]
 
-    t_extended = t_tot[0:replen * nrep]
-
-    return y_extended, t_extended
+    if plot_flag:
+        plt.figure()
+        for i in range(nrep):
+            plt.plot(t[:replen], y_overlap[:, i])
+        plt.plot(t[:replen], y_merged, 'k')
+        plt.show()
+    
+    return y_merged, t_merged
 
 
 def full_fobi_reduction(y,
@@ -234,7 +323,7 @@ def full_fobi_reduction(y,
                         nrep,
                         chopper_id,
                         c=1e-1,
-                        bool_roll=False,
+                        roll_value=201,
                         bool_smooth=True,
                         SG_w=5,
                         SG_o=1):
@@ -258,6 +347,10 @@ def full_fobi_reduction(y,
     T_fobi: FOBI reduced I/I0
     t_fobi: FOBI reduced TOF bins
     """
+    if (bool_smooth):
+        y0 = rt.savitzky_golay(y0, SG_w, SG_o)
+        y = rt.savitzky_golay(y, SG_w, SG_o)
+
     [y, tn] = interp_noreadoutgaps(y, t, tmax, nrep)
     [y0, tn] = interp_noreadoutgaps(y0, t, tmax, nrep)
     if (chopper_id == 'poldi'):
@@ -266,42 +359,21 @@ def full_fobi_reduction(y,
         D = time_delays_4x10(tn)
     if (chopper_id == '5x8'):
         D = time_delays_5x8(tn)
-
-    # FIXED POLDI angles: now it's working as deconvolution!
-    # x0rec = rt.savitzky_golay(wiener_decorrelation(y0,D,c),SG_w,SG_o)
-    # yrec = rt.savitzky_golay(wiener_decorrelation(y,D,c),SG_w,SG_o)
-    # Trec = np.divide(yrec,x0rec)
-    # #Trec = rt.savitzky_golay(wiener_decorrelation(np.divide(y,y0),D,c),SG_w,SG_o)
+    if (chopper_id == '3x14'):
+        D = time_delays_3x14(tn)
 
     y0rec = wiener_deconvolution(y0, D, c)
     yrec = wiener_deconvolution(y, D, c)
-    if (bool_smooth):
-        y0rec = rt.savitzky_golay(y0rec, SG_w, SG_o)
-        yrec = rt.savitzky_golay(yrec, SG_w, SG_o)
-    Trec = np.divide(yrec, y0rec)
-    # Trec = rt.savitzky_golay(wiener_deconvolution(np.divide(y,y0),D,c),SG_w,SG_o)
+    Trec = wiener_deconvolution(y/y0, D, c)
 
-    if (bool_roll == True):
-        min_id = np.argmin(y0rec[0:np.shape(y0rec)[0] / nrep])
-        y0rec = np.roll(y0rec, -min_id)
-        yrec = np.roll(yrec, -min_id)
-        Trec = np.roll(Trec, -min_id)
+    if (roll_value == True):
+        y0rec = np.roll(y0rec, -roll_value)
+        yrec = np.roll(yrec, -roll_value)
+        Trec = np.roll(Trec, -roll_value)
 
-    replen = np.int(np.floor(np.shape(y)[0] / nrep))
-    y0_over = np.zeros((replen, nrep))
-    y_over = np.zeros((replen, nrep))
-    T_over = np.zeros((replen, nrep))
-    for i in range(0, nrep):
-        y0_over[:, i] = y0rec[replen * i:replen * (i + 1)]
-        y_over[:, i] = yrec[replen * i:replen * (i + 1)]
-        T_over[:, i] = Trec[replen * i:replen * (i + 1)]
+    t_fobi = tn
 
-    y0_fobi = np.nanmean(y0_over, axis=1)
-    y_fobi = np.nanmean(y_over, axis=1)
-    T_fobi = np.nanmean(T_over, axis=1)
-    t_fobi = tn[0:replen]
-
-    return y0_fobi, y_fobi, T_fobi, t_fobi
+    return y0rec, yrec, Trec, t_fobi
 
 
 def fobi_2d(I,

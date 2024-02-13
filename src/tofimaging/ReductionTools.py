@@ -21,7 +21,7 @@ def tof2l(tof, L, lambda_0=0, tof_0=0):
         l = lambda_0 + h / m * (tof) / (L) / 1e-10
     if (tof_0):
         l = 0.3956 * (tof * 1e6 + tof_0) / (
-            L * 100)  #converts L to cm and tof0 must be in ns
+            L * 100)  #converts L from m to cm and tof0 must be in mu s and tof in mu s
     return l
 
 
